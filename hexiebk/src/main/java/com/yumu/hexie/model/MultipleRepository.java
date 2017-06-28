@@ -19,8 +19,8 @@ public class MultipleRepository {
     private static final Logger SCHEDULE_LOG = LoggerFactory.getLogger("com.yumu.hexie.schedule");
 
     @Inject
-    @Named("mainRedisTemplate")
-    private RedisTemplate<String, SystemConfig> mainRedisTemplate;
+    @Named("systemConfigRedisTemplate")
+    private RedisTemplate<String, SystemConfig> systemConfigRedisTemplate;
     
     public void setSystemConfig(String key,SystemConfig value) {
 
@@ -28,8 +28,8 @@ public class MultipleRepository {
         
         String sysKey = Keys.systemConfigKey(key);
         
-        mainRedisTemplate.opsForValue().set(sysKey, value, 120, TimeUnit.MINUTES);
-        SystemConfig c = mainRedisTemplate.opsForValue().get(sysKey);
+        systemConfigRedisTemplate.opsForValue().set(sysKey, value, 120, TimeUnit.MINUTES);
+        SystemConfig c = systemConfigRedisTemplate.opsForValue().get(sysKey);
         if(c != null) {
             SCHEDULE_LOG.warn("get mainRedis cache:"+c.getSysKey() + "["+c.getSysValue()+"]");
         }
