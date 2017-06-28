@@ -34,6 +34,7 @@ public class YimeiUtil {
 		if(r == null){
 			return false;
 		}
+		Log.error("result is :" + r.toString());
 		return r.isSuccess();
 	}
 	
