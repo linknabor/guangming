@@ -11,7 +11,7 @@ import org.springframework.session.web.http.CookieHttpSessionStrategy;
 import org.springframework.session.web.http.HttpSessionStrategy;
 
 @Configuration
-@EnableRedisHttpSession(maxInactiveIntervalInSeconds = 360000, redisNamespace = "youyi")
+@EnableRedisHttpSession(maxInactiveIntervalInSeconds = 360000, redisNamespace = "guangming")
 public class HttpSessionConfig {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(HttpSessionConfig.class);
