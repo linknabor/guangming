@@ -36,7 +36,7 @@ public class UserNoticeServiceImpl implements UserNoticeService {
 	}
 	@Override
 	public void orderSuccess(long userId, String tel,long orderId, String orderNo, String productName, float prices) {
-		String msg = "您好，您购买的"+productName+"已支付成功，支付总额" + prices + "元,关注微信号“光明悦生活”,了解更多订单信息。";
+		String msg = "您好，您购买的"+productName+"已支付成功，支付总额" + prices + "元,关注微信号“友宜物业”,了解更多订单信息。";
 		userNoticeRepository.save(new UserNotice(userId, ModelConstant.NOTICE_TYPE_ORDER, ModelConstant.NOTICE_SUB_TYPE_ORDERSUCCESS,
 				msg, orderId));
 		smsService.sendMsg(userId, tel, msg, getKey(userId,orderId,1));
@@ -83,9 +83,9 @@ public class UserNoticeServiceImpl implements UserNoticeService {
 	public void yuyueSuccess(long userId,String tel, String userName, long yuyueId, String serviceName, int paymentType, float prices) {
 		String msg;
 		if(paymentType != ModelConstant.YUYUE_PAYMENT_TYPE_OFFLINE){
-			msg ="您好，您预约的"+serviceName + "已成功支付" + prices + "元。我们将尽快为您发货或服务，感谢您的信任。关注微信公众号“光明悦生活”，了解更多服务信息";
+			msg ="您好，您预约的"+serviceName + "已成功支付" + prices + "元。我们将尽快为您发货或服务，感谢您的信任。关注微信公众号“友宜物业”，了解更多服务信息";
 		}else{
-			msg ="您好，您的"+serviceName+"服务已成功预约，感谢您的信任。关注微信公众号“光明悦生活”，了解更多服务信息";
+			msg ="您好，您的"+serviceName+"服务已成功预约，感谢您的信任。关注微信公众号“友宜物业”，了解更多服务信息";
 		}
 
 		userNoticeRepository.save(new UserNotice(userId, ModelConstant.NOTICE_TYPE_YUYUE, 1,

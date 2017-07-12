@@ -47,7 +47,6 @@ import com.yumu.hexie.web.BaseResult;
 
 @Controller(value = "wuyeController")
 public class WuyeController extends BaseController {
-	
 	private static final Logger log = LoggerFactory.getLogger(WuyeController.class);
 
 	@Inject
@@ -300,7 +299,7 @@ public class WuyeController extends BaseController {
 	
 	@Async
 	private void sendMsg(User user){
-		String msg = "您好，欢迎加入光明悦生活。您已获得价值10元红包一份。感谢您对光明悦生活的支持。";
+		String msg = "您好，欢迎加入友宜物业。您已获得价值10元红包一份。感谢您对友宜物业的支持。";
 		smsService.sendMsg(user.getId(), user.getTel(), msg, 11, 3);
 	}
 	
@@ -415,7 +414,8 @@ public class WuyeController extends BaseController {
 	@Async
 	private void sendPayTemplateMsg(User user, String tradeWaterId, String feePrice){
 		
-		TemplateMsgService.sendWuYePaySuccessMsg(user, tradeWaterId, feePrice, systemConfigService.queryWXAToken());
+		String token = systemConfigService.queryWXAccToken(user.getBindAppId()).getToken();
+		TemplateMsgService.sendWuYePaySuccessMsg(user, tradeWaterId, feePrice, token);
 	}
 	
 	

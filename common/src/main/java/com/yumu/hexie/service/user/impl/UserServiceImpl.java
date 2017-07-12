@@ -14,6 +14,7 @@ import com.yumu.hexie.integration.wuye.vo.HexieUser;
 import com.yumu.hexie.model.ModelConstant;
 import com.yumu.hexie.model.user.User;
 import com.yumu.hexie.model.user.UserRepository;
+import com.yumu.hexie.service.common.BindedWechatService;
 import com.yumu.hexie.service.common.WechatCoreService;
 import com.yumu.hexie.service.exception.BizValidateException;
 import com.yumu.hexie.service.user.PointService;
@@ -30,6 +31,8 @@ public class UserServiceImpl implements UserService {
 
 	@Inject
 	private WechatCoreService wechatCoreService;
+	@Inject
+    private BindedWechatService bindedWechatService;
     @Override
     public User getById(long uId){
         return userRepository.findOne(uId);
@@ -39,7 +42,13 @@ public class UserServiceImpl implements UserService {
     }
 	@Override
 	public User getOrSubscibeUserByCode(String code) {
-		UserWeiXin user = wechatCoreService.getByOAuthAccessToken(code);
+		
+		UserWeiXin user = null;
+		try {
+			user = wechatCoreService.getByOAuthAccessToken(code);
+		} catch (Exception e) {
+			//defend the null point exception here.
+		}
 		if(user == null) {
             throw new BizValidateException("微信信息不正确");
         }
@@ -156,6 +165,40 @@ public class UserServiceImpl implements UserService {
     public User queryByShareCode(String code) {
         List<User> users = userRepository.findByShareCode(code);
         return users.size() > 0 ? users.get(0) : null;
+    }
+
+	@Override
+    public UserWeiXin getOtherWechatUser(String appId, String code) {
+        return bindedWechatService.getUserByCode(appId, code);
+    }
+    
+    @Override
+    public UserWeiXin getOtherUserByOpenId(String appId, String openId) {
+        return bindedWechatService.getUserByOpenId(appId, openId);
+    }
+	@Override
+	public User getOrSubscibeUserByWechatuser(UserWeiXin user){
+	    User userAccount = userRepository.findByOpenid(user.getOpenid());
+	    if(userAccount == null) {
+            userAccount = createUser(user);
+            userAccount.setNewRegiste(true);
+            
+            if(StringUtil.isEmpty(userAccount.getWuyeId()) ){
+                bindWithWuye(userAccount);
+            }
+            
+            return userRepository.save(userAccount);
+        }
+	    
+	    if(StringUtil.isEmpty(userAccount.getWuyeId()) ){
+            bindWithWuye(userAccount);
+        }
+	    return userAccount;
+	}
+
+
+	public UserWeiXin getUserByCode(String code) {
+        return wechatCoreService.getByOAuthAccessToken(code);
     }
 
 }

@@ -42,9 +42,15 @@ public class OperatorServiceImpl implements OperatorService {
         return null;
     }
     @Override
-    public boolean isOperator(int type,long userId) {
-        List<ServiceOperator> o = serviceOperatorRepository.findByTypeAndUserId(type,userId);
-        return o.size()>0;
+    public int isOperator(int type,long userId) {
+        List<ServiceOperator> o = serviceOperatorRepository.findByUserId(userId);
+        
+        if (o.size()>0) {
+        	return o.get(0).getType();
+		}else {
+			return 10001;
+		}
+         
     }
     /** 
      * @param ids

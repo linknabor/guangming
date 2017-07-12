@@ -52,4 +52,8 @@ public interface ServiceOrderRepository extends JpaRepository<ServiceOrder, Long
 	
 	@Query(value=" select s.id from serviceorder s join orderitem i on s.id = i.orderId where s.userId = ?1 and i.productId = ?2 and s.status =?3 group by s.id ", nativeQuery = true)
 	public List<ServiceOrder> findAllByUserAndStatusAndProductIdAndOrderType(long userId, long productId, List<Integer> statuses);
+	
+	@Query(" from ServiceOrder p where p.status in ?1 and p.merchantId = ?2 and p.orderType = ?3 order by p.id desc ")
+	public List<ServiceOrder> findByStatusAndMerchatIdAndOrderType(List<Integer> statuses, long merchantId, int orderType);
+	
 }

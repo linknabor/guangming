@@ -15,6 +15,7 @@ import com.yumu.hexie.common.util.StringUtil;
 import com.yumu.hexie.integration.wechat.constant.ConstantWeChat;
 import com.yumu.hexie.integration.wechat.entity.AccessToken;
 import com.yumu.hexie.integration.wechat.util.WeixinUtil;
+import com.yumu.hexie.integration.wechat.util.WeixinUtilV2;
 import com.yumu.hexie.service.RefreshTokenService;
 import com.yumu.hexie.service.SharedSysConfigService;
 import com.yumu.hexie.service.common.SystemConfigService;
@@ -38,7 +39,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
     @Inject
     private SharedSysConfigService sharedSysConfigService;
     
-    @Scheduled(cron = "0 0/20 * * * ?")
+    @Scheduled(cron = "0 0 0/1 * * ?")
     public void refreshAccessTokenJob() {
         if(!ConstantWeChat.isMainServer()){
             return;
@@ -53,7 +54,7 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         SCHEDULE_LOG.error("--------------------refresh token[E]-------------------");
     }
 
-    @Scheduled(cron = "0 0/20 * * * ?")
+    @Scheduled(cron = "0 0 0/1 * * ?")
     public void refreshJsTicketJob() {
         if(!ConstantWeChat.isMainServer()){
             return;
@@ -67,8 +68,25 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
         }
         SCHEDULE_LOG.error("--------------------refresh ticket[E]-------------------");
     }
-
     
+    @Scheduled(cron = "0 0 0/1 * * ?")
+    public void refreshOtherAccessTokenJob() {
+        if(!ConstantWeChat.isMainServer()){
+            return;
+        }
+        SCHEDULE_LOG.error("--------------------refresh Other token[B]-------------------");
+        String[] appIds = systemConfigService.queryAppIds();
+        for(String appId : appIds) {
+            AccessToken at = WeixinUtilV2.getAccessToken(appId, systemConfigService.querySecret(appId));
+            if (at == null) {
+                SCHEDULE_LOG.error("获取Other token失败----------------------------------------------！！！！！！！！！！！");
+                return;
+            }
+            sharedSysConfigService.saveAccessTokenByAppid(appId, at);
+        }
+        SCHEDULE_LOG.error("--------------------refresh Other token[E]-------------------");
+    }
+
     	
     
 }

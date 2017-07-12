@@ -4,6 +4,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -31,6 +33,9 @@ import com.yumu.hexie.web.user.resp.CouponSeedVO;
 
 @Controller(value = "couponController")
 public class CouponController extends BaseController{
+	
+	private static final Logger log = LoggerFactory.getLogger(CouponController.class);
+	
     @Inject
     private CouponService couponService;
     @Inject
@@ -97,6 +102,8 @@ public class CouponController extends BaseController{
    	@ResponseBody
    	public BaseResult<List<Coupon>> findValidCoupons(@PathVariable int salePlanType,
    			@PathVariable long salePlanId,@ModelAttribute(Constants.USER)User user) throws Exception {
+    	
+    	log.error("saleplantype:"+salePlanType+",saleplanid:"+salePlanId);
    		return new BaseResult<List<Coupon>>().success(couponService.findAvaibleCoupon(user.getId(),salePlanService.getService(salePlanType).findSalePlan(salePlanId)));
    	}
     

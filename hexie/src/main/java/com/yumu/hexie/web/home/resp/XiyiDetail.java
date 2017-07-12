@@ -5,7 +5,6 @@
 package com.yumu.hexie.web.home.resp;
 
 import java.io.Serializable;
-import java.lang.reflect.InvocationTargetException;
 import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
@@ -61,17 +60,15 @@ public class XiyiDetail implements Serializable {
     private BigDecimal realAmount;//实付金额
     
     public String getDiscountAmount() {
-        if(amount.equals(realAmount)) {
-            return "0";
-        } else {
-            return amount.subtract(realAmount).toString();
-        }
+    	
+    	return amount.add(shipFee).subtract(realAmount).toString();
     }
 
     private String receiveOperator;
     private String receiveOperatorTel;
     private String sendOperatorName;
     private String sendOperatorTel;
+    private BigDecimal shipFee;
 
     public long getId() {
         return id;
@@ -175,4 +172,11 @@ public class XiyiDetail implements Serializable {
     public void setCreateDateStr(String createDateStr) {
         this.createDateStr = createDateStr;
     }
+	public BigDecimal getShipFee() {
+		return shipFee;
+	}
+	public void setShipFee(BigDecimal shipFee) {
+		this.shipFee = shipFee;
+	}
+    
 }

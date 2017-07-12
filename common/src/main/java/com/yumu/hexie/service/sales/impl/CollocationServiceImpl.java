@@ -4,6 +4,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
@@ -15,12 +17,19 @@ import com.yumu.hexie.model.market.CollocationItem;
 import com.yumu.hexie.model.market.CollocationItemRepository;
 import com.yumu.hexie.model.market.CollocationRepository;
 import com.yumu.hexie.model.market.OrderItem;
+import com.yumu.hexie.model.market.ServiceOrder;
+import com.yumu.hexie.model.market.ServiceOrderRepository;
 import com.yumu.hexie.model.market.saleplan.SalePlan;
+import com.yumu.hexie.model.user.User;
+import com.yumu.hexie.service.exception.BizValidateException;
+import com.yumu.hexie.service.o2o.BillAssignService;
 import com.yumu.hexie.service.sales.CollocationService;
 import com.yumu.hexie.service.sales.ProductService;
 import com.yumu.hexie.service.sales.SalePlanService;
 @Service("collocationService")
 public class CollocationServiceImpl implements CollocationService {
+	
+	private static final Logger log = LoggerFactory.getLogger(CollocationServiceImpl.class);
 
     @Inject
     private SalePlanService salePlanService;
@@ -30,6 +39,10 @@ public class CollocationServiceImpl implements CollocationService {
     private CollocationRepository collocationRepository;
     @Inject
     private CollocationItemRepository collocationItemRepository;
+    @Inject
+    private ServiceOrderRepository serviceOrderRepository;
+    @Inject
+    private BillAssignService billAssignService;
 
 	public void fillItemInfo4Cart(Cart cart){
 		for(OrderItem item : cart.getItems()){
@@ -58,5 +71,43 @@ public class CollocationServiceImpl implements CollocationService {
 	public Collocation findOne(long collId){
 		return collocationRepository.findOne(collId);
 	}
+
+	@Override
+	public void AssginSupermarketOrder(long orderId, User user) {
+		
+		ServiceOrder order = serviceOrderRepository.findOne(orderId);
+		
+		if (order.getUserId()!=user.getId()) {
+			throw new BizValidateException("不能操作他人的订单。");
+		}
+		
+		log.warn("超市快购notifyPayed成功[BEG]" + orderId); 
+			try {
+				Thread.sleep(1000);//等待微信端处理完成
+		} catch (InterruptedException e) {
+			
+		}
+
+		billAssignService.assginSupermarketOrder(order);
+		
+	}
+
+	
+	@Override
+	public void AssginSupermarketOrder(long orderId) {
+		
+		ServiceOrder order = serviceOrderRepository.findOne(orderId);
+		
+		log.warn("超市快购notifyPayed成功[BEG]" + orderId); 
+			try {
+				Thread.sleep(1000);//等待微信端处理完成
+		} catch (InterruptedException e) {
+			
+		}
+
+		billAssignService.assginSupermarketOrder(order);
+		
+	}
+	
 	
 }

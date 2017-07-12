@@ -17,5 +17,6 @@ public interface ScheduleService {
     public void executeCouponTimeoutJob();
     //7.优惠券到期提醒
     public void executeCoupinTimeoutHintJob();
-   
+    //8.超时订单补发提醒
+    public void executeSmOrderReassign();
 }

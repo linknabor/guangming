@@ -68,11 +68,9 @@ public class WeixinUtil {
 	public final static String JS_TICKET ="https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token=ACCESS_TOKEN&type=jsapi";
 	private final static String NONCESTR = "Wm3WZYTP1z0wzccnW";
 	private final static String JS_T_PARAM = "jsapi_ticket=JS_TICKET&noncestr="+NONCESTR+"&timestamp=TIMESTAMP&url=URL";
-	public static AccessToken at;
-	public static String jsTicket="";
 	
+	//非主机不允许调用，否则会被重复更新
 	public static String getRefreshJsTicket(String accessToken) {
-		if(!ConstantWeChat.isMainServer())return jsTicket;
 		WechatResponse jsonObject = httpsRequest(JS_TICKET, "GET", null, accessToken);
 		// 如果请求成功
 		if (null != jsonObject && StringUtil.isNotEmpty(jsonObject.getTicket())) {
@@ -89,8 +87,9 @@ public class WeixinUtil {
 	 *            密钥
 	 * @return AccessToken对象
 	 */
+
+    //非主机不允许调用，否则会被重复更新
 	public static AccessToken getAccessToken() {
-		if(!ConstantWeChat.isMainServer())return at;
 		AccessToken accessToken = null;
 
 		String requestUrl = ACCESS_TOKEN.replace("APPID", ConstantWeChat.APPID).replace(
@@ -104,22 +103,8 @@ public class WeixinUtil {
 		}
 		return accessToken;
 	}
-	public static void setJsTicket(String jsTicker){
-		WeixinUtil.jsTicket=jsTicker;
-	}
 	
-	public static void setAccessToken(AccessToken t) {
-		WeixinUtil.at = t;
-	}
-	
-	public static String getJsTicket() {
-		if(StringUtil.isEmpty(jsTicket)){
-			throw new WechatException(1,"JSToken获取失败");
-		}
-		return jsTicket;
-	}
-	
-	public static JsSign getJsSign(String url, String jsTicket) {
+	public static JsSign getJsSign(String url,String jsTicket) {
 		long timestamp = new Date().getTime();
 		String param = JS_T_PARAM.replace("JS_TICKET",jsTicket).replace("TIMESTAMP", ""+timestamp).replace("URL", url);
 		JsSign r = new JsSign();
@@ -136,30 +121,9 @@ public class WeixinUtil {
 	 * 
 	 * @return token
 	 */
-	public static String getToken() {
-		if(at == null){
-			throw new WechatException(2,"Token获取失败");
-		}else {
-			return at.getToken();
-		}
-	}
-//	public static String getToken() {
-//		if(at == null) {
-//			at = WeixinUtil.getAccessToken();
-//			return at.getToken();
-//		} else {
-//			return at.getToken();
-//		}
-//	}
-	/**
-	 * 获取token值
-	 * 
-	 * @return token
-	 */
-	
 	public static WechatResponse httpsRequest(String requestUrl,
-			String requestMethod, String outputStr, String accessToken) {
-		if(StringUtil.isNotEmpty(accessToken)){
+			String requestMethod, String outputStr,String accessToken) {
+	    if(StringUtil.isNotEmpty(accessToken)){
 	        requestUrl = requestUrl.replace("ACCESS_TOKEN", accessToken);
 	    }
 		WechatResponse jsonObject = null;

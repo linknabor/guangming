@@ -38,7 +38,7 @@ public class MenuService {
 	 *            json格式
 	 * @return 状态 0 表示成功、其他表示失败
 	 */
-	public static Integer createMenu(String jsonMenu, String accessToken) {
+	public static Integer createMenu(String jsonMenu,String accessToken) {
 		WechatResponse jsonObject = WeixinUtil.httpsRequest(MENU_CREATE, "POST", jsonMenu, accessToken);
 		if(null != jsonObject)
 			return jsonObject.getErrcode();
@@ -52,9 +52,9 @@ public class MenuService {
 	 *            菜单实例
 	 * @return 0表示成功，其他值表示失败
 	 */
-	public static Integer createMenu(Menu menu, String accessToken) {
+	public static Integer createMenu(Menu menu,String accessToken) {
 		try {
-			return createMenu(JacksonJsonUtil.beanToJson(menu), accessToken);//JSONObject.valueToString(menu));
+			return createMenu(JacksonJsonUtil.beanToJson(menu),accessToken);//JSONObject.valueToString(menu));
 		} catch (Exception e) {
 			e.printStackTrace();
 			return 1;
@@ -77,7 +77,7 @@ public class MenuService {
 	 * @return 菜单结构json字符串
 	 */
 	public static WechatResponse deleteMenuJson(String accessToken) {
-		return WeixinUtil.httpsRequest(MENU_DELETE, "GET", null, accessToken);
+		return WeixinUtil.httpsRequest(MENU_DELETE, "GET", null,accessToken);
 	}
 	
 	/**
@@ -200,6 +200,6 @@ public class MenuService {
 				sb3,sb4,sb5,sb6 });
 
 		Menu menu = new Menu(new Button[] { btn1, btn2, btn3 });
-		createMenu(menu, accessToken);
+		createMenu(menu,accessToken);
 	}
 }

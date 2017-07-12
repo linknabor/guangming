@@ -32,9 +32,9 @@ public interface BaojieService {
     
     //查询
     public BaojieBill get(long billId,User user);
-    //确认
+    //深度保洁确认
     public BaojieBill confirm(long billId,User user);
-    //取消
+    //深度保洁确认
     public BaojieBill cancel(long billId,User user);
     
     public void timeout(long billId);

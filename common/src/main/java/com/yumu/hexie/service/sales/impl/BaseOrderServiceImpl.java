@@ -32,7 +32,6 @@ import com.yumu.hexie.model.payment.PaymentOrder;
 import com.yumu.hexie.model.promotion.coupon.CouponSeed;
 import com.yumu.hexie.model.user.Address;
 import com.yumu.hexie.model.user.User;
-import com.yumu.hexie.service.car.CarService;
 import com.yumu.hexie.service.comment.CommentService;
 import com.yumu.hexie.service.common.ShareService;
 import com.yumu.hexie.service.common.SystemConfigService;
@@ -46,6 +45,7 @@ import com.yumu.hexie.service.user.UserNoticeService;
 import com.yumu.hexie.service.user.UserService;
 import com.yumu.hexie.vo.CreateOrderReq;
 import com.yumu.hexie.vo.SingleItemOrder;
+import com.yumu.hexie.service.car.CarService;
 
 @Service("baseOrderService")
 public class BaseOrderServiceImpl extends BaseOrderProcessor implements BaseOrderService {
@@ -58,8 +58,11 @@ public class BaseOrderServiceImpl extends BaseOrderProcessor implements BaseOrde
 	protected OrderItemRepository orderItemRepository;
 	@Inject
 	protected ProductService productService;
-	@Inject
-	protected PaymentService paymentService;
+    @Inject
+    protected PaymentService paymentService;
+    @Inject
+    protected SystemConfigService systemConfigService;
+	
 	@Inject
 	protected UserService userService;
 	@Inject 
@@ -76,9 +79,6 @@ public class BaseOrderServiceImpl extends BaseOrderProcessor implements BaseOrde
 	
 	@Inject
 	private CarService carService;
-	
-	@Inject
-	private SystemConfigService systemconfigservice;
 
     @Value(value = "${testMode}")
     private boolean testMode;
@@ -163,9 +163,10 @@ public class BaseOrderServiceImpl extends BaseOrderProcessor implements BaseOrde
 			item.setUserId(o.getUserId());
 			orderItemRepository.save(item);
 		}
+
 		//3.1保存车辆信息 20160721 车大大的车辆服务
 		carService.saveOrderCarInfo(o);
-		
+
         log.warn("[Create]订单创建OrderNo:" + o.getOrderNo());
 		//4. 订单后处理
 		commonPostProcess(ModelConstant.ORDER_OP_CREATE,o);
@@ -185,12 +186,14 @@ public class BaseOrderServiceImpl extends BaseOrderProcessor implements BaseOrde
 			//userNoticeService.noticeUser(order.getUserId(), ModelConstant.NOTICE_TYPE_NOTICE, "订单"+order.getOrderNo()+"已取消！", "");
 		} else if(orderOp == ModelConstant.ORDER_OP_UPDATE_PAYSTATUS
 				&&(order.getStatus()==ModelConstant.ORDER_STATUS_PAYED||order.getStatus()==ModelConstant.ORDER_STATUS_CONFIRM)){
+			
+			User user = userService.getById(order.getUserId());//短信发送号码修改为用户注册号码 20160120
 			if(order.getOrderType() != ModelConstant.ORDER_TYPE_YUYUE){
-				User user = userService.getById(order.getUserId());//短信发送号码修改为用户注册号码 20160120
+				user = userService.getById(order.getUserId());//短信发送号码修改为用户注册号码 20160120
 				userNoticeService.orderSuccess(order.getUserId(), user.getTel(),order.getId(), order.getOrderNo(), order.getProductName(), order.getPrice());
 			}
-			String token = systemconfigservice.queryWXAToken();
-			TemplateMsgService.sendPaySuccessMsg(order, token);
+			String token = systemConfigService.queryWXAccToken(user.getBindAppId()).getToken();
+			TemplateMsgService.sendPaySuccessMsg(user, order, token);
 		} else if(orderOp == ModelConstant.ORDER_OP_SEND){
 			userNoticeService.orderSend(order.getUserId(), order.getTel(),order.getId(), order.getOrderNo(), order.getLogisticName(), order.getLogisticNo());
 		}
@@ -378,4 +381,21 @@ public class BaseOrderServiceImpl extends BaseOrderProcessor implements BaseOrde
 	public ServiceOrder findOne(long orderId){
 	    return serviceOrderRepository.findOne(orderId);
 	}
+
+	@Override
+	public List<OrderItem> findOrderItemsByOrderId(long orderId) {
+		
+		
+		return orderItemRepository.findByServiceOrder(serviceOrderRepository.findOne(orderId));
+	}
+
+	@Override
+	public void sendGoods(long orderId) {
+		
+		
+		
+	}
+	
+	
+	
 }

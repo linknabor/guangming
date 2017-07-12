@@ -39,6 +39,9 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.PlatformTransactionManager;
 
 import com.mchange.v2.c3p0.ComboPooledDataSource;
+import com.yumu.hexie.model.localservice.HomeCart;
+import com.yumu.hexie.model.market.Cart;
+import com.yumu.hexie.model.promotion.share.ShareAccessRecord;
 import com.yumu.hexie.model.system.SystemConfig;
 
 
@@ -66,6 +69,26 @@ public class AppConfig {
     private String redisHost;
     @Value(value = "${redis.port}")
     private String redisPort;
+
+	@Value(value = "${mainRedis.host}")
+    private String mainRedisHost;
+    @Value(value = "${mainRedis.port}")
+    private String mainRedisPort;
+    
+    @Value(value = "${baofangRedis.host}")
+    private String baofangRedisHost;
+    @Value(value = "${baofangRedis.port}")
+    private String baofangRedisPort;
+    
+    @Value(value = "${chunhuiRedis.host}")
+    private String chunhuiRedisHost;
+    @Value(value = "${chunhuiRedis.port}")
+    private String chunhuiRedisPort;
+    
+    @Value(value = "${liangyouRedis.host}")
+    private String liangyouRedisHost;
+    @Value(value = "${liangyouRedis.port}")
+    private String liangyouRedisPort;
     
     public static void main(String[] args) {
         SpringApplication.run(AppConfig.class, args);
@@ -121,14 +144,86 @@ public class AppConfig {
     }
     
     
-    @Bean
+     @Bean(name="redisConnectionFactory")
     public RedisConnectionFactory redisConnectionFactory() {
         JedisConnectionFactory connectionFactory = new JedisConnectionFactory();
         connectionFactory.setHostName(redisHost);
         connectionFactory.setPort(Integer.valueOf(redisPort));
-        //connectionFactory.setPassword(redisPassword);
         connectionFactory.setUsePool(true);
         return connectionFactory;
+    }
+
+
+    @Bean(name="mainRedisConnectionFactory")
+    public RedisConnectionFactory mainRedisConnectionFactory() {
+        JedisConnectionFactory connectionFactory = new JedisConnectionFactory();
+        connectionFactory.setHostName(mainRedisHost);
+        connectionFactory.setPort(Integer.valueOf(mainRedisPort));
+        connectionFactory.setUsePool(true);
+        return connectionFactory;
+    }
+
+    @Bean(name="baofangrRdisConnectionFactory")
+    public RedisConnectionFactory baofangrRdisConnectionFactory() {
+        JedisConnectionFactory connectionFactory = new JedisConnectionFactory();
+        connectionFactory.setHostName(baofangRedisHost);
+        connectionFactory.setPort(Integer.valueOf(baofangRedisPort));
+        connectionFactory.setUsePool(true);
+        return connectionFactory;
+    }
+    
+    @Bean(name="chunhuiRdisConnectionFactory")
+    public RedisConnectionFactory chunhuiRdisConnectionFactory() {
+        JedisConnectionFactory connectionFactory = new JedisConnectionFactory();
+        connectionFactory.setHostName(chunhuiRedisHost);
+        connectionFactory.setPort(Integer.valueOf(chunhuiRedisPort));
+        connectionFactory.setUsePool(true);
+        return connectionFactory;
+    }
+    
+    @Bean(name="liangyouRdisConnectionFactory")
+    public RedisConnectionFactory liangyouRdisConnectionFactory() {
+        JedisConnectionFactory connectionFactory = new JedisConnectionFactory();
+        connectionFactory.setHostName(liangyouRedisHost);
+        connectionFactory.setPort(Integer.valueOf(liangyouRedisPort));
+        connectionFactory.setUsePool(true);
+        return connectionFactory;
+    }
+    
+    
+    @Bean(name = "mainRedisTemplate")
+    public  RedisTemplate<String, SystemConfig> mainRedisTemplate(){
+        RedisTemplate<String, SystemConfig> redisTemplate = new RedisTemplate<String, SystemConfig>();
+        redisTemplate.setConnectionFactory(mainRedisConnectionFactory());
+        redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<SystemConfig>(SystemConfig.class));
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        return redisTemplate;
+    }
+    @Bean(name = "baofangRedisTemplate")
+    public RedisTemplate<String,SystemConfig> baofangRedisTemplate(){
+        RedisTemplate<String,SystemConfig> redisTemplate = new RedisTemplate<String, SystemConfig>();
+        redisTemplate.setConnectionFactory(baofangrRdisConnectionFactory());
+        redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<SystemConfig>(SystemConfig.class));
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        return redisTemplate;
+    }
+    
+    @Bean(name = "chunhuiRedisTemplate")
+    public RedisTemplate<String,SystemConfig> chunhuiRedisTemplate(){
+        RedisTemplate<String,SystemConfig> redisTemplate = new RedisTemplate<String, SystemConfig>();
+        redisTemplate.setConnectionFactory(chunhuiRdisConnectionFactory());
+        redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<SystemConfig>(SystemConfig.class));
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        return redisTemplate;
+    }
+    
+    @Bean(name = "liangyouRedisTemplate")
+    public RedisTemplate<String,SystemConfig> liangyouRedisTemplate(){
+        RedisTemplate<String,SystemConfig> redisTemplate = new RedisTemplate<String, SystemConfig>();
+        redisTemplate.setConnectionFactory(liangyouRdisConnectionFactory());
+        redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<SystemConfig>(SystemConfig.class));
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        return redisTemplate;
     }
 
     @Bean(name = "stringRedisTemplate")
@@ -145,6 +240,33 @@ public class AppConfig {
         return redisTemplate;
     }
     
+	@Bean(name = "cartRedisTemplate")
+    public RedisTemplate<String, Cart> cartRedisTemplate() {
+        RedisTemplate<String, Cart> redisTemplate = new RedisTemplate<String, Cart>();
+        redisTemplate.setConnectionFactory(redisConnectionFactory());
+        redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<Cart>(Cart.class));
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        return redisTemplate;
+    }
+
+    @Bean(name = "homeCartRedisTemplate")
+    public RedisTemplate<String, HomeCart> homeCartRedisTemplate() {
+        RedisTemplate<String, HomeCart> redisTemplate = new RedisTemplate<String, HomeCart>();
+        redisTemplate.setConnectionFactory(redisConnectionFactory());
+        redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<HomeCart>(HomeCart.class));
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        return redisTemplate;
+    }
+
+    @Bean(name = "shareAccessRecordTemplate")
+    public RedisTemplate<String, ShareAccessRecord> shareAccessRecordTemplate() {
+        RedisTemplate<String, ShareAccessRecord> redisTemplate = new RedisTemplate<String, ShareAccessRecord>();
+        redisTemplate.setConnectionFactory(redisConnectionFactory());
+        redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<ShareAccessRecord>(ShareAccessRecord.class));
+        redisTemplate.setKeySerializer(new StringRedisSerializer());
+        return redisTemplate;
+    }
+
     @Bean(name = "systemConfigRedisTemplate")
     public RedisTemplate<String, SystemConfig> systemConfigRedisTemplate(){
         RedisTemplate<String, SystemConfig> redisTemplate = new RedisTemplate<String, SystemConfig>();
@@ -153,7 +275,6 @@ public class AppConfig {
         redisTemplate.setKeySerializer(new StringRedisSerializer());
         return redisTemplate;
     };
-    
     public KeyGenerator keyGenerator() {
         return new KeyGenerator(){
 

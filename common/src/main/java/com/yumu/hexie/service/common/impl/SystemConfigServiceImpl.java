@@ -24,7 +24,6 @@ import com.yumu.hexie.model.system.SystemConfig;
 import com.yumu.hexie.model.system.SystemConfigRepository;
 import com.yumu.hexie.service.common.SystemConfigService;
 import com.yumu.hexie.service.exception.BizValidateException;
-
 /**
  * <pre>
  * 
@@ -38,8 +37,11 @@ public class SystemConfigServiceImpl implements SystemConfigService {
 	
 	private static final Logger log = LoggerFactory.getLogger(SystemConfigServiceImpl.class);
 
-    private static final String JS_TOKEN = "JS_TOKEN";
-    private static final String ACC_TOKEN = "ACCESS_TOKEN";
+	private static final String JS_TOKEN = "JS_TOKEN";
+	private static final String ACC_TOKEN = "ACCESS_TOKEN";
+    private static final String APP_SECRET_KEY = "APPSEC_%s";
+    public static final String APP_ACC_TOKEN = "APP_TOKEN_%s";
+    private static final String APPIDS = "APPIDS";
     @Inject
     private SystemConfigRepository systemConfigRepository;
     @Inject
@@ -81,6 +83,24 @@ public class SystemConfigServiceImpl implements SystemConfigService {
         return res;
     }
     
+    @Override 
+    public String querySecret(String appId) {
+    	String value = queryValueByKey(String.format(APP_SECRET_KEY, appId));
+        return value;
+    }
+    
+    @Override
+    public String[] queryAppIds() {
+    	
+    	String value = queryValueByKey(APPIDS);
+    	if (!StringUtil.isEmpty(value)) {
+    		return value.split(",");
+		}else {
+			return new String[0];
+		}
+        
+    }
+    
     public SystemConfig getConfigFromCache(String key){
     	
     	SystemConfig systemConfig = redisRepository.getSystemConfig(key);
@@ -88,19 +108,33 @@ public class SystemConfigServiceImpl implements SystemConfigService {
 			log.error("could not find key [" + key +"] in cache " );
 			int ret = SystemConfigUtil.notifyRefreshing(key);
 			log.error("notify refreshing the cache : " + ret);
+			throw new BizValidateException("重新生成"+key+"，请重试。");
     	}
     	return systemConfig;
     
     }
     
-    public String queryWXAToken() {
-    	SystemConfig config = getConfigFromCache(ACC_TOKEN);
+    @Override
+    public AccessToken queryWXAccToken(String appId) {
+        SystemConfig config = getConfigFromCache(String.format(APP_ACC_TOKEN, appId));
         if (config != null) {
             try {
-                AccessToken at = (AccessToken) JacksonJsonUtil.jsonToBean(config.getSysValue(), AccessToken.class);
-                return at.getToken();
+                return (AccessToken) JacksonJsonUtil.jsonToBean(config.getSysValue(), AccessToken.class);
             } catch (JSONException e) {
                log.error("queryWXAccToken failed :", e);
+            }
+        }
+        throw new BizValidateException("微信token没有记录" + appId);
+    }
+    
+    @Override
+    public String queryWXAToken() {
+        SystemConfig config = getConfigFromCache(ACC_TOKEN);
+        if (config != null) {
+            try {
+                return ((AccessToken) JacksonJsonUtil.jsonToBean(config.getSysValue(), AccessToken.class)).getToken();
+            } catch (JSONException e) {
+                log.error("queryWXAccToken failed", e);;
             }
         }
         throw new BizValidateException("微信token没有记录");
@@ -115,8 +149,8 @@ public class SystemConfigServiceImpl implements SystemConfigService {
         }
         return tickets;
     }
-   
-    @Override
+
+	@Override
 	public String queryValueByKey(String key) {
 		
 		String ret = "";
@@ -129,4 +163,5 @@ public class SystemConfigServiceImpl implements SystemConfigService {
 		return ret;
 	}
     
+	
 }

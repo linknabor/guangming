@@ -35,13 +35,13 @@ import com.yumu.hexie.common.util.DateUtil;
 import com.yumu.hexie.common.util.StringUtil;
 import com.yumu.hexie.integration.qiniu.util.QiniuUtil;
 import com.yumu.hexie.integration.wechat.service.FileService;
-import com.yumu.hexie.integration.wechat.util.WeixinUtil;
 import com.yumu.hexie.model.ModelConstant;
 import com.yumu.hexie.model.community.Annoucement;
 import com.yumu.hexie.model.community.CommunityInfo;
 import com.yumu.hexie.model.community.Thread;
 import com.yumu.hexie.model.community.ThreadComment;
 import com.yumu.hexie.model.user.User;
+import com.yumu.hexie.service.common.SystemConfigService;
 import com.yumu.hexie.service.shequ.CommunityService;
 import com.yumu.hexie.service.user.UserService;
 import com.yumu.hexie.web.BaseController;
@@ -60,9 +60,11 @@ public class CommunityController extends BaseController{
     @Value(value = "${qiniu.domain}")
     private String domain;
 
-	
 	@Inject
 	private CommunityService communityService;
+	
+	@Inject
+	private SystemConfigService systemConfigService;
 	
 	@Inject
 	private UserService userService;
@@ -409,7 +411,7 @@ public class CommunityController extends BaseController{
 					int imgcounter = 0;
 					inputStream = null;
 					while(inputStream==null&&imgcounter<3) {
-						inputStream = FileService.downloadFile(uploadId);		//下载图片
+						inputStream = FileService.downloadFile(uploadId ,systemConfigService.queryWXAToken());		//下载图片
 						if (inputStream==null) {
 							log.error("获取图片附件失败。");
 						}
@@ -637,8 +639,7 @@ public class CommunityController extends BaseController{
 			return BaseResult.successResult(new ArrayList<Thread>());
 		}
 		
-		String access_token = WeixinUtil.getToken();
-		return BaseResult.successResult(access_token);
+		return BaseResult.successResult(systemConfigService.queryWXAToken());
 		
 	}
 	

@@ -68,7 +68,7 @@ public class OAuthService {
 				.replace("SECRET", ConstantWeChat.APPSECRET)
 				.replace("CODE", code);
 
-		WechatResponse jsonObject = WeixinUtil.httpsRequest(url, "POST", null, null);
+		WechatResponse jsonObject = WeixinUtil.httpsRequest(url, "POST", null,null);
 
 		AccessTokenOAuth accessTokenOAuth = null;
 

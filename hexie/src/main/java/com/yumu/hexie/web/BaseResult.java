@@ -11,6 +11,7 @@ public class BaseResult<T> {
     private T result;
     private int errorCode = 0;
     public static final int NEED_LOGIN = 40001;
+    public static final int NEED_BAOFANG_LOGIN = 40002; //需要微信登录授权
     public static final int NEED_AUTH = 42032; //需要微信登录授权
 
     public static BaseResult fail(int code){

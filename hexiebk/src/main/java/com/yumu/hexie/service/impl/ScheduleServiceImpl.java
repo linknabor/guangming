@@ -17,12 +17,16 @@ import org.springframework.stereotype.Service;
 
 import com.yumu.hexie.common.util.StringUtil;
 import com.yumu.hexie.model.ModelConstant;
+import com.yumu.hexie.model.distribution.region.Merchant;
+import com.yumu.hexie.model.distribution.region.MerchantRepository;
 import com.yumu.hexie.model.localservice.bill.BaojieBill;
 import com.yumu.hexie.model.localservice.bill.BaojieBillRepository;
 import com.yumu.hexie.model.localservice.bill.YunXiyiBill;
 import com.yumu.hexie.model.localservice.bill.YunXiyiBillRepository;
 import com.yumu.hexie.model.market.ServiceOrder;
 import com.yumu.hexie.model.market.ServiceOrderRepository;
+import com.yumu.hexie.model.market.SupermarketAssgin;
+import com.yumu.hexie.model.market.SupermarketAssginRepository;
 import com.yumu.hexie.model.market.saleplan.RgroupRule;
 import com.yumu.hexie.model.market.saleplan.RgroupRuleRepository;
 import com.yumu.hexie.model.op.ScheduleRecord;
@@ -41,6 +45,7 @@ import com.yumu.hexie.service.common.SmsService;
 import com.yumu.hexie.service.common.WechatCoreService;
 import com.yumu.hexie.service.exception.BizValidateException;
 import com.yumu.hexie.service.o2o.BaojieService;
+import com.yumu.hexie.service.o2o.BillAssignService;
 import com.yumu.hexie.service.o2o.XiyiService;
 import com.yumu.hexie.service.sales.BaseOrderService;
 import com.yumu.hexie.service.sales.RgroupService;
@@ -64,7 +69,6 @@ public class ScheduleServiceImpl implements ScheduleService{
     private BaseOrderService baseOrderService;
 	@Inject
 	private RgroupRuleRepository rgroupRuleRepository;
-
     @Inject
     private YunXiyiBillRepository yunXiyiBillRepository;
     @Inject
@@ -73,21 +77,22 @@ public class ScheduleServiceImpl implements ScheduleService{
     private BaojieBillRepository baojieBillRepository;
     @Inject
     private BaojieService baojieService;
-
     @Inject
     private BizErrorRepository bizErrorRepository;
-    
     @Inject 
     private ScheduleRecordRepository scheduleRecordRepository;
-    
     @Inject
     private CouponService couponService;
-    
     @Inject
     private UserRepository userRepository;
-    
     @Inject
     private SmsService smsService;
+    @Inject
+    private SupermarketAssginRepository supermarketAssginRepository;
+    @Inject
+    private BillAssignService billAssignService;
+    @Inject
+    private MerchantRepository merchantRepository;
 	
 	//1. 订单超时
     @Scheduled(cron = "50 1/3 * * * ?")
@@ -327,7 +332,7 @@ public class ScheduleServiceImpl implements ScheduleService{
 	@Scheduled(cron = "0 0 18 * * ? ")
 	public void executeCoupinTimeoutHintJob() {
 		
-		String msg = "亲爱的邻居，您有amount元的优惠券即将过期，赶紧去“光明悦生活”看看吧！";
+		String msg = "亲爱的邻居，您有amount元的优惠券即将过期，赶紧去“友宜物业”看看吧！";
 
 		SCHEDULE_LOG.debug("--------------------start executeCouponHintJob-------------------");
 		
@@ -404,6 +409,46 @@ public class ScheduleServiceImpl implements ScheduleService{
 		}
 		SCHEDULE_LOG.debug("--------------------end executeCouponHintJob-------------------");
 	}
+	
+	@Override
+	@Scheduled(cron = "0 0/2 * * * ?")
+	public void executeSmOrderReassign() {
+
+		SCHEDULE_LOG.warn("--------------------start executeSmOrderReassign-------------------");
+		
+		List<Integer> status = new ArrayList<Integer>();
+		status.add(ModelConstant.ORDER_STATUS_CONFIRM);
+		
+		Merchant merchant = merchantRepository.findMechantByNameLike("超市");
+		if (merchant == null) {
+			return;
+		}
+		long merchantId = merchant.getId();	//超市快购商户ID
+		
+		List<ServiceOrder> list = serviceOrderRepository.findByStatusAndMerchatIdAndOrderType(status, merchantId, ModelConstant.ORDER_TYPE_ONSALE);
+		
+		for (ServiceOrder serviceOrder : list) {
+			
+			long orderId = serviceOrder.getId();
+			SCHEDULE_LOG.warn("orderId is : " + orderId);
+			
+			List<SupermarketAssgin>asginList = supermarketAssginRepository.findByServiceOrderId(orderId);
+			//没有发成功的需要重发
+			if (asginList == null || asginList.size()==0) {
+				
+				SCHEDULE_LOG.warn("start to reassign, orderId " + orderId);
+				baseOrderService.notifyPayed(orderId);
+				billAssignService.assginSupermarketOrder(serviceOrder);
+			}
+			
+		}
+		
+		SCHEDULE_LOG.warn("--------------------end executeSmOrderReassign-------------------");
+		
+		
+	}
+	
+	
 	
 	
 }

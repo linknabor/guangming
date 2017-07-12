@@ -13,6 +13,7 @@ import com.yumu.hexie.model.BaseModel;
 import com.yumu.hexie.model.localservice.ServiceOperator;
 import com.yumu.hexie.model.localservice.bill.YunXiyiBill;
 import com.yumu.hexie.model.localservice.repair.RepairOrder;
+import com.yumu.hexie.model.market.ServiceOrder;
 
 /**
  * <pre>
@@ -62,6 +63,16 @@ public class AssignRecord extends BaseModel {
         this.time = DateUtil.dtFormat(new Date(order.getCreateDate()),"MM.dd HH:mm");
         this.orderDate = order.getCreateDate();
     }
+    
+    public AssignRecord(ServiceOperator ro,ServiceOrder order) {
+        this.operatorId = ro.getId();
+        this.operatorUserId = ro.getUserId();
+        
+        this.orderId = order.getId();
+        this.time = DateUtil.dtFormat(new Date(order.getCreateDate()),"MM.dd HH:mm");
+        this.orderDate = order.getCreateDate();
+    }
+    
     public int getOrderType() {
         return orderType;
     }

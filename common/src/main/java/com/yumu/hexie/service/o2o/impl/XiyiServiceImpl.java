@@ -91,9 +91,13 @@ public class XiyiServiceImpl implements XiyiService {
     public YunXiyiBill createBill(User user,CommonBillReq req, HomeCart cart) {
         Date d = DateUtil.parse(req.getReqTime(),"yyyy-MM-dd HH:mm");
         long time = d.getTime()-System.currentTimeMillis();
-        if(time>7*24*3600000 || time < 7200000) {
-            throw new BizValidateException("服务时间不支持！");
+        if(time>7*24*3600000) {
+            throw new BizValidateException("预约服务时间不能大于7天。");
         }
+        if (time<600000) {
+			throw new BizValidateException("预约服务时间"+DateUtil.dtFormat(d, "yyyy-MM-dd HH:mm")+"不在服务范围");
+		}
+        
         Address addr = addressService.queryAddressById(req.getAddressId());
         O2OServiceBuilder<YunXiyiBill> ob = O2OServiceBuilder.init(YunXiyiBill.class);
         ob.initCart(cart).userId(user.getId()).req(req)
@@ -159,8 +163,14 @@ public class XiyiServiceImpl implements XiyiService {
     }
 
     private void notify2Operators(YunXiyiBill bill){
+    	
+    	String addr = bill.getAddress();
+    	String tel = bill.getTel();
+    	String name = bill.getReceiverName();
+    	
+    	String remark = "联系人："+name+" 先生/女士\r\n电话："+tel+"\r\n地址："+addr;
         gotongService.sendCommonYuyueBillMsg(HomeServiceConstant.SERVICE_TYPE_XIYI,
-                "您有一条新的订单消息",bill.getProjectName(), DateUtil.dtFormat(bill.getRequireDate(),"yyyy-MM-dd HH:mm"), "");    
+                "您有一条新的订单消息",bill.getProjectName(), DateUtil.dtFormat(bill.getRequireDate(),"yyyy-MM-dd HH:mm"), "", remark);    
     }
     /** 
      * @param payment

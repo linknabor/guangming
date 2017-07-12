@@ -44,14 +44,14 @@ import com.yumu.hexie.service.user.CouponService;
 @Service(value = "wechatCoreService")
 public class WechatCoreServiceImpl implements WechatCoreService {
 
-	private static final Logger SCHEDULE_LOG = LoggerFactory.getLogger("com.yumu.hexie.schedule");
 	public AccessToken at;
 	public String jsTicket = "";
 	private static final Logger LOGGER = LoggerFactory.getLogger(WechatCoreServiceImpl.class);
 	@Inject
-	private com.yumu.hexie.service.user.UserService userService;
-	@Inject
 	private SystemConfigService systemConfigService;
+	@Inject
+	private com.yumu.hexie.service.user.UserService userService;
+	
 	@Inject 
 	private CouponService couponService;
 
@@ -83,7 +83,7 @@ public class WechatCoreServiceImpl implements WechatCoreService {
 				// 事件类型
 				switch (requestMap.getEvent()) {
 				case ConstantWeChat.EVENT_TYPE_SUBSCRIBE:// 订阅
-					respContent = "欢迎来到光明悦生活\n"
+					respContent = "欢迎来到友宜物业\n"
 							+ "【我的房子】物业费缴纳、账单查询\n"
 							+ "【到家服务】一键预约，随叫随到\n"
 							+ "【限时特卖】每日限时劲爆商品抢鲜\n"
@@ -121,7 +121,7 @@ public class WechatCoreServiceImpl implements WechatCoreService {
 					tm.setText(new Text("有用户扫码："
 							+ JacksonJsonUtil.beanToJson(requestMap
 									.getScanCodeInfo())));
-					CustomService.sendCustomerMessage(tm, systemConfigService.queryWXAToken());
+					CustomService.sendCustomerMessage(tm,systemConfigService.queryWXAToken());
 					LOGGER.error("用户扫码：发送完毕");
 					break;
 				}
@@ -157,7 +157,11 @@ public class WechatCoreServiceImpl implements WechatCoreService {
 	private void processError(Exception e) {
 		LOGGER.error("微信异常----------------------------------------------！！！！！！！！！！！", e);
 		if (e instanceof WechatException) {
-			SCHEDULE_LOG.error("process error" , e);
+//			if (((WechatException) e).getErrorCode() == 1) {
+//				executeJsTokenJob();
+//			} else if (((WechatException) e).getErrorCode() == 2) {
+//				executeAccessTokenJob();
+//			}
 		}
 	}
 
@@ -184,7 +188,7 @@ public class WechatCoreServiceImpl implements WechatCoreService {
 	@Override
 	public UserWeiXin getUserInfo(String openid) {
 		try {
-			return UserService.getUserInfo(openid, systemConfigService.queryWXAToken());
+			return UserService.getUserInfo(openid,systemConfigService.queryWXAToken());
 		} catch (Exception e) {
 			processError(e);
 		}

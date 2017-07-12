@@ -4,6 +4,8 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.json.JSONException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import com.yumu.hexie.common.util.JacksonJsonUtil;
 import com.yumu.hexie.integration.wechat.constant.ConstantWeChat;
@@ -20,6 +22,8 @@ import com.yumu.hexie.integration.wechat.util.WeixinUtil;
  * 发送客服消息
  */
 public class CustomService {
+
+	private static final Logger LOGGER = LoggerFactory.getLogger(CustomService.class);
 
 	private static String CUSTOME_URL = "https://api.weixin.qq.com/cgi-bin/message/custom/send?access_token=ACCESS_TOKEN";
 
@@ -39,7 +43,7 @@ public class CustomService {
 	 * @param obj	消息对象
 	 * @return 是否发送成功
 	 */
-	public static boolean sendCustomerMessage(Object obj, String accessToken) {
+	public static boolean sendCustomerMessage(Object obj,String accessToken) {
 		boolean bo = false;
 		String jsonStr;
 		try {

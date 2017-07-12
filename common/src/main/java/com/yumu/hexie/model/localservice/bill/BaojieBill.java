@@ -37,8 +37,8 @@ public class BaojieBill extends BaseO2OService implements HasMerchant,CancelAble
 
     private static final long serialVersionUID = 7642902547929637598L;
 
-    //public static final int NEED_PREPAY = 1;
-    //public static final int NO_PREPAY = 2;
+    public static final int NEED_PREPAY = 1;
+    public static final int NO_PREPAY = 2;
     private Long merchantId;
     private String merchantName;
     private String merchantTel;
@@ -49,6 +49,7 @@ public class BaojieBill extends BaseO2OService implements HasMerchant,CancelAble
     private Date cancelTime;
     
     private String typeName;
+    private int prepayType = NO_PREPAY;//需要预付
     
     private BigDecimal totalAmount;//实付金额
 
@@ -147,6 +148,12 @@ public class BaojieBill extends BaseO2OService implements HasMerchant,CancelAble
     @Override
     public int getSettleType() {
         return SettleConstant.ORDER_TYPE_BAOJIE;
+    }
+    public int getPrepayType() {
+        return prepayType;
+    }
+    public void setPrepayType(int prepayType) {
+        this.prepayType = prepayType;
     }
     public BigDecimal getTotalAmount() {
         return totalAmount;

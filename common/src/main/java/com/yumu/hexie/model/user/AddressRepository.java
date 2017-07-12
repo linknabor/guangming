@@ -13,7 +13,7 @@ public interface AddressRepository extends JpaRepository<Address, Long> {
 	@Query("delete from Address a where a.id = ?1 and a.userId = ?2 and a.main=false")
 	public void deleteAddress(long addressId,long user);
 	
-	//@Query("from Address a where a.userId = ?1") 
+	@Query("from Address a where a.userId = ?1 order by a.id desc") 
 	public List<Address> findAllByUserId(long userId);
 	
 	public List<Address> findByXiaoquId(long xiaoquId);

@@ -19,6 +19,14 @@ public class SimpleRegisterReq implements Serializable{
     private String mobile;
     private String yzm;
     private String name;
+    
+    private long xiaoquId;
+    private String xiaoquName;
+    private String province;
+    private String city;
+    private String county;
+    private String xioquAddr;
+    
     public String getMobile() {
         return mobile;
     }
@@ -37,5 +45,44 @@ public class SimpleRegisterReq implements Serializable{
     public void setName(String name) {
         this.name = name;
     }
+	
+	public long getXiaoquId() {
+		return xiaoquId;
+	}
+	public void setXiaoquId(long xiaoquId) {
+		this.xiaoquId = xiaoquId;
+	}
+	public String getXiaoquName() {
+		return xiaoquName;
+	}
+	public void setXiaoquName(String xiaoquName) {
+		this.xiaoquName = xiaoquName;
+	}
+	public String getProvince() {
+		return province;
+	}
+	public void setProvince(String province) {
+		this.province = province;
+	}
+	public String getCity() {
+		return city;
+	}
+	public void setCity(String city) {
+		this.city = city;
+	}
+	public String getCounty() {
+		return county;
+	}
+	public void setCounty(String county) {
+		this.county = county;
+	}
+	public String getXioquAddr() {
+		return xioquAddr;
+	}
+	public void setXioquAddr(String xioquAddr) {
+		this.xioquAddr = xioquAddr;
+	}
+    
+    
     
 }

@@ -67,8 +67,10 @@ public class User extends BaseModel{
 	private Integer couponCount;
 	
 	private String shareCode;
-	
-	private boolean newRegiste = true;
+
+    private boolean newRegiste = true;
+    private String bindAppId;
+    private String bindOpenId;
 	
 	
 	public long getCurrentAddrId() {
@@ -367,6 +369,22 @@ public class User extends BaseModel{
 	public void setNewRegiste(boolean isNewRegiste) {
 		this.newRegiste = isNewRegiste;
 	}
+
+    public String getBindOpenId() {
+        return bindOpenId;
+    }
+
+    public void setBindOpenId(String bindOpenId) {
+        this.bindOpenId = bindOpenId;
+    }
+
+    public String getBindAppId() {
+        return bindAppId;
+    }
+
+    public void setBindAppId(String bindAppId) {
+        this.bindAppId = bindAppId;
+    }
 
 	
 	

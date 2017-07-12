@@ -10,7 +10,7 @@ import com.yumu.hexie.model.ModelConstant;
 
 //消息
 @Entity
-public class UserNotice extends BaseModel{
+public class UserNotice extends BaseModel {
 
 	private static final long serialVersionUID = 4808669460780339640L;
 	private long userId;

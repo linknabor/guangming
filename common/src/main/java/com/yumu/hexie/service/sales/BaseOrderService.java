@@ -1,10 +1,13 @@
 package com.yumu.hexie.service.sales;
 
+import java.util.List;
+
 import com.yumu.hexie.integration.wechat.entity.common.JsSign;
 import com.yumu.hexie.integration.wechat.entity.common.WxRefundOrder;
 import com.yumu.hexie.model.commonsupport.comment.Comment;
 import com.yumu.hexie.model.localservice.repair.RepairOrder;
 import com.yumu.hexie.model.market.Cart;
+import com.yumu.hexie.model.market.OrderItem;
 import com.yumu.hexie.model.market.ServiceOrder;
 import com.yumu.hexie.model.payment.PaymentOrder;
 import com.yumu.hexie.vo.CreateOrderReq;
@@ -37,4 +40,8 @@ public interface BaseOrderService {
 	public void finishRefund(WxRefundOrder wxRefundOrder);
 	
 	public ServiceOrder findOne(long orderId);
+	
+	public List<OrderItem> findOrderItemsByOrderId(long orderId);
+	
+	public void sendGoods(long orderId);
 }

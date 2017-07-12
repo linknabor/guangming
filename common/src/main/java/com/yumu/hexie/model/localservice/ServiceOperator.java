@@ -28,12 +28,16 @@ public class ServiceOperator  extends BaseModel {
     private String tel;
     private String openId;//设置用户ID的时候将其匹配
     private long userId;
-    
 
-    private Long regionId;//光明悦生活区域ID
+    private Long regionId;//友宜物业区域ID
     private boolean fromWuye = false;
     private double longitude;
     private double latitude;
+    
+    private long merchantId;	//商户ID
+    
+    private String bindAppId;	
+    private String bindOpenId;
     
     public String getCompanyName() {
         return companyName;
@@ -95,5 +99,24 @@ public class ServiceOperator  extends BaseModel {
     public void setType(int type) {
         this.type = type;
     }
+	public long getMerchantId() {
+		return merchantId;
+	}
+	public void setMerchantId(long merchantId) {
+		this.merchantId = merchantId;
+	}
+	public String getBindAppId() {
+		return bindAppId;
+	}
+	public void setBindAppId(String bindAppId) {
+		this.bindAppId = bindAppId;
+	}
+	public String getBindOpenId() {
+		return bindOpenId;
+	}
+	public void setBindOpenId(String bindOpenId) {
+		this.bindOpenId = bindOpenId;
+	}
+    
     
 }

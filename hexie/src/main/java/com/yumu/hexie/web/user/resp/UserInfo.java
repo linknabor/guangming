@@ -8,6 +8,7 @@ import java.io.Serializable;
 
 import org.springframework.beans.BeanUtils;
 
+import com.yumu.hexie.model.localservice.HomeServiceConstant;
 import com.yumu.hexie.model.user.User;
 
 /**
@@ -25,6 +26,7 @@ public class UserInfo implements Serializable {
     private String tel;
     
     private boolean isRepairOperator = false;
+    private boolean isMerchantOperator = false;
     
     private Double longitude;
     private Double latitude;
@@ -62,9 +64,19 @@ public class UserInfo implements Serializable {
         BeanUtils.copyProperties(user, this);
     }
 
-    public UserInfo(User user,boolean isOperator){
+   public UserInfo(User user, int operatorType){
         BeanUtils.copyProperties(user, this);
-        this.isRepairOperator = isOperator;
+        switch (operatorType) {
+		case HomeServiceConstant.SERVICE_TYPE_REPAIR:
+			this.isRepairOperator = true;
+			break;
+		case HomeServiceConstant.SERVICE_TYPE_SUPERMARKET:
+			this.isMerchantOperator = true;
+			break;
+		default:
+			break;
+		}
+        
     }
     public String getRealName() {
         return realName;
@@ -227,6 +239,14 @@ public class UserInfo implements Serializable {
     public void setRepairOperator(boolean isRepairOperator) {
         this.isRepairOperator = isRepairOperator;
     }
+
+	public boolean isMerchantOperator() {
+		return isMerchantOperator;
+	}
+	public void setMechantOperator(boolean isMerchantOperator) {
+		this.isMerchantOperator = isMerchantOperator;
+	}
+
     public String getXiaoquName() {
         return xiaoquName;
     }

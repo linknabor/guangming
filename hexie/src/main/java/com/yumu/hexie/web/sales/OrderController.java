@@ -5,6 +5,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -18,13 +20,20 @@ import com.yumu.hexie.integration.wechat.entity.common.JsSign;
 import com.yumu.hexie.model.ModelConstant;
 import com.yumu.hexie.model.commonsupport.comment.Comment;
 import com.yumu.hexie.model.commonsupport.info.Product;
+import com.yumu.hexie.model.localservice.HomeServiceConstant;
+import com.yumu.hexie.model.localservice.ServiceOperator;
+import com.yumu.hexie.model.localservice.ServiceOperatorRepository;
 import com.yumu.hexie.model.market.Cart;
+import com.yumu.hexie.model.market.OrderItem;
 import com.yumu.hexie.model.market.ServiceOrder;
 import com.yumu.hexie.model.market.ServiceOrderRepository;
+import com.yumu.hexie.model.market.SupermarketAssgin;
+import com.yumu.hexie.model.market.SupermarketAssginRepository;
 import com.yumu.hexie.model.market.saleplan.SalePlan;
 import com.yumu.hexie.model.redis.Keys;
 import com.yumu.hexie.model.redis.RedisRepository;
 import com.yumu.hexie.model.user.User;
+import com.yumu.hexie.service.o2o.SendGoodsService;
 import com.yumu.hexie.service.sales.BaseOrderService;
 import com.yumu.hexie.service.sales.ProductService;
 import com.yumu.hexie.service.sales.RgroupService;
@@ -39,6 +48,10 @@ import com.yumu.hexie.web.sales.resp.BuyInfoVO;
 
 @Controller(value = "orderController")
 public class OrderController extends BaseController{
+	
+	private static final Logger log = LoggerFactory.getLogger(OrderController.class);
+
+	
     @Inject
     private ServiceOrderRepository serviceOrderRepository;
     @Inject
@@ -53,8 +66,13 @@ public class OrderController extends BaseController{
     private RgroupService rgroupService;
 	@Inject
 	private AddressService addressService;
+	@Inject
+	private SupermarketAssginRepository supermarketAssginRepository;
+	@Inject
+	private SendGoodsService sendGoodsService;
+	@Inject
+	private ServiceOperatorRepository serviceOperatorRepository;
 	
-
 	@RequestMapping(value = "/getProduct/{productId}", method = RequestMethod.GET)
 	@ResponseBody
 	public BaseResult<Product> getProduct(@PathVariable long productId) throws Exception {
@@ -268,5 +286,82 @@ public class OrderController extends BaseController{
 		baseOrderService.comment(order, comment);
 		return new BaseResult<String>().success("评价成功");
 	}
+	
+	@RequestMapping(value = "/getSupermarketOrder/{orderId}", method = RequestMethod.GET)
+	@ResponseBody
+	public BaseResult<ServiceOrder> getOrderItem(@ModelAttribute(Constants.USER)User user,@PathVariable long orderId) throws Exception {
+		
+		ServiceOrder order = baseOrderService.findOne(orderId);
+		List<SupermarketAssgin>list = supermarketAssginRepository.findByServiceOrderId(orderId);
+		
+		List<Long>assginedOp = new ArrayList<Long>();
+		for (SupermarketAssgin supermarketAssgin : list) {
+			assginedOp.add(supermarketAssgin.getUserId());
+		}
+		
+		if (order.getUserId() != user.getId() && !assginedOp.contains(user.getId())) {
+			
+			log.error("userId : " + user.getId() + ", orderId : " + orderId);
+			return new BaseResult<ServiceOrder>().failMsg("你没有权限查看该订单！");
+		}
+		
+		return new BaseResult<ServiceOrder>().success(order);
+    }
+	
+	@RequestMapping(value = "/getSupermarketOrderItems/{orderId}", method = RequestMethod.GET)
+	@ResponseBody
+	public BaseResult<List<OrderItem>> getSupermarketOrderItems(@ModelAttribute(Constants.USER)User user,@PathVariable long orderId) throws Exception {
+		
+		List<OrderItem>oiList = baseOrderService.findOrderItemsByOrderId(orderId);
+		return new BaseResult<List<OrderItem>>().success(oiList);
+    }
+	
+	
+	@RequestMapping(value = "/supermarket/sendGoods/{orderId}", method = RequestMethod.GET)
+	@ResponseBody
+	public BaseResult<String> sendGoods(@PathVariable long orderId, @ModelAttribute(Constants.USER)User user) throws Exception{
+
+		ServiceOrder order = baseOrderService.findOne(orderId);
+		List<SupermarketAssgin>list = supermarketAssginRepository.findByServiceOrderId(orderId);
+		
+		List<Long>assginedOp = new ArrayList<Long>();
+		for (SupermarketAssgin supermarketAssgin : list) {
+			assginedOp.add(supermarketAssgin.getUserId());
+		}
+		
+		if (order.getUserId() != user.getId()&&!assginedOp.contains(user.getId())) {
+			return new BaseResult<String>().failMsg("你没有权限查看该订单！");
+		}
+		
+		int ret = sendGoodsService.sendGoods(orderId);
+		
+		if (ret==0) {
+			return new BaseResult<String>().failMsg("CODE："+ret+"，发货失败。");
+		}
+		
+		return new BaseResult<String>().success("success");
+	}
+	
+	@RequestMapping(value = "/orders/status/supermarket/{statusType}", method = RequestMethod.GET)
+	@ResponseBody
+	public BaseResult<List<ServiceOrder>> getSupermarketOrders(@ModelAttribute(Constants.USER)User user,@PathVariable String statusType) throws Exception {
+		
+		List<Integer> status = new ArrayList<Integer>();
+		if("NEEDSEND".equalsIgnoreCase(statusType)){
+			status.add(ModelConstant.ORDER_STATUS_PAYED);
+			status.add(ModelConstant.ORDER_STATUS_CONFIRM);
+		}else if ("FINISHED".equalsIgnoreCase(statusType)) {
+			status.add(ModelConstant.ORDER_STATUS_SENDED);
+			status.add(ModelConstant.ORDER_STATUS_RECEIVED);
+		}
+		
+		List<ServiceOperator> list = serviceOperatorRepository.findByTypeAndUserId(HomeServiceConstant.SERVICE_TYPE_SUPERMARKET, user.getId());
+		ServiceOperator so = list.get(0);
+		
+		return new BaseResult<List<ServiceOrder>>().success(serviceOrderRepository.
+					findByStatusAndMerchatIdAndOrderType(status, so.getMerchantId(), ModelConstant.ORDER_TYPE_ONSALE));
+    }
+	
+	
 	
 }

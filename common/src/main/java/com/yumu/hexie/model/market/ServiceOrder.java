@@ -87,7 +87,7 @@ public class ServiceOrder  extends BaseModel {
 	private String productThumbPic;
 	private String groupRuleName;
 	
-	private String gongzhonghao = "上海光明悦生活";
+	private String gongzhonghao = "友宜物业";
 	
 	
 	/**物流信息**/
