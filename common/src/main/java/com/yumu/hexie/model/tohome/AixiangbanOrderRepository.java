@@ -3,7 +3,7 @@ package com.yumu.hexie.model.tohome;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 /** 
- * <p>项目：友宜物业</p>
+ * <p>项目：光明悦生活</p>
  * <p>模块：爱相伴服务</p>
  * <p>描述：</p>
  * <p>版    权: Copyright (c) 2016</p>
