@@ -8,7 +8,6 @@ import com.yumu.hexie.model.distribution.region.AmapAddress;
 import com.yumu.hexie.model.distribution.region.Region;
 import com.yumu.hexie.model.user.Address;
 import com.yumu.hexie.model.user.User;
-import com.yumu.hexie.model.user.Xiaoqu;
 import com.yumu.hexie.service.user.req.AddressReq;
 
 
@@ -17,24 +16,12 @@ import com.yumu.hexie.service.user.req.AddressReq;
  */
 public interface AddressService {
 
-    /**
-     * <pre>
-     * 保存地址信息
-     * </pre>
-     * @param addr
-     * @return
-     */
-    public Address saveAddress(AddressReq addr,User user);
-    
-    public List<Xiaoqu> queryXiaoqu();
-    
-    
 	//添加地址
-	public Address addAddress(Address address);
+	public Address addAddress(AddressReq address);
 	
 	public void deleteAddress(long id,long userId);
     //设置默认地址
-    public boolean configDefaultAddress(User user, long addressId);
+    public Address configDefaultAddress(User user, long addressId);
 
     public Address queryDefaultAddress(User user);
     //根据id查询地址
