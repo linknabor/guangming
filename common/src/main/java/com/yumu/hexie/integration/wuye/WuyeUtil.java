@@ -18,6 +18,7 @@ import com.yumu.hexie.common.util.JacksonJsonUtil;
 import com.yumu.hexie.common.util.MyHttpClient;
 import com.yumu.hexie.integration.wuye.resp.BaseResult;
 import com.yumu.hexie.integration.wuye.resp.BillListVO;
+import com.yumu.hexie.integration.wuye.resp.CellListVO;
 import com.yumu.hexie.integration.wuye.resp.HouseListVO;
 import com.yumu.hexie.integration.wuye.resp.PayWaterListVO;
 import com.yumu.hexie.integration.wuye.vo.HexieHouse;
@@ -30,6 +31,7 @@ public class WuyeUtil {
 
 	private static String REQUEST_ADDRESS = "http://www.e-shequ.com/mobileInterface/mobile/";
 	private static String SYSTEM_NAME;
+	private static String CSPID;
 	private static Properties props = new Properties();
 	
 	static {
@@ -44,14 +46,15 @@ public class WuyeUtil {
 		
 		REQUEST_ADDRESS = props.getProperty("requestUrl");
 		SYSTEM_NAME = props.getProperty("sysName");
+		CSPID = props.getProperty("cspId");
 	}
 
 	// 接口地址
 	private static final String HOUSE_DETAIL_URL = "getHoseInfoSDO.do?user_id=%s"; // 房屋详情地址
 	private static final String ADD_HOUSE_URL = "addHouseSDO.do?user_id=%s&stmt_id=%s&mng_cell_id=%s"; // 添加房子
-	private static final String SYS_ADD_HOUSE_URL = "billSaveHoseSDO.do?user_id=%s&stmt_id=%s"; // 扫一扫（添加房子）
+	private static final String SYS_ADD_HOUSE_URL = "billSaveHoseSDO.do?user_id=%s&stmt_id=%s&house_id=%s"; // 扫一扫（添加房子）
 	private static final String DEL_HOUSE_URL = "delHouseSDO.do?user_id=%s&mng_cell_id=%s"; // 删除房子
-	private static final String BILL_LIST_URL = "getBillListMSDO.do?user_id=%s&pay_status=%s&startDate=%s&endDate=%s&curr_page=%s&total_count=%s"; // 获取账单列表
+	private static final String BILL_LIST_URL = "getBillListMSDO.do?user_id=%s&pay_status=%s&startDate=%s&endDate=%s&curr_page=%s&total_count=%s&house_id=%s"; // 获取账单列表
 	private static final String BILL_DETAIL_URL = "getBillInfoMSDO.do?user_id=%s&stmt_id=%s&bill_id=%s"; // 获取账单详情
 	private static final String PAY_RECORD_URL = "payMentRecordSDO.do?user_id=%s&startDate=%s&endDate=%s"; // 获取支付记录列表
 	private static final String PAY_INFO_URL = "payMentRecordInfoSDO.do?user_id=%s&trade_water_id=%s"; // 获取支付记录详情
@@ -62,6 +65,8 @@ public class WuyeUtil {
 	private static final String WX_PAY_NOTICE = "wechatPayQuerySDO.do?user_id=%s&bill_id=%s&stmt_id=%s&trade_water_id=%s&package=%s"; // 微信支付返回
 	//private static final String GET_LOCATION_URL = "getGeographicalPositionSDO.do"; // 用户地理位置
 	private static final String COUPON_USE_QUERY_URL = "conponUseQuerySDO.do?user_id=%s";
+	private static final String SECT_LIST_URL = "querySectByCspIdSDO.do?csp_id=%s";
+	private static final String MNG_LIST_URL = "queryMngByIdSDO.do?sect_id=%s&build_id=%s&unit_id=%s&data_type=%s";
 	
 	public static BaseResult<BillListVO> quickPayInfo(String stmtId, String currPage, String totalCount) {
 		String url = REQUEST_ADDRESS + String.format(QUICK_PAY_URL, stmtId, currPage, totalCount);
@@ -86,8 +91,8 @@ public class WuyeUtil {
 	}
 	
 	// 4.根据订单查询房产信息
-	public static BaseResult<HexieHouse> getHouse(String userId,String stmtId) {
-		String url = REQUEST_ADDRESS + String.format(SYS_ADD_HOUSE_URL, userId,stmtId);
+	public static BaseResult<HexieHouse> getHouse(String userId,String stmtId, String house_id) {
+		String url = REQUEST_ADDRESS + String.format(SYS_ADD_HOUSE_URL, userId,stmtId, house_id);
 		return (BaseResult<HexieHouse>)httpGet(url,HexieHouse.class);
 	}
 
@@ -116,9 +121,9 @@ public class WuyeUtil {
 	
 	//status 00,01,02? startDate 2015-02
 	// 8.账单记录
-	public static BaseResult<BillListVO> queryBillList(String userId,String payStatus,String startDate,String endDate, String currentPage, String totalCount){
+	public static BaseResult<BillListVO> queryBillList(String userId,String payStatus,String startDate,String endDate, String currentPage, String totalCount, String house_id){
 		//total_count 和curr_page没有填
-		String url = REQUEST_ADDRESS + String.format(BILL_LIST_URL, userId,payStatus,startDate,endDate,currentPage,totalCount);
+		String url = REQUEST_ADDRESS + String.format(BILL_LIST_URL, userId,payStatus,startDate,endDate,currentPage,totalCount, house_id);
 		return (BaseResult<BillListVO>)httpGet(url,BillListVO.class);
 	}
 	// 9.账单详情 anotherbillIds(逗号分隔) 汇总了去支付,来自BillInfo的bill_id
@@ -151,6 +156,20 @@ public class WuyeUtil {
 		String url = REQUEST_ADDRESS + String.format(COUPON_USE_QUERY_URL, userId);
 		return (BaseResult<String>)httpGet(url,String.class);
 		
+	}
+	
+	//13.查询小区列表
+	public static BaseResult<CellListVO> getSectList()
+	{
+		String url = REQUEST_ADDRESS + String.format(SECT_LIST_URL, CSPID);
+		return (BaseResult<CellListVO>)httpGet(url,CellListVO.class);
+	}
+	
+	//14.根据ID查询指定类型的物业信息
+	public static BaseResult<CellListVO> getMngList(String sect_id, String build_id, String unit_id, String data_type)
+	{
+		String url = REQUEST_ADDRESS + String.format(MNG_LIST_URL, sect_id, build_id, unit_id, data_type);
+		return (BaseResult<CellListVO>)httpGet(url,CellListVO.class);
 	}
 	
 	

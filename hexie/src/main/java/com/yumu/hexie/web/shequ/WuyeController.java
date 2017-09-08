@@ -13,6 +13,7 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -24,8 +25,10 @@ import com.yumu.hexie.common.util.StringUtil;
 import com.yumu.hexie.integration.wechat.service.TemplateMsgService;
 import com.yumu.hexie.integration.wuye.WuyeUtil;
 import com.yumu.hexie.integration.wuye.resp.BillListVO;
+import com.yumu.hexie.integration.wuye.resp.CellVO;
 import com.yumu.hexie.integration.wuye.resp.HouseListVO;
 import com.yumu.hexie.integration.wuye.resp.PayWaterListVO;
+import com.yumu.hexie.integration.wuye.resp.CellListVO;
 import com.yumu.hexie.integration.wuye.vo.HexieHouse;
 import com.yumu.hexie.integration.wuye.vo.HexieUser;
 import com.yumu.hexie.integration.wuye.vo.PayResult;
@@ -81,7 +84,29 @@ public class WuyeController extends BaseController {
 		}
 	}
 
-
+	@RequestMapping(value = "/getSect", method = RequestMethod.GET)
+	@ResponseBody
+	public BaseResult<List<CellVO>> getSect(@ModelAttribute(Constants.USER)User user)throws Exception {
+		CellListVO cellMng = wuyeService.querySectList();
+		if (cellMng != null && cellMng.getSect_info() != null) {
+			return BaseResult.successResult(cellMng.getSect_info());
+		} else {
+			return BaseResult.successResult(new ArrayList<CellVO>());
+		}
+	}
+	
+	@RequestMapping(value = "/getcellbyid", method = RequestMethod.GET)
+	@ResponseBody
+	public BaseResult<CellVO> getCellById(@ModelAttribute(Constants.USER)User user, @RequestParam(required=false) String sect_id, 
+			@RequestParam(required=false) String build_id, @RequestParam(required=false) String unit_id, @RequestParam(required=false) String data_type)throws Exception {
+		CellListVO cellMng = wuyeService.querySectList(sect_id, build_id, unit_id, data_type);
+		if (cellMng != null) {
+			return BaseResult.successResult(cellMng);
+		} else {
+			return BaseResult.successResult(new ArrayList<CellVO>());
+		}
+	}
+	
 	@RequestMapping(value = "/hexiehouse/delete/{houseId}", method = RequestMethod.GET)
 	@ResponseBody
 	public BaseResult<List<HexieHouse>> deleteHouse(@ModelAttribute(Constants.USER)User user,@PathVariable String houseId)
@@ -97,25 +122,23 @@ public class WuyeController extends BaseController {
 		}
 	}
 	
-	@RequestMapping(value = "/hexiehouse/{stmtId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/hexiehouse", method = RequestMethod.GET)
 	@ResponseBody
 	public BaseResult<HexieHouse> hexiehouses(@ModelAttribute(Constants.USER)User user,
-			@PathVariable String stmtId) throws Exception {
+			@RequestParam(required=false) String stmtId, @RequestParam(required=false) String house_id) throws Exception {
 
 		if(StringUtil.isEmpty(user.getWuyeId())){
 			//FIXME 后续可调转绑定房子页面
 			return BaseResult.successResult(null);
 		}
-		return BaseResult.successResult(wuyeService.getHouse(user.getWuyeId(),
-				stmtId));
+		return BaseResult.successResult(wuyeService.getHouse(user.getWuyeId(),stmtId, house_id));
 	}
 
-	@RequestMapping(value = "/addhexiehouse/{stmtId}/{houseId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/addhexiehouse", method = RequestMethod.POST)
 	@ResponseBody
 	public BaseResult<HexieHouse> addhouses(@ModelAttribute(Constants.USER)User user,
-			@PathVariable String stmtId,
-			@PathVariable String houseId) throws Exception {
-		HexieUser u = wuyeService.bindHouse(user.getWuyeId(), stmtId, houseId);
+			@RequestParam(required=false) String stmtId, @RequestParam(required=false) String houseId, @RequestBody HexieHouse house) throws Exception {
+		HexieUser u = wuyeService.bindHouse(user.getWuyeId(), stmtId, house);
 		if(u != null) {
 			pointService.addZhima(user, 1000, "zhima-house-"+user.getId()+"-"+houseId);
 		}
@@ -168,9 +191,10 @@ public class WuyeController extends BaseController {
 			@RequestParam(required=false) String startDate,
 			@RequestParam(required=false) String endDate,
 			@RequestParam(required=false) String currentPage,
-			@RequestParam(required=false) String totalCount)
+			@RequestParam(required=false) String totalCount,
+			@RequestParam(required=false) String house_id)
 			throws Exception {
-		BillListVO  listVo = wuyeService.queryBillList(user.getWuyeId(), payStatus, startDate, endDate, currentPage, totalCount);
+		BillListVO  listVo = wuyeService.queryBillList(user.getWuyeId(), payStatus, startDate, endDate, currentPage, totalCount, house_id);
 		if (listVo != null && listVo.getBill_info() != null) {
 			return BaseResult.successResult(listVo);
 		} else {
@@ -224,9 +248,10 @@ public class WuyeController extends BaseController {
 	public BaseResult<String> noticePayed(@ModelAttribute(Constants.USER)User user,
 			@RequestParam(required=false) String billId,@RequestParam(required=false) String stmtId, 
 			@RequestParam(required=false) String tradeWaterId, @RequestParam(required=false) String packageId,
-			@RequestParam(required=false) String feePrice, @RequestParam(required=false) String couponId)
+			@RequestParam(required=false) String feePrice, @RequestParam(required=false) String couponId,
+			@RequestParam(required=false) String bind_switch)
 			throws Exception {
-		PayResult payResult = wuyeService.noticePayed(user.getWuyeId(), billId, stmtId, tradeWaterId, packageId);
+		PayResult payResult = wuyeService.noticePayed(user, billId, stmtId, tradeWaterId, packageId, bind_switch);
 		
 		String trade_status = payResult.getMerger_status();
 //		if ("01".equals(trade_status)) {	//01表示支付成功，02表示未支付成功
