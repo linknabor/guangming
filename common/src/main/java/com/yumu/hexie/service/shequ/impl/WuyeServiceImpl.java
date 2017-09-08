@@ -1,19 +1,9 @@
 package com.yumu.hexie.service.shequ.impl;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.TreeSet;
-
-import javax.inject.Inject;
 import javax.xml.bind.ValidationException;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
-
 import com.yumu.hexie.integration.wuye.WuyeUtil;
 import com.yumu.hexie.integration.wuye.resp.BaseResult;
 import com.yumu.hexie.integration.wuye.resp.BillListVO;
@@ -23,11 +13,9 @@ import com.yumu.hexie.integration.wuye.resp.PayWaterListVO;
 import com.yumu.hexie.integration.wuye.vo.HexieHouse;
 import com.yumu.hexie.integration.wuye.vo.HexieUser;
 import com.yumu.hexie.integration.wuye.vo.PayResult;
-import com.yumu.hexie.integration.wuye.vo.PaymentData;
 import com.yumu.hexie.integration.wuye.vo.PaymentInfo;
 import com.yumu.hexie.integration.wuye.vo.WechatPayInfo;
 import com.yumu.hexie.model.user.User;
-import com.yumu.hexie.model.user.UserRepository;
 import com.yumu.hexie.service.exception.BizValidateException;
 import com.yumu.hexie.service.shequ.WuyeService;
 
@@ -106,19 +94,13 @@ public class WuyeServiceImpl implements WuyeService {
 		//如果switch为1，则顺便绑定该房屋
 		if("1".equals(bind_switch))
 		{
-			PaymentInfo payInfo = queryPaymentDetail(user.getWuyeId(), tradeWaterId);
-			List<PaymentData> paymentData = payInfo.getFee_data();
-			List<String> listMng = new ArrayList<String>();
+			BaseResult<String> result = WuyeUtil.getPayWaterToCell(user.getWuyeId(), tradeWaterId);
+			String ids = result.getResult();
+			String[] idsSuff = ids.split(",");
 			//因为考虑一次支持存在多套房子的情况
-			for (int i = 0; i < paymentData.size(); i++) {
-				PaymentData p = paymentData.get(i);
-				listMng.add(p.getMng_cell_id());
-			}
-			//对重复的房屋ID去重后循环绑定房屋
-			List<String> newList = new ArrayList<String>(new TreeSet<String>(listMng));
-			for (int i = 0; i < newList.size(); i++) {
+			for (int i = 0; i < idsSuff.length; i++) {
 				try {
-					HexieHouse house = getHouse(user.getWuyeId(), stmtId, newList.get(i));
+					HexieHouse house = getHouse(user.getWuyeId(), stmtId, idsSuff[i]);
 					if(house!=null)
 					{
 						bindHouse(user.getWuyeId(), stmtId, house);
