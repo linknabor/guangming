@@ -25,14 +25,12 @@ import com.yumu.hexie.common.util.StringUtil;
 import com.yumu.hexie.integration.wechat.entity.user.UserWeiXin;
 import com.yumu.hexie.model.localservice.HomeServiceConstant;
 import com.yumu.hexie.model.promotion.coupon.Coupon;
-import com.yumu.hexie.model.user.Address;
 import com.yumu.hexie.model.user.User;
 import com.yumu.hexie.service.common.GotongService;
 import com.yumu.hexie.service.common.SmsService;
 import com.yumu.hexie.service.common.SystemConfigService;
 import com.yumu.hexie.service.o2o.OperatorService;
 import com.yumu.hexie.service.shequ.WuyeService;
-import com.yumu.hexie.service.user.AddressService;
 import com.yumu.hexie.service.user.CouponService;
 import com.yumu.hexie.service.user.PointService;
 import com.yumu.hexie.service.user.UserService;
@@ -40,7 +38,6 @@ import com.yumu.hexie.vo.CouponsSummary;
 import com.yumu.hexie.web.BaseController;
 import com.yumu.hexie.web.BaseResult;
 import com.yumu.hexie.web.user.req.MobileYzm;
-import com.yumu.hexie.web.user.req.RegisterReq;
 import com.yumu.hexie.web.user.req.SimpleRegisterReq;
 import com.yumu.hexie.web.user.resp.UserInfo;
 
@@ -51,10 +48,6 @@ public class UserController extends BaseController{
 	
 	private static final Logger log = LoggerFactory.getLogger(UserController.class);
 	
-	
-
-	@Inject
-	private AddressService addressService;
 	@Inject
 	private UserService userService;
 	@Inject
@@ -331,56 +324,5 @@ public class UserController extends BaseController{
 //            couponService.addCoupon4Regist(user);
             return new BaseResult<UserInfo>().success(new UserInfo(user));
         }
-    }
-	@RequestMapping(value = "/register", method = RequestMethod.POST)
-	@ResponseBody
-    public BaseResult<UserInfo> saveWithCaptcha(HttpSession session,@ModelAttribute(Constants.USER)User user,@RequestBody RegisterReq req) throws Exception {
-		if(StringUtil.isEmpty(req.getCity()) || StringUtil.isEmpty(req.getProvince()) || StringUtil.isEmpty(req.getCounty())){
-		    return new BaseResult<UserInfo>().failMsg("请重新选择所在区域");
-		}
-		if(StringUtil.isEmpty(req.getXiaoquName()) || StringUtil.isEmpty(req.getDetailAddress())){
-		    return new BaseResult<UserInfo>().failMsg("请重新填写小区和详细地址");
-		}
-		if (StringUtil.isEmpty(req.getRealName()) || StringUtil.isEmpty(req.getTel())) {
-		    return new BaseResult<UserInfo>().failMsg("请检查真实姓名和手机号码是否正确");
-		}
-		boolean result = smsService.checkVerificationCode(req.getTel(), req.getYzm());
-		if(!result){
-		    return new BaseResult<UserInfo>().failMsg("校验失败！");
-		} else {
-			user.setName(req.getName());
-			user.setRealName(req.getRealName());
-			user.setSex(req.getSex());
-			user.setTel(req.getTel());
-			user.setRegisterDate(System.currentTimeMillis());
-			session.setAttribute(Constants.USER, userService.save(user));
-			
-			Address addr = new Address();
-			addr.setCity(req.getCity());
-			addr.setCityId(req.getCityId());
-			addr.setCounty(req.getCounty());
-			addr.setCountyId(req.getCountyId());
-			addr.setDetailAddress(req.getDetailAddress());
-			addr.setAmapId(req.getAmapId());
-			addr.setMain(true);
-			addr.setProvince(req.getProvince());
-			addr.setProvinceId(req.getProvinceId());
-			addr.setReceiveName(req.getRealName());
-			addr.setUserId(user.getId());
-			addr.setUserName(user.getName());
-			addr.setXiaoquName(req.getXiaoquName());
-			addr.setReceiveName(user.getRealName());
-			addr.setTel(user.getTel());
-			addr = addressService.addAddress(addr);
-			
-
-			//本方法内调用无法异步
-			addressService.fillAmapInfo(addr);
-			
-			addressService.configDefaultAddress(user, addr.getId());
-			session.setAttribute(Constants.USER, user);
-//			couponService.addCoupon4Regist(user);
-			return new BaseResult<UserInfo>().success(new UserInfo(user));
-		}
     }
 }

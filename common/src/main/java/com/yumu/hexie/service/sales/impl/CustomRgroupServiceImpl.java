@@ -1,5 +1,7 @@
 package com.yumu.hexie.service.sales.impl;
 
+import java.util.List;
+
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
@@ -7,10 +9,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.yumu.hexie.model.ModelConstant;
+import com.yumu.hexie.model.distribution.RuleDistribution;
 import com.yumu.hexie.model.market.OrderItem;
 import com.yumu.hexie.model.market.ServiceOrder;
 import com.yumu.hexie.model.market.rgroup.RgroupUser;
 import com.yumu.hexie.model.market.rgroup.RgroupUserRepository;
+import com.yumu.hexie.model.market.saleplan.OnSaleRule;
 import com.yumu.hexie.model.market.saleplan.RgroupRule;
 import com.yumu.hexie.model.market.saleplan.SalePlan;
 import com.yumu.hexie.model.payment.PaymentOrder;
@@ -115,5 +119,17 @@ public class CustomRgroupServiceImpl  extends CustomOrderServiceImpl {
     @Override
     public void postOrderCancel(ServiceOrder order) {
     }
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<RuleDistribution> findRuleDistribution(long productId,
+			long ruleId) {
+
+		RgroupRule rule = new RgroupRule();
+		rule.setId(ruleId);
+		rule.setProductId(productId);
+		return (List<RuleDistribution>) distributionService.queryRgroupsByRules(rule);
+	
+	}
 
 }

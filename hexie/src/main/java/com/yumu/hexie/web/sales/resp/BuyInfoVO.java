@@ -1,7 +1,6 @@
 package com.yumu.hexie.web.sales.resp;
 
 import java.io.Serializable;
-import java.util.List;
 
 import com.yumu.hexie.model.commonsupport.info.Product;
 import com.yumu.hexie.model.market.saleplan.SalePlan;
@@ -16,6 +15,9 @@ public class BuyInfoVO implements Serializable{
 	private Address address;
 	//规则
 	private SalePlan rule;
+	//区域
+	private Address supportedAddress;
+	
 	public BuyInfoVO(){}
 	public Product getProduct() {
 		return product;
@@ -35,5 +37,12 @@ public class BuyInfoVO implements Serializable{
 	public void setAddress(Address address) {
 		this.address = address;
 	}
+	public Address getSupportedAddress() {
+		return supportedAddress;
+	}
+	public void setSupportedAddress(Address supportedAddress) {
+		this.supportedAddress = supportedAddress;
+	}
+	
 	
 }

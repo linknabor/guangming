@@ -188,4 +188,19 @@ public class DistributionServiceImpl implements DistributionService {
     public List<Long> queryO2OItemIds(long regionId, long typeId) {
         return homeDistributionRepository.queryItemIdsByParent(regionId, typeId);
     }
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<? extends DistributionService> queryOnsalesByRules(OnSaleRule rule) {
+		
+		return (List<? extends DistributionService>) onSaleAreaItemRepository.findByProductIdAndRuleId(rule.getProductId(), rule.getId());
+	}
+
+	@SuppressWarnings("unchecked")
+	@Override
+	public List<? extends DistributionService> queryRgroupsByRules(RgroupRule rule) {
+		
+		return (List<? extends DistributionService>) rgroupAreaItemRepository.findByProductIdAndRuleId(rule.getProductId(), rule.getId());
+	}
+    
 }

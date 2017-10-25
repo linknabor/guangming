@@ -10,6 +10,7 @@ import javax.inject.Inject;
 
 import org.springframework.stereotype.Service;
 
+import com.yumu.hexie.model.distribution.RuleDistribution;
 import com.yumu.hexie.model.localservice.repair.RepairOrder;
 import com.yumu.hexie.model.localservice.repair.RepairOrderRepository;
 import com.yumu.hexie.model.market.OrderItem;
@@ -92,6 +93,13 @@ public class CustomRepairServiceImpl extends CustomOrderServiceImpl {
     @Override
     public void postOrderCancel(ServiceOrder order) {
     }
+
+	@Override
+	public List<RuleDistribution> findRuleDistribution(long productId,
+			long ruleId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
     
 }

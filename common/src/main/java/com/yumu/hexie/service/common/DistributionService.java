@@ -32,4 +32,7 @@ public interface DistributionService {
     public List<RgroupAreaItem> queryRgroups(User user,int page);
     public List<Long> queryO2OServiceIds(long regionId, long type);
     public List<Long> queryO2OItemIds(long regionId, long type);
+    
+    List< ? extends DistributionService> queryOnsalesByRules(OnSaleRule rule);
+    List<? extends DistributionService> queryRgroupsByRules(RgroupRule rule);
 }

@@ -60,4 +60,6 @@ public interface OnSaleAreaItemRepository extends JpaRepository<OnSaleAreaItem, 
 	public List<OnSaleAreaItem> findByCusProductType(long provinceId,long cityId,long countyId,long xiaoquId,long current,int productType, Pageable pageable);
 
 	public List<OnSaleAreaItem> findByRuleId(long ruleId);
+	
+	public List<OnSaleAreaItem> findByProductIdAndRuleId(long productId, long ruleId);
 }
