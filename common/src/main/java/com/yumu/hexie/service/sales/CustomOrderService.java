@@ -6,7 +6,6 @@ package com.yumu.hexie.service.sales;
 
 import java.util.List;
 
-import com.yumu.hexie.model.distribution.OnSaleAreaItem;
 import com.yumu.hexie.model.distribution.RuleDistribution;
 import com.yumu.hexie.model.market.OrderItem;
 import com.yumu.hexie.model.market.ServiceOrder;

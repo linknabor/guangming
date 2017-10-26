@@ -189,18 +189,16 @@ public class DistributionServiceImpl implements DistributionService {
         return homeDistributionRepository.queryItemIdsByParent(regionId, typeId);
     }
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public List<? extends DistributionService> queryOnsalesByRules(OnSaleRule rule) {
+	public List<?> queryOnsalesByRules(OnSaleRule rule) {
 		
-		return (List<? extends DistributionService>) onSaleAreaItemRepository.findByProductIdAndRuleId(rule.getProductId(), rule.getId());
+		return (List<?>) onSaleAreaItemRepository.findByProductIdAndRuleId(rule.getProductId(), rule.getId());
 	}
 
-	@SuppressWarnings("unchecked")
 	@Override
-	public List<? extends DistributionService> queryRgroupsByRules(RgroupRule rule) {
+	public List<?> queryRgroupsByRules(RgroupRule rule) {
 		
-		return (List<? extends DistributionService>) rgroupAreaItemRepository.findByProductIdAndRuleId(rule.getProductId(), rule.getId());
+		return (List<?>) rgroupAreaItemRepository.findByProductIdAndRuleId(rule.getProductId(), rule.getId());
 	}
     
 }
