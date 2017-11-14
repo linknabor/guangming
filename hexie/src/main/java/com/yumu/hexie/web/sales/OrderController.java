@@ -229,6 +229,17 @@ public class OrderController extends BaseController{
 				supportedAddress.setProvince(province.getName());
 				xiaoquCount++;
 				
+			}else {
+				supportedAddress.setXiaoquId(0);
+				supportedAddress.setXiaoquName("");
+				supportedAddress.setXiaoquAddr("");
+				supportedAddress.setCountyId(0);
+				supportedAddress.setCounty("");
+				supportedAddress.setCityId(0);
+				supportedAddress.setCity("");
+				supportedAddress.setProvinceId(0);
+				supportedAddress.setProvince("");
+				xiaoquCount++;
 			}
 		}
 		
