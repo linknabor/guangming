@@ -1,0 +1,15 @@
+/common/.settings/org.eclipse.core.resources.prefs
+/common/.settings/org.eclipse.jdt.core.prefs
+/common/.settings/org.eclipse.m2e.core.prefs
+/common/.settings/org.eclipse.wst.common.component
+/common/.settings/org.eclipse.wst.common.project.facet.core.xml
+/common/.settings/org.eclipse.wst.validation.prefs
+/hexiebk/target/maven-status/maven-compiler-plugin/compile/default-compile/createdFiles.lst
+/hexiebk/target/maven-status/maven-compiler-plugin/compile/default-compile/inputFiles.lst
+/hexiebk/target/maven-status/maven-compiler-plugin/testCompile/default-testCompile/inputFiles.lst
+/common/.settings
+/hexie/.settings
+/hexiebk/.settings
+/.settings/org.eclipse.core.resources.prefs
+/common/src/main/resources/logback.xml
+/common/src/main/resources/*.properties
