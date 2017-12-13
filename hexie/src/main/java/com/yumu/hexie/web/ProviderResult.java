@@ -19,7 +19,7 @@ public class ProviderResult<T> implements Serializable {
 	private static final long serialVersionUID = 2486938184953707720L;
 	
 	private String return_code;
-	private String return_message;
+	private String return_msg;
 	private String appid;
 	private String timestamp;
 	private String nonce_str;
@@ -30,7 +30,7 @@ public class ProviderResult<T> implements Serializable {
 		// TODO Auto-generated constructor stub
 	}
 
-	public ProviderResult(String appid) {
+	public ProviderResult(String appid, String key) {
 		
 		this.appid = appid;
 		this.return_code = ProviderConstant.SUCCESS;
@@ -38,14 +38,14 @@ public class ProviderResult<T> implements Serializable {
 		this.nonce_str = WeixinUtil.buildRandom();
 		Map<String, Object>map = new TreeMap<String, Object>();
 		BeanUtils.copyProperties(this, map);
-		String sign = SignService.createSign(map, "");
+		String sign = SignService.createSign(map, key, "");
 		this.sign = sign;
 	
 	}
 
-	public static <T> String success(T result, String appid) {
+	public static <T> String success(T result, String appid, String key) {
 		
-		ProviderResult<T> r = new ProviderResult<T>(appid);
+		ProviderResult<T> r = new ProviderResult<T>(appid, key);
 		String json = "";
 		try {
 			
@@ -62,9 +62,9 @@ public class ProviderResult<T> implements Serializable {
 		return json;
 	}
 	
-	public static <T> String success(String appid) {
+	public static <T> String success(String appid, String key) {
 		
-		ProviderResult<T> r = new ProviderResult<T>(appid);
+		ProviderResult<T> r = new ProviderResult<T>(appid, key);
 		String json = "";
 		try {
 			String rJson = JacksonJsonUtil.beanToJson(r);
@@ -98,11 +98,11 @@ public class ProviderResult<T> implements Serializable {
 	}
 
 	public String getReturn_message() {
-		return return_message;
+		return return_msg;
 	}
 
 	public void setReturn_message(String return_message) {
-		this.return_message = return_message;
+		this.return_msg = return_message;
 	}
 
 	public String getAppid() {

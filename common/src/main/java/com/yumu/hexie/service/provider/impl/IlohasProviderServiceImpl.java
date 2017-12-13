@@ -39,7 +39,9 @@ import com.yumu.hexie.model.market.saleplan.OnSaleRuleRepository;
 import com.yumu.hexie.model.provider.ProviderConstant;
 import com.yumu.hexie.model.provider.ilohas.IlohasProduct;
 import com.yumu.hexie.model.provider.ilohas.IlohasProductRepository;
+import com.yumu.hexie.model.redis.Keys;
 import com.yumu.hexie.model.redis.RedisRepository;
+import com.yumu.hexie.service.common.SystemConfigService;
 import com.yumu.hexie.service.exception.BizValidateException;
 import com.yumu.hexie.service.exception.InteractionException;
 import com.yumu.hexie.service.jms.JMSProducer;
@@ -74,6 +76,8 @@ public class IlohasProviderServiceImpl<T> implements ProviderService<T>{
 	private CollocationItemRepository collocationItemRepository;
 	@Inject
 	private ServiceOrderRepository serviceOrderRepository;
+	@Inject
+	private SystemConfigService systemConfigService;
 	
 	@Override
 	public String getToken(ProviderLoginer loginer){
@@ -110,8 +114,12 @@ public class IlohasProviderServiceImpl<T> implements ProviderService<T>{
 		String appid = (String) map.get("appid");
 		ProviderLoginer loginer = new ProviderLoginer();
 		loginer.setProviderId(appid);
+		
+		String secret = systemConfigService.queryValueByKey(Keys.appSecret(appid));
+		loginer.setSecret(secret);
+		
 		String sysToken = tokenService.getToken(loginer);
-		SignService.validateSign(map, sysToken);
+		SignService.validateSign(map, sysToken, secret);
 		
 	}
 

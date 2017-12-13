@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.yumu.hexie.integration.provider.ilohas.entity.ProviderLoginer;
+import com.yumu.hexie.model.redis.Keys;
+import com.yumu.hexie.service.common.SystemConfigService;
 import com.yumu.hexie.service.exception.InteractionException;
 import com.yumu.hexie.service.provider.ProviderService;
 import com.yumu.hexie.web.BaseController;
@@ -23,19 +25,23 @@ public class ProviderController extends BaseController {
 	@SuppressWarnings("rawtypes")
 	@Inject
 	private ProviderService providerService;
+	@Inject
+	private SystemConfigService systemConfigService;
 	
 	@RequestMapping(value = "/getToken", method = RequestMethod.POST)
 	@ResponseBody
     public String getToken(@RequestBody Map<String, String> map) throws Exception {
 		
 		String appid = map.get("appid");
+		String key = map.get("key");
 		ProviderLoginer loginer = new ProviderLoginer();
 		loginer.setProviderId(appid);
+		loginer.setSecret(key);
 		loginer.setCreateToken(true);
 		String token = providerService.getToken(loginer);
 		Map<String, String>tokenMap = new HashMap<String, String>();
 		tokenMap.put("token", token);
-        return ProviderResult.success(tokenMap, appid);
+        return ProviderResult.success(tokenMap, appid, key);
         
     }
 	
@@ -54,7 +60,8 @@ public class ProviderController extends BaseController {
 			providerService.sendMessageByJms(goods, destination);
 		}
 		String appid = (String) map.get("appid");
-		return ProviderResult.success(appid);
+		String key = systemConfigService.queryValueByKey(Keys.appSecret(appid));
+		return ProviderResult.success(appid, key);
         
     }
 	
@@ -69,7 +76,8 @@ public class ProviderController extends BaseController {
 		
 		Long appid = 2l;
 		providerService.updateProducts(appid);
-		return ProviderResult.success(String.valueOf(appid));
+		String key = systemConfigService.queryValueByKey(Keys.systemConfigKey(String.valueOf(appid)));
+		return ProviderResult.success(String.valueOf(appid), key);
 	}
 	
 	@SuppressWarnings("unchecked")
@@ -87,7 +95,8 @@ public class ProviderController extends BaseController {
 			providerService.sendMessageByJms(goods, destination);
 		}
 		String appid = (String) map.get("appid");
-		return ProviderResult.success(appid);
+		String key = systemConfigService.queryValueByKey(Keys.systemConfigKey(appid));
+		return ProviderResult.success(appid, key);
 		
 	}
 	

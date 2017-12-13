@@ -31,4 +31,8 @@ public final class Keys {
     	return String.format("provider.updateOrderReq:%s:key", key);
     }
     
+    public static String appSecret(String appid) {
+    	return String.format("PROVIDERS_ILOHAS_%s", appid);
+    }
+    
 }
