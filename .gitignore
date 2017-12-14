@@ -13,3 +13,5 @@
 /.settings/org.eclipse.core.resources.prefs
 /common/src/main/resources/logback.xml
 /common/src/main/resources/*.properties
+/hexie/logs/hexie/*.log
+/hexiebk/logs/bk/*.log

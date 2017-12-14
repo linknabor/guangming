@@ -36,6 +36,7 @@ import com.yumu.hexie.model.payment.PaymentOrderRepository;
 import com.yumu.hexie.model.payment.RefundOrder;
 import com.yumu.hexie.model.payment.RefundOrderRepository;
 import com.yumu.hexie.model.promotion.coupon.Coupon;
+import com.yumu.hexie.model.provider.ProviderConstant;
 import com.yumu.hexie.model.system.BizError;
 import com.yumu.hexie.model.system.BizErrorRepository;
 import com.yumu.hexie.model.user.User;
@@ -47,6 +48,7 @@ import com.yumu.hexie.service.exception.BizValidateException;
 import com.yumu.hexie.service.o2o.BaojieService;
 import com.yumu.hexie.service.o2o.BillAssignService;
 import com.yumu.hexie.service.o2o.XiyiService;
+import com.yumu.hexie.service.provider.ProviderService;
 import com.yumu.hexie.service.sales.BaseOrderService;
 import com.yumu.hexie.service.sales.RgroupService;
 import com.yumu.hexie.service.user.CouponService;
@@ -93,6 +95,11 @@ public class ScheduleServiceImpl implements ScheduleService{
     private BillAssignService billAssignService;
     @Inject
     private MerchantRepository merchantRepository;
+    
+    @SuppressWarnings("rawtypes")
+	@Inject
+    private ProviderService providerService;
+    
 	
 	//1. 订单超时
     @Scheduled(cron = "50 1/3 * * * ?")
@@ -452,7 +459,14 @@ public class ScheduleServiceImpl implements ScheduleService{
 	@Scheduled(cron = "0 0/10 * * * ?")
 	public void executeUpdateIlohasProductInfo() {
 
-		
+		providerService.updateProducts(Long.valueOf(ProviderConstant.ILOHAS_MERCHANT_ID));
+	}
+
+	@Override
+	@Scheduled(cron = "0 0/10 * * * ?")
+	public void executeUPdateIlohasOrderStatus() {
+
+		providerService.updateOrderStatus(Long.valueOf(ProviderConstant.ILOHAS_MERCHANT_ID));
 	}
 	
 	

@@ -24,8 +24,9 @@ public class IlohasProduct extends BaseModel {
 	private String stock;	//库存
 	private String openState;	//销售状态，0上架、1下架、售罄,供应商的商品状态
 	private String headLog;	//商品图片
-	private String updateDate;	//更新时间
-	private String status;	//合协社区产品状态：0已更新到product表，如果为空，则未更新
+	private String receivedTime;//接收到商品推送的时间
+	private String updateTime;	//更新时间
+	private Boolean updated = Boolean.FALSE;	//合协社区产品状态：false未更新到product表，true，已经更新到product
 	private String merchantId;	//商户ID
 	
 	public String getCode() {
@@ -76,17 +77,11 @@ public class IlohasProduct extends BaseModel {
 	public void setHeadLog(String headLog) {
 		this.headLog = headLog;
 	}
-	public String getUpdateDate() {
-		return updateDate;
+	public String getUpdateTime() {
+		return updateTime;
 	}
-	public void setUpdateDate(String updateDate) {
-		this.updateDate = updateDate;
-	}
-	public String getStatus() {
-		return status;
-	}
-	public void setStatus(String status) {
-		this.status = status;
+	public void setUpdateTime(String updateDate) {
+		this.updateTime = updateDate;
 	}
 	public String getMerchantId() {
 		return merchantId;
@@ -94,15 +89,28 @@ public class IlohasProduct extends BaseModel {
 	public void setMerchantId(String merchantId) {
 		this.merchantId = merchantId;
 	}
+	public Boolean getUpdated() {
+		return updated;
+	}
+	public void setUpdated(Boolean updated) {
+		this.updated = updated;
+	}
+	public String getReceivedTime() {
+		return receivedTime;
+	}
+	public void setReceivedTime(String receivedTime) {
+		this.receivedTime = receivedTime;
+	}
 	@Override
 	public String toString() {
 		return "IlohasProduct [code=" + code + ", name=" + name
 				+ ", supplierName=" + supplierName + ", unit=" + unit
 				+ ", price=" + price + ", stock=" + stock + ", openState="
-				+ openState + ", headLog=" + headLog + ", updateDate="
-				+ updateDate + ", status=" + status + ", merchantId="
-				+ merchantId + "]";
+				+ openState + ", headLog=" + headLog + ", receivedTime="
+				+ receivedTime + ", updateTime=" + updateTime + ", updated="
+				+ updated + ", merchantId=" + merchantId + "]";
 	}
+	
 	
 	
 }

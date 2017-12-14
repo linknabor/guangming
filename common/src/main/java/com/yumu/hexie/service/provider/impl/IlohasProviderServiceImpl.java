@@ -1,6 +1,7 @@
 package com.yumu.hexie.service.provider.impl;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -36,7 +37,6 @@ import com.yumu.hexie.model.market.ServiceOrder;
 import com.yumu.hexie.model.market.ServiceOrderRepository;
 import com.yumu.hexie.model.market.saleplan.OnSaleRule;
 import com.yumu.hexie.model.market.saleplan.OnSaleRuleRepository;
-import com.yumu.hexie.model.provider.ProviderConstant;
 import com.yumu.hexie.model.provider.ilohas.IlohasProduct;
 import com.yumu.hexie.model.provider.ilohas.IlohasProductRepository;
 import com.yumu.hexie.model.redis.Keys;
@@ -95,7 +95,6 @@ public class IlohasProviderServiceImpl<T> implements ProviderService<T>{
     	if (StringUtil.isEmpty(destination)) {
 			throw new InteractionException(" destination is empty .");
 		}
-    	
     	
     	logger.info("t is : " + t.toString());
     	
@@ -381,7 +380,9 @@ public class IlohasProviderServiceImpl<T> implements ProviderService<T>{
 	
 	private void updateIlohasProductStatus(IlohasProduct ilohasProduct){
 	
-		ilohasProduct.setStatus(ProviderConstant.STATUS_UPDATED);
+		ilohasProduct.setUpdated(Boolean.TRUE);
+		Date nowDate = new Date();
+		ilohasProduct.setUpdateTime(DateUtil.dtFormat(nowDate));
 		ilohasProductRepository.save(ilohasProduct);
 	}
 	
@@ -502,10 +503,14 @@ public class IlohasProviderServiceImpl<T> implements ProviderService<T>{
 	}
 
 	@Override
-	public void updateOrderStatus(Map<String, Object> map) {
-		//
-		
-		
+	//TODO 需要时候再更新状态??? 按流程，当支付完成时，serviceOrder就已经更改了
+	public void updateOrderStatus(Long merchantId) {
+
+//		List<IlohasOrder> ilohasOrders = ilohasOrderRepository.findByUpdated(Boolean.FALSE);	
+//		for (IlohasOrder ilohasOrder : ilohasOrders) {
+//			ServiceOrder serviceOrder = serviceOrderRepository.findByOrderNo(ilohasOrder.getOrderNo());
+//		}
+	
 	}
 
 	

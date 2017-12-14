@@ -2,6 +2,8 @@ package com.yumu.hexie.service.provider.impl;
 
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.yumu.hexie.common.util.MD5Util;
@@ -18,6 +20,8 @@ import com.yumu.hexie.service.provider.TokenService;
 
 @Service
 public class TokenServiceImpl implements TokenService {
+	
+	private static final Logger logger = LoggerFactory.getLogger(TokenServiceImpl.class);
 
 	@Inject
 	RedisRepository redisRepository;
@@ -31,6 +35,8 @@ public class TokenServiceImpl implements TokenService {
 	@Override
 	public String getToken(ProviderLoginer loginer) {
 
+		logger.info("loginer is : " + loginer.toString());
+		
 		String appid = loginer.getProviderId();
 		boolean isCreate = loginer.isCreateToken();
 		

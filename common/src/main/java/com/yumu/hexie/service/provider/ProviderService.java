@@ -21,6 +21,6 @@ public interface ProviderService <T> {
 	
 	boolean checkUpdateOrderStatusDuplicate(Map<String, Object> map);
 	
-	void updateOrderStatus(Map<String, Object>map);
+	void updateOrderStatus(Long merchantId);
 	
 }
