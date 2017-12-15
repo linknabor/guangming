@@ -186,7 +186,11 @@ public class IlohasProviderServiceImpl<T> implements ProviderService<T>{
 			onSaleRule = saveOnSaleRule(product, onSaleRule);
 			
 			//保存serviceareaitem
-			ServiceAreaItem serviceAreaItem = serviceAreaItemRepository.findByProductId(product.getId());
+			List<ServiceAreaItem> serviceAreaItems = serviceAreaItemRepository.findByProductId(product.getId());
+			ServiceAreaItem serviceAreaItem = null;
+			if (serviceAreaItems.size()>0) {
+				serviceAreaItem = serviceAreaItems.get(0);
+			}
 			serviceAreaItem = saveServiceAreaItem(product, onSaleRule, serviceAreaItem);
 			
 			//保存onsaleareaitem
