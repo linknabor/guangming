@@ -21,11 +21,11 @@ public interface BaseOrderService {
 	//创建订单
 	public ServiceOrder createOrder(CreateOrderReq req,Cart cart,long userId,String openId);
 	//发起支付
-	public JsSign requestPay(ServiceOrder order);
+	public JsSign requestPay(ServiceOrder order, String return_url);
 	//支付状态变更
 	public void update4Payment(PaymentOrder payment);
 	//通知支付成功
-	public PaymentOrder notifyPayed(long orderId);
+	public PaymentOrder notifyPayed(long orderId, String pay_status, String other_payId);
 	//取消订单
 	public ServiceOrder cancelOrder(ServiceOrder order);
 	//确认订单

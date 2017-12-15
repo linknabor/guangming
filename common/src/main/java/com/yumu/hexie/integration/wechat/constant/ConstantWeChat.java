@@ -146,4 +146,10 @@ public class ConstantWeChat {
 	 */
 	public static final String SCOPE_SNSAPI_BASE = "snsapi_base";
 	public static final String SCOPE_SNSAPI_USERINFO = "snsapi_userinfo";
+	
+	
+	/**
+	 * 通联appkey
+	 */
+	public static final String ALLIN_APPKEY = ConfigUtil.get("ALLIN_APPKEY");
 }

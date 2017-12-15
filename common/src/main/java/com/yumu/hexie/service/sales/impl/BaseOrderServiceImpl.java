@@ -203,7 +203,7 @@ public class BaseOrderServiceImpl extends BaseOrderProcessor implements BaseOrde
 
 
 	@Override
-	public JsSign requestPay(ServiceOrder order) {
+	public JsSign requestPay(ServiceOrder order, String return_url) {
         log.warn("[requestPay]OrderNo:" + order.getOrderNo());
 		//校验订单状态
 		if(!order.payable()){
@@ -213,7 +213,7 @@ public class BaseOrderServiceImpl extends BaseOrderProcessor implements BaseOrde
 		PaymentOrder pay = paymentService.fetchPaymentOrder(order);
         log.warn("[requestPay]PaymentId:" + pay.getId());
 		//发起支付
-		JsSign sign = paymentService.requestPay(pay);
+		JsSign sign = paymentService.requestPay(pay, return_url);
         log.warn("[requestPay]NonceStr:" + sign.getNonceStr());
 		//操作记录
 		commonPostProcess(ModelConstant.ORDER_OP_REQPAY,order);
@@ -264,14 +264,14 @@ public class BaseOrderServiceImpl extends BaseOrderProcessor implements BaseOrde
 	}
 
 	@Override
-	public PaymentOrder notifyPayed(long orderId) {
+	public PaymentOrder notifyPayed(long orderId, String pay_status, String other_payId) {
         log.warn("[notifyPayed]orderId:"+orderId);
 		ServiceOrder so = serviceOrderRepository.findOne(orderId);
 		if(so == null || so.getStatus() == ModelConstant.ORDER_STATUS_PAYED) {
 		    return null;
 		}
         PaymentOrder payment = paymentService.fetchPaymentOrder(so);
-        payment = paymentService.refreshStatus(payment);
+        payment = paymentService.refreshStatus(payment, pay_status, other_payId);
         update4Payment(payment);
         return payment;
 	}

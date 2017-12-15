@@ -4,8 +4,11 @@
  */
 package com.yumu.hexie.service.repair.impl;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import javax.inject.Inject;
 
@@ -132,7 +135,20 @@ public class RepairServiceImpl implements RepairService {
         RepairOrder ro = repairOrderRepository.findOne(orderId);
         ro.setAmount(amount);
         ServiceOrder so = baseOrderService.createRepairOrder(ro, amount);
-        return baseOrderService.requestPay(so);
+        
+        Properties props = new Properties();
+        try {
+			props.load(Thread.currentThread().getContextClassLoader()
+					.getResourceAsStream("wechat.properties"));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+        
+        String weixiuReturnUrl = props.getProperty("weixiuReturnUrl");
+		
+        return baseOrderService.requestPay(so, weixiuReturnUrl);
     }
 
     /** 
@@ -154,10 +170,23 @@ public class RepairServiceImpl implements RepairService {
      * @see com.yumu.hexie.service.repair.RepairService#notifyPaySuccess(long, com.yumu.hexie.model.user.User)
      */
     @Override
-    public void notifyPaySuccess(long orderId, User user) {
+    public void notifyPaySuccess(long orderId, String pay_status, String other_payId, User user) {
         RepairOrder ro = repairOrderRepository.findOne(orderId);
         if(ro.getOrderId()!=null&&ro.getOrderId()!=0&&ro.getUserId() == user.getId()){
-            baseOrderService.notifyPayed(ro.getOrderId());
+            baseOrderService.notifyPayed(ro.getOrderId(), pay_status, other_payId);
+        }
+    }
+    
+    /** 
+     * @param orderId
+     * @param user
+     * @see com.yumu.hexie.service.repair.RepairService#notifyPaySuccess(long, com.yumu.hexie.model.user.User)
+     */
+    @Override
+    public void notifyPaySuccess(long orderId, String pay_status, String other_payId) {
+        RepairOrder ro = repairOrderRepository.findOne(orderId);
+        if(ro.getOrderId()!=null&&ro.getOrderId()!=0){
+            baseOrderService.notifyPayed(ro.getOrderId(), pay_status, other_payId);
         }
     }
 

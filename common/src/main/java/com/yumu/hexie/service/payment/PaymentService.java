@@ -29,13 +29,13 @@ public interface PaymentService {
     //线下支付
     public void payOffline(BaseO2OService order);
     //发起支付
-    public JsSign requestPay(PaymentOrder payment);
+    public JsSign requestPay(PaymentOrder payment, String return_url);
     //取消支付
     public PaymentOrder cancelPayment(int orderType,long orderId);
     //全额退款申请
     public boolean refundApply(PaymentOrder payment);
     //更新支付单状态
-    public PaymentOrder refreshStatus(PaymentOrder payment);
+    public PaymentOrder refreshStatus(PaymentOrder payment, String pay_status, String other_payId);
     //更新退款状态
     public PaymentOrder updateRefundStatus(WxRefundOrder wxRefundOrder);
     

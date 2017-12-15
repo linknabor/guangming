@@ -4,8 +4,11 @@
  */
 package com.yumu.hexie.service.o2o.impl;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Properties;
 
 import javax.inject.Inject;
 
@@ -138,8 +141,19 @@ public class BaojieServiceImpl implements BaojieService {
         //发起支付
         bill.setPaymentId(pay.getId());
         bill = baojieBillRepository.save(bill);
-        log.warn("发起支付[END]" + bill.getId()); 
-        return paymentService.requestPay(pay);
+        log.warn("发起支付[END]" + bill.getId());
+        Properties props = new Properties();
+        try {
+			props.load(Thread.currentThread().getContextClassLoader()
+					.getResourceAsStream("wechat.properties"));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+        
+        String baojieReturnUrl = props.getProperty("baojieReturnUrl");
+        return paymentService.requestPay(pay, baojieReturnUrl);
     }
 
     /** 
@@ -232,47 +246,43 @@ public class BaojieServiceImpl implements BaojieService {
      */
     @Async
     @Override
-    public void notifyPayed(long billId) {
+    public void notifyPayed(long billId, String pay_status, String other_payId) {
         log.warn("到家notifyPayed成功[BEG]" + billId); 
-        try {
-            Thread.sleep(1000);//等待微信端处理完成
-        } catch (InterruptedException e) {
-        }
         BaojieBill bill = baojieBillRepository.findOne(billId);
         if(bill == null || bill.getStatus() != HomeServiceConstant.ORDER_STATUS_CREATE) {
             return;
         }
         PaymentOrder payment = paymentService.queryPaymentOrder(PaymentConstant.TYPE_BAOJIE_ORDER,billId);
-        payment = paymentService.refreshStatus(payment);
+        payment = paymentService.refreshStatus(payment, pay_status, other_payId);
         update4Payment(payment);
     }
-    private static final long BAOJIE_TIMEOUT = 3600000l;
-    /** 
-     * @param billId
-     * @see com.yumu.hexie.service.o2o.BaojieService#timeout(long)
-     */
-    @Override
-    public void timeout(long billId) {
-
-        BaojieBill bill = baojieBillRepository.findOne(billId);
-
-        log.warn("保洁超时[BEG]" + billId);
-        PaymentOrder payment = paymentService.queryPaymentOrder(PaymentConstant.TYPE_BAOJIE_ORDER,billId);
-        if(payment != null) {
-            payment = paymentService.refreshStatus(payment);
-            update4Payment(payment);
-        }
-        if((payment == null || payment.getStatus() == PaymentConstant.PAYMENT_STATUS_INIT) 
-                && bill.getCreateDate() + BAOJIE_TIMEOUT > System.currentTimeMillis()) {
-
-            log.warn("保洁超时[BEG]" + billId); 
-            paymentService.cancelPayment(PaymentConstant.TYPE_BAOJIE_ORDER,billId);
-            couponService.unlock(bill.getCouponId());
-            O2OServiceBuilder.init(bill).cancelBySystem("");
-            baojieBillRepository.save(bill);
-            log.warn("保洁超时[END]" + billId); 
-        }
-    }
+//    private static final long BAOJIE_TIMEOUT = 3600000l;
+//    /** 
+//     * @param billId
+//     * @see com.yumu.hexie.service.o2o.BaojieService#timeout(long)
+//     */
+//    @Override
+//    public void timeout(long billId, String pay_status, String other_payId) {
+//
+//        BaojieBill bill = baojieBillRepository.findOne(billId);
+//
+//        log.warn("保洁超时[BEG]" + billId);
+//        PaymentOrder payment = paymentService.queryPaymentOrder(PaymentConstant.TYPE_BAOJIE_ORDER,billId);
+//        if(payment != null) {
+//            payment = paymentService.refreshStatus(payment, pay_status, other_payId);
+//            update4Payment(payment);
+//        }
+//        if((payment == null || payment.getStatus() == PaymentConstant.PAYMENT_STATUS_INIT) 
+//                && bill.getCreateDate() + BAOJIE_TIMEOUT > System.currentTimeMillis()) {
+//
+//            log.warn("保洁超时[BEG]" + billId); 
+//            paymentService.cancelPayment(PaymentConstant.TYPE_BAOJIE_ORDER,billId);
+//            couponService.unlock(bill.getCouponId());
+//            O2OServiceBuilder.init(bill).cancelBySystem("");
+//            baojieBillRepository.save(bill);
+//            log.warn("保洁超时[END]" + billId); 
+//        }
+//    }
 
     /** 
      * @param billId

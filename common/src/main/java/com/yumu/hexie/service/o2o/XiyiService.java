@@ -27,7 +27,7 @@ public interface XiyiService {
     public YunXiyiBill createBill(User user,CommonBillReq req,HomeCart cart);
     public JsSign pay(YunXiyiBill bill,String openId);
     public void update4Payment(PaymentOrder payment);
-    public void notifyPayed(long billId);
+    public void notifyPayed(long billId, String pay_status, String other_payId);
     //public void accept(long billId,long userId);
     public void cancel(long billId, long userId);
     //public void received(long billId);
@@ -35,7 +35,7 @@ public interface XiyiService {
     //public void sended(long billId);
     public void signed(long billId,long userId);
     
-    public void timeout(long billId);
+    //public void timeout(long billId);
     
     public List<YunXiyiBill> queryBills(long userId, int page);
     

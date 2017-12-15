@@ -217,9 +217,9 @@ public class WechatCoreServiceImpl implements WechatCoreService {
 	}
 
 	@Override
-	public PrePaymentOrder createOrder(PaymentOrder payOrder) {
+	public String createOrder(PaymentOrder payOrder, String return_url) {
 		try {
-			return FundService.createOrder(payOrder);
+			return FundService.createOrder(payOrder, return_url);
 		} catch (Exception e) {
 			processError(e);
 		}

@@ -119,7 +119,7 @@ public class RepairController extends BaseController{
     @RequestMapping(value="repair/paySuccess/{repairOrderId}", method = RequestMethod.GET)
     @ResponseBody
     public BaseResult<String> paySuccess(@ModelAttribute(Constants.USER)User user,@PathVariable long repairOrderId){
-        repairService.notifyPaySuccess(repairOrderId, user);
+        repairService.notifyPaySuccess(repairOrderId, "", "", user);
         return new BaseResult<String>().success("支付成功");
     }
     //取消维修
