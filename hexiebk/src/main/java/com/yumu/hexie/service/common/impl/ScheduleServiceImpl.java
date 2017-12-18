@@ -148,66 +148,66 @@ public class ScheduleServiceImpl implements ScheduleService{
     	SCHEDULE_LOG.debug("--------------------executeGroupTimeoutJob[E][R]-------------------");
     }
   //4. 保洁超时  YunXiyiBillRepository
-    @Scheduled(cron = "50 1/2 * * * ?")
-    public void executeBaojieTimeoutJob() {
-        SCHEDULE_LOG.debug("--------------------executeBaojieTimeoutJob[B][R]-------------------");
-        List<BaojieBill> bills = baojieBillRepository.findTimeoutBill(System.currentTimeMillis() - 30000);
-        if(bills.size() == 0) {
-            SCHEDULE_LOG.error("**************executeBaojieTimeoutJob没有记录");
-            return;
-        }
-        String ids = "";
-        for(BaojieBill rule : bills) {
-            ids += rule.getId()+",";
-        }
-        ScheduleRecord sr = new ScheduleRecord(ModelConstant.SCHEDULE_TYPE_BAOJIE_TIMEOUT,ids);
-        sr = scheduleRecordRepository.save(sr);
-        
-        for(BaojieBill rule : bills) {
-            try{
-                SCHEDULE_LOG.debug("XIYIBILL TimeOUt:" + rule.getId());
-                baojieService.timeout(rule.getId());
-            } catch(Exception e){
-                SCHEDULE_LOG.error("超时保洁订单更新失败"+ rule.getId(),e);
-                recordError(e);
-                sr.addErrorCount(""+rule.getId());
-            }
-        }
-        sr.setFinishDate(new Date());
-        scheduleRecordRepository.save(sr);
-        SCHEDULE_LOG.debug("--------------------executeBaojieTimeoutJob[E][R]-------------------");
-    }
+//    @Scheduled(cron = "50 1/2 * * * ?")
+//    public void executeBaojieTimeoutJob() {
+//        SCHEDULE_LOG.debug("--------------------executeBaojieTimeoutJob[B][R]-------------------");
+//        List<BaojieBill> bills = baojieBillRepository.findTimeoutBill(System.currentTimeMillis() - 30000);
+//        if(bills.size() == 0) {
+//            SCHEDULE_LOG.error("**************executeBaojieTimeoutJob没有记录");
+//            return;
+//        }
+//        String ids = "";
+//        for(BaojieBill rule : bills) {
+//            ids += rule.getId()+",";
+//        }
+//        ScheduleRecord sr = new ScheduleRecord(ModelConstant.SCHEDULE_TYPE_BAOJIE_TIMEOUT,ids);
+//        sr = scheduleRecordRepository.save(sr);
+//        
+//        for(BaojieBill rule : bills) {
+//            try{
+//                SCHEDULE_LOG.debug("XIYIBILL TimeOUt:" + rule.getId());
+//                baojieService.timeout(rule.getId());
+//            } catch(Exception e){
+//                SCHEDULE_LOG.error("超时保洁订单更新失败"+ rule.getId(),e);
+//                recordError(e);
+//                sr.addErrorCount(""+rule.getId());
+//            }
+//        }
+//        sr.setFinishDate(new Date());
+//        scheduleRecordRepository.save(sr);
+//        SCHEDULE_LOG.debug("--------------------executeBaojieTimeoutJob[E][R]-------------------");
+//    }
     
     //4. 洗衣超时  YunXiyiBillRepository
-    @Scheduled(cron = "20 1/2 * * * ?")
-    public void executeXiyiTimeoutJob() {
-        SCHEDULE_LOG.debug("--------------------executeXiyiTimeoutJob[B][R]-------------------");
-        List<YunXiyiBill> bills = yunXiyiBillRepository.findTimeoutBill(System.currentTimeMillis() - 30000);
-        if(bills.size() == 0) {
-            SCHEDULE_LOG.error("**************executeXiyiTimeoutJob没有记录");
-            return;
-        }
-        String ids = "";
-        for(YunXiyiBill rule : bills) {
-            ids += rule.getId()+",";
-        }
-        ScheduleRecord sr = new ScheduleRecord(ModelConstant.SCHEDULE_TYPE_XIYI_TIMEOUT,ids);
-        sr = scheduleRecordRepository.save(sr);
-        
-        for(YunXiyiBill rule : bills) {
-            try{
-                SCHEDULE_LOG.debug("XIYIBILL TimeOUt:" + rule.getId());
-                xiyiService.timeout(rule.getId());
-            } catch(Exception e){
-                SCHEDULE_LOG.error("超时洗衣订单更新失败"+ rule.getId(),e);
-                recordError(e);
-                sr.addErrorCount(""+rule.getId());
-            }
-        }
-        sr.setFinishDate(new Date());
-        scheduleRecordRepository.save(sr);
-        SCHEDULE_LOG.debug("--------------------executeXiyiTimeoutJob[E][R]-------------------");
-    }
+//    @Scheduled(cron = "20 1/2 * * * ?")
+//    public void executeXiyiTimeoutJob() {
+//        SCHEDULE_LOG.debug("--------------------executeXiyiTimeoutJob[B][R]-------------------");
+//        List<YunXiyiBill> bills = yunXiyiBillRepository.findTimeoutBill(System.currentTimeMillis() - 30000);
+//        if(bills.size() == 0) {
+//            SCHEDULE_LOG.error("**************executeXiyiTimeoutJob没有记录");
+//            return;
+//        }
+//        String ids = "";
+//        for(YunXiyiBill rule : bills) {
+//            ids += rule.getId()+",";
+//        }
+//        ScheduleRecord sr = new ScheduleRecord(ModelConstant.SCHEDULE_TYPE_XIYI_TIMEOUT,ids);
+//        sr = scheduleRecordRepository.save(sr);
+//        
+//        for(YunXiyiBill rule : bills) {
+//            try{
+//                SCHEDULE_LOG.debug("XIYIBILL TimeOUt:" + rule.getId());
+//                xiyiService.timeout(rule.getId());
+//            } catch(Exception e){
+//                SCHEDULE_LOG.error("超时洗衣订单更新失败"+ rule.getId(),e);
+//                recordError(e);
+//                sr.addErrorCount(""+rule.getId());
+//            }
+//        }
+//        sr.setFinishDate(new Date());
+//        scheduleRecordRepository.save(sr);
+//        SCHEDULE_LOG.debug("--------------------executeXiyiTimeoutJob[E][R]-------------------");
+//    }
     
 
 	/************************************定时任务，由各业务自行调用 **************************/
@@ -229,7 +229,7 @@ public class ScheduleServiceImpl implements ScheduleService{
     	for(Long id : orderIds) {
 	    	SCHEDULE_LOG.debug("PayOrderNotify:" + id);
     		try{
-    			baseOrderService.notifyPayed(id);
+    			baseOrderService.notifyPayed(id, "", "");
     		} catch(Exception e){
     			SCHEDULE_LOG.error("支付状态同步失败"+ id,e);
     			recordError(e);
@@ -444,7 +444,7 @@ public class ScheduleServiceImpl implements ScheduleService{
 			if (asginList == null || asginList.size()==0) {
 				
 				SCHEDULE_LOG.warn("start to reassign, orderId " + orderId);
-				baseOrderService.notifyPayed(orderId);
+				baseOrderService.notifyPayed(orderId, "", "");
 				billAssignService.assginSupermarketOrder(serviceOrder);
 			}
 			
