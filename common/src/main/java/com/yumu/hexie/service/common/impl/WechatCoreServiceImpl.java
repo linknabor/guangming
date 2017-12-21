@@ -6,6 +6,7 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -247,7 +248,7 @@ public class WechatCoreServiceImpl implements WechatCoreService {
 	}
 
 	@Override
-	public WxRefundResp requestRefund(RefundOrder refund) {
+	public JSONObject requestRefund(RefundOrder refund) {
 		try {
 			return RefundService.requestRefund(refund);
 		} catch (Exception e) {
@@ -257,7 +258,7 @@ public class WechatCoreServiceImpl implements WechatCoreService {
 	}
 
 	@Override
-	public WxRefundOrder refundQuery(String outTradeNo) {
+	public JSONObject refundQuery(String outTradeNo) {
 		try {
 			return RefundService.refundQuery(outTradeNo);
 		} catch (Exception e) {

@@ -285,31 +285,31 @@ public class XiyiServiceImpl implements XiyiService {
     }
 
 
-//    private static final long XIYI_TIMEOUT = 3600000l;
+    private static final long XIYI_TIMEOUT = 3600000l;
     /** 
      * @param billId
      * @see com.yumu.hexie.service.o2o.XiyiService#timeout(long)
      */
-//    @Override
-//    public void timeout(long billId) {
-//        YunXiyiBill bill = yunXiyiBillRepository.findOne(billId);
-//
-//        log.warn("洗衣超时[BEG]" + billId);
-//        PaymentOrder payment = paymentService.queryPaymentOrder(PaymentConstant.TYPE_XIYI_ORDER,billId);
-//        if(payment != null) {
-//            payment = paymentService.refreshStatus(payment);
-//            update4Payment(payment);
-//        }
-//        if((payment == null || payment.getStatus() == PaymentConstant.PAYMENT_STATUS_INIT) 
-//                && bill.getCreateDate() + XIYI_TIMEOUT > System.currentTimeMillis()) {
-//
-//            log.warn("洗衣超时[BEG]" + billId); 
-//            paymentService.cancelPayment(PaymentConstant.TYPE_XIYI_ORDER,billId);
-//            couponService.unlock(bill.getCouponId());
-//            O2OServiceBuilder.init(bill).cancelBySystem("");
-//            yunXiyiBillRepository.save(bill);
-//            log.warn("洗衣超时[END]" + billId); 
-//        }
-//    }
+    @Override
+    public void timeout(long billId, String pay_status, String other_payId) {
+        YunXiyiBill bill = yunXiyiBillRepository.findOne(billId);
+
+        log.warn("洗衣超时[BEG]" + billId);
+        PaymentOrder payment = paymentService.queryPaymentOrder(PaymentConstant.TYPE_XIYI_ORDER,billId);
+        if(payment != null) {
+            payment = paymentService.refreshStatus(payment, pay_status, other_payId);
+            update4Payment(payment);
+        }
+        if((payment == null || payment.getStatus() == PaymentConstant.PAYMENT_STATUS_INIT) 
+                && bill.getCreateDate() + XIYI_TIMEOUT > System.currentTimeMillis()) {
+
+            log.warn("洗衣超时[BEG]" + billId); 
+            paymentService.cancelPayment(PaymentConstant.TYPE_XIYI_ORDER,billId);
+            couponService.unlock(bill.getCouponId());
+            O2OServiceBuilder.init(bill).cancelBySystem("");
+            yunXiyiBillRepository.save(bill);
+            log.warn("洗衣超时[END]" + billId); 
+        }
+    }
 
 }

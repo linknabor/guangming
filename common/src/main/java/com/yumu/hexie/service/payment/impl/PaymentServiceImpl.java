@@ -8,6 +8,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -204,10 +206,11 @@ public class PaymentServiceImpl implements PaymentService {
     /** 
      * @param paymentId
      * @return
+     * @throws JSONException 
      * @see com.yumu.hexie.service.payment.PaymentService#refundApply(long)
      */
     @Override
-    public boolean refundApply(PaymentOrder po) {
+    public boolean refundApply(PaymentOrder po) throws JSONException {
         log.warn("[Payment-refundApply]begin["+po.getOrderType()+"]["+po.getId()+"]");
         if(po.getStatus() == PaymentConstant.PAYMENT_STATUS_REFUNDED
                 || po.getStatus() == PaymentConstant.PAYMENT_STATUS_REFUNDING){
@@ -240,12 +243,14 @@ public class PaymentServiceImpl implements PaymentService {
     /** 
      * @param wxRefundOrder
      * @return
+     * @throws JSONException 
      * @see com.yumu.hexie.service.payment.PaymentService#updateRefundStatus(com.yumu.hexie.integration.wechat.entity.common.WxRefundOrder)
      */
     @Override
-    public PaymentOrder updateRefundStatus(WxRefundOrder wxRefundOrder) {
-        log.warn("[Payment-updateRefundStatus]begin["+wxRefundOrder.getOut_trade_no()+"]");
-        RefundOrder ro = refundService.updateRefundStatus(wxRefundOrder);
+    public PaymentOrder updateRefundStatus(JSONObject json) throws JSONException {
+    	String trade_no = json.getString("trade_no");
+        log.warn("[Payment-updateRefundStatus]begin["+trade_no+"]");
+        RefundOrder ro = refundService.updateRefundStatus(json);
         if(ro == null) {
             return null;
         }

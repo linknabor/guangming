@@ -10,6 +10,7 @@ import javax.xml.bind.ValidationException;
 import org.apache.http.client.methods.HttpGet;
 import org.hibernate.bytecode.buildtime.spi.ExecutionException;
 import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -70,6 +71,8 @@ public class WuyeUtil {
 	private static final String PAY_WATER_URL = "getMngCellByTradeIdSDO.do?user_id=%s&trade_water_id=%s"; // 获取支付记录涉及的房屋
 	
 	private static final String ORDER_PAY_URL = "orderPaySDO.do?trade_no=%s&csp_id=%s&openid=%s&return_url=%s&price=%s"; //商品支付
+	private static final String ORDER_NOTIFY_URL = "orderNotifySDO.do?trade_no=%s&csp_id=%s"; //商品支付查询
+	private static final String ORDER_REFUND_URL = "refundOrderSDO.do?trade_no=%s&csp_id=%srefund_id=%s&refund_price=%s"; //商品支付退款
 	
 	public static BaseResult<BillListVO> quickPayInfo(String stmtId, String currPage, String totalCount) {
 		String url = REQUEST_ADDRESS + String.format(QUICK_PAY_URL, stmtId, currPage, totalCount);
@@ -186,6 +189,18 @@ public class WuyeUtil {
 	public static BaseResult<String> getOrderPay(String trade_no, String openId, String return_url, String price) {
 		String url = REQUEST_ADDRESS + String.format(ORDER_PAY_URL, trade_no, CSPID, openId, return_url, price);
 		return (BaseResult<String>)httpGet(url, String.class);
+	}
+	
+	//17.商品支付通知查询
+	public static BaseResult<JSONObject> notifyPayed(String trade_no) {
+		String url = REQUEST_ADDRESS + String.format(ORDER_NOTIFY_URL, trade_no, CSPID);
+		return (BaseResult<JSONObject>)httpGet(url, String.class);
+	}
+	
+	//18.商品支付退款
+	public static BaseResult<JSONObject> refundPayed(String trade_no, String refund_id, String refundFee) {
+		String url = REQUEST_ADDRESS + String.format(ORDER_REFUND_URL, trade_no, CSPID, refund_id, refundFee);
+		return (BaseResult<JSONObject>)httpGet(url, String.class);
 	}
 	
 	private static BaseResult httpGet(String reqUrl, Class c){

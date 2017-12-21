@@ -35,7 +35,7 @@ public interface XiyiService {
     //public void sended(long billId);
     public void signed(long billId,long userId);
     
-    //public void timeout(long billId);
+    public void timeout(long billId, String pay_status, String other_payId);
     
     public List<YunXiyiBill> queryBills(long userId, int page);
     

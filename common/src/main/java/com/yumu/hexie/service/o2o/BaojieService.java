@@ -37,7 +37,7 @@ public interface BaojieService {
     //深度保洁确认
     public BaojieBill cancel(long billId,User user);
     
-    //public void timeout(long billId);
+    public void timeout(long billId, String pay_status, String other_payId);
     
     public List<BaojieBill> query(User user,int page);
 }

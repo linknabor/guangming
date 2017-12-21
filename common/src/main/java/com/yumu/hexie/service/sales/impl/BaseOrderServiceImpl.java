@@ -4,6 +4,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -347,7 +349,7 @@ public class BaseOrderServiceImpl extends BaseOrderProcessor implements BaseOrde
 	//FIXME 注意该方法不应该被外部用户调用
 	@Transactional
 	@Override
-	public ServiceOrder refund(ServiceOrder order) {
+	public ServiceOrder refund(ServiceOrder order) throws JSONException {
         log.warn("[refund]refund-begin:"+order.getId());
 		if(!order.refundable()) {
             throw new BizValidateException(order.getId(),"该订单无法退款！").setError();
@@ -367,9 +369,11 @@ public class BaseOrderServiceImpl extends BaseOrderProcessor implements BaseOrde
 
 	@Transactional
 	@Override
-	public void finishRefund(WxRefundOrder wxRefundOrder) {
-        log.warn("[finishRefund]refund-begin:"+wxRefundOrder.getOut_trade_no());
-		PaymentOrder po = paymentService.updateRefundStatus(wxRefundOrder);
+	public void finishRefund(JSONObject json) throws JSONException {
+		String trade_no = json.getString("trade_no");
+		
+        log.warn("[finishRefund]refund-begin:"+trade_no);
+		PaymentOrder po = paymentService.updateRefundStatus(json);
 		ServiceOrder serviceOrder = serviceOrderRepository.findOne(po.getOrderId());
 		if(po.getStatus() == PaymentConstant.PAYMENT_STATUS_REFUNDED) {
 			serviceOrder.setStatus(ModelConstant.ORDER_STATUS_REFUNDED);
@@ -377,7 +381,7 @@ public class BaseOrderServiceImpl extends BaseOrderProcessor implements BaseOrde
 	        log.warn("[finishRefund]refund-saved:"+serviceOrder.getId());
 			commonPostProcess(ModelConstant.ORDER_OP_REFUND_FINISH,serviceOrder);
 		}
-        log.warn("[finishRefund]refund-end:"+wxRefundOrder.getOut_trade_no());
+        log.warn("[finishRefund]refund-end:"+trade_no);
 	}
 	public ServiceOrder findOne(long orderId){
 	    return serviceOrderRepository.findOne(orderId);
@@ -385,7 +389,6 @@ public class BaseOrderServiceImpl extends BaseOrderProcessor implements BaseOrde
 
 	@Override
 	public List<OrderItem> findOrderItemsByOrderId(long orderId) {
-		
 		
 		return orderItemRepository.findByServiceOrder(serviceOrderRepository.findOne(orderId));
 	}

@@ -1,5 +1,8 @@
 package com.yumu.hexie.service.payment;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import com.yumu.hexie.integration.wechat.entity.common.JsSign;
 import com.yumu.hexie.integration.wechat.entity.common.WxRefundOrder;
 import com.yumu.hexie.model.localservice.basemodel.BaseO2OService;
@@ -33,10 +36,10 @@ public interface PaymentService {
     //取消支付
     public PaymentOrder cancelPayment(int orderType,long orderId);
     //全额退款申请
-    public boolean refundApply(PaymentOrder payment);
+    public boolean refundApply(PaymentOrder payment) throws JSONException;
     //更新支付单状态
     public PaymentOrder refreshStatus(PaymentOrder payment, String pay_status, String other_payId);
     //更新退款状态
-    public PaymentOrder updateRefundStatus(WxRefundOrder wxRefundOrder);
+    public PaymentOrder updateRefundStatus(JSONObject json) throws JSONException;
     
 }

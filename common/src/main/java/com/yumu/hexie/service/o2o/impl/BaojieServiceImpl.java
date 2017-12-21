@@ -256,33 +256,33 @@ public class BaojieServiceImpl implements BaojieService {
         payment = paymentService.refreshStatus(payment, pay_status, other_payId);
         update4Payment(payment);
     }
-//    private static final long BAOJIE_TIMEOUT = 3600000l;
-//    /** 
-//     * @param billId
-//     * @see com.yumu.hexie.service.o2o.BaojieService#timeout(long)
-//     */
-//    @Override
-//    public void timeout(long billId, String pay_status, String other_payId) {
-//
-//        BaojieBill bill = baojieBillRepository.findOne(billId);
-//
-//        log.warn("保洁超时[BEG]" + billId);
-//        PaymentOrder payment = paymentService.queryPaymentOrder(PaymentConstant.TYPE_BAOJIE_ORDER,billId);
-//        if(payment != null) {
-//            payment = paymentService.refreshStatus(payment, pay_status, other_payId);
-//            update4Payment(payment);
-//        }
-//        if((payment == null || payment.getStatus() == PaymentConstant.PAYMENT_STATUS_INIT) 
-//                && bill.getCreateDate() + BAOJIE_TIMEOUT > System.currentTimeMillis()) {
-//
-//            log.warn("保洁超时[BEG]" + billId); 
-//            paymentService.cancelPayment(PaymentConstant.TYPE_BAOJIE_ORDER,billId);
-//            couponService.unlock(bill.getCouponId());
-//            O2OServiceBuilder.init(bill).cancelBySystem("");
-//            baojieBillRepository.save(bill);
-//            log.warn("保洁超时[END]" + billId); 
-//        }
-//    }
+    private static final long BAOJIE_TIMEOUT = 3600000l;
+    /** 
+     * @param billId
+     * @see com.yumu.hexie.service.o2o.BaojieService#timeout(long)
+     */
+    @Override
+    public void timeout(long billId, String pay_status, String other_payId) {
+
+        BaojieBill bill = baojieBillRepository.findOne(billId);
+
+        log.warn("保洁超时[BEG]" + billId);
+        PaymentOrder payment = paymentService.queryPaymentOrder(PaymentConstant.TYPE_BAOJIE_ORDER,billId);
+        if(payment != null) {
+            payment = paymentService.refreshStatus(payment, pay_status, other_payId);
+            update4Payment(payment);
+        }
+        if((payment == null || payment.getStatus() == PaymentConstant.PAYMENT_STATUS_INIT) 
+                && bill.getCreateDate() + BAOJIE_TIMEOUT > System.currentTimeMillis()) {
+
+            log.warn("保洁超时[BEG]" + billId); 
+            paymentService.cancelPayment(PaymentConstant.TYPE_BAOJIE_ORDER,billId);
+            couponService.unlock(bill.getCouponId());
+            O2OServiceBuilder.init(bill).cancelBySystem("");
+            baojieBillRepository.save(bill);
+            log.warn("保洁超时[END]" + billId); 
+        }
+    }
 
     /** 
      * @param billId
