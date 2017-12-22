@@ -28,7 +28,7 @@ public interface BaojieService {
     public JsSign pay(long billId,User user);
 
     public void update4Payment(PaymentOrder payment);
-    public void notifyPayed(long billId);
+    public void notifyPayed(long billId, String pay_status, String other_payId);
     
     //查询
     public BaojieBill get(long billId,User user);
@@ -37,7 +37,7 @@ public interface BaojieService {
     //深度保洁确认
     public BaojieBill cancel(long billId,User user);
     
-    public void timeout(long billId);
+    public void timeout(long billId, String pay_status, String other_payId);
     
     public List<BaojieBill> query(User user,int page);
 }

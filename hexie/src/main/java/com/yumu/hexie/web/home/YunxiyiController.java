@@ -82,7 +82,7 @@ public class YunxiyiController extends BaseController{
         if(bill.getUserId() != user.getId()) {
             throw new BizValidateException("不能操作他人的订单");
         }
-        xiyiService.notifyPayed(orderId);
+        xiyiService.notifyPayed(orderId, "", "");
         return new BaseResult<String>().success("通知完成");
     }
     @RequestMapping(value="/bills/{page}",method = RequestMethod.POST)

@@ -4,6 +4,9 @@
  */
 package com.yumu.hexie.service.payment;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import com.yumu.hexie.integration.wechat.entity.common.WxRefundOrder;
 import com.yumu.hexie.model.payment.RefundOrder;
 
@@ -17,7 +20,7 @@ import com.yumu.hexie.model.payment.RefundOrder;
  */
 public interface RefundService {
 
-    public boolean refundApply(RefundOrder refundOrder);
+    public boolean refundApply(RefundOrder refundOrder) throws JSONException;
     
-    public RefundOrder updateRefundStatus(WxRefundOrder wxRefundOrder);
+    public RefundOrder updateRefundStatus(JSONObject json) throws JSONException;
 }

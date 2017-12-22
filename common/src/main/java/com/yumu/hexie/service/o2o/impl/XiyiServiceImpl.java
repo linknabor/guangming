@@ -4,8 +4,11 @@
  */
 package com.yumu.hexie.service.o2o.impl;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.Date;
 import java.util.List;
+import java.util.Properties;
 
 import javax.inject.Inject;
 import javax.transaction.Transactional;
@@ -147,8 +150,20 @@ public class XiyiServiceImpl implements XiyiService {
         //发起支付
         bill.pay(pay.getId());
         bill = yunXiyiBillRepository.save(bill);
-        log.warn("发起支付[END]" + bill.getId()); 
-        return paymentService.requestPay(pay);
+        log.warn("发起支付[END]" + bill.getId());
+        
+        Properties props = new Properties();
+        try {
+			props.load(Thread.currentThread().getContextClassLoader()
+					.getResourceAsStream("wechat.properties"));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+        
+		String xiyiReturnUrl = props.getProperty("xiyiReturnUrl");
+        return paymentService.requestPay(pay, xiyiReturnUrl);
     }
 
     private void paySuccess(YunXiyiBill bill,PaymentOrder pay) {
@@ -202,18 +217,15 @@ public class XiyiServiceImpl implements XiyiService {
      */
     @Async
     @Override
-    public void notifyPayed(long billId) {
+    public void notifyPayed(long billId, String pay_status, String other_payId) {
         log.warn("到家notifyPayed成功[BEG]" + billId); 
-        try {
-            Thread.sleep(1000);//等待微信端处理完成
-        } catch (InterruptedException e) {
-        }
+
         YunXiyiBill bill = yunXiyiBillRepository.findOne(billId);
         if(bill == null || bill.getStatus() != HomeServiceConstant.ORDER_STATUS_CREATE) {
             return;
         }
-        PaymentOrder payment = paymentService.queryPaymentOrder(PaymentConstant.TYPE_XIYI_ORDER,billId);
-        payment = paymentService.refreshStatus(payment);
+        PaymentOrder payment = paymentService.queryPaymentOrder(PaymentConstant.TYPE_XIYI_ORDER, billId);
+        payment = paymentService.refreshStatus(payment, pay_status, other_payId);
         update4Payment(payment);
     }
 
@@ -279,13 +291,13 @@ public class XiyiServiceImpl implements XiyiService {
      * @see com.yumu.hexie.service.o2o.XiyiService#timeout(long)
      */
     @Override
-    public void timeout(long billId) {
+    public void timeout(long billId, String pay_status, String other_payId) {
         YunXiyiBill bill = yunXiyiBillRepository.findOne(billId);
 
         log.warn("洗衣超时[BEG]" + billId);
         PaymentOrder payment = paymentService.queryPaymentOrder(PaymentConstant.TYPE_XIYI_ORDER,billId);
         if(payment != null) {
-            payment = paymentService.refreshStatus(payment);
+            payment = paymentService.refreshStatus(payment, pay_status, other_payId);
             update4Payment(payment);
         }
         if((payment == null || payment.getStatus() == PaymentConstant.PAYMENT_STATUS_INIT) 

@@ -13,9 +13,12 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import com.yumu.hexie.common.Constants;
 import com.yumu.hexie.model.market.Cart;
 import com.yumu.hexie.model.market.Collocation;
+import com.yumu.hexie.model.payment.PaymentConstant;
+import com.yumu.hexie.model.payment.PaymentOrder;
 import com.yumu.hexie.model.redis.Keys;
 import com.yumu.hexie.model.redis.RedisRepository;
 import com.yumu.hexie.model.user.User;
+import com.yumu.hexie.service.provider.ProviderService;
 import com.yumu.hexie.service.sales.BaseOrderService;
 import com.yumu.hexie.service.sales.CollocationService;
 import com.yumu.hexie.service.user.AddressService;
@@ -34,6 +37,9 @@ public class CollocationController extends BaseController{
     private RedisRepository redisRepository;
     @Inject
     private BaseOrderService baseOrderService;
+    @SuppressWarnings("rawtypes")
+	@Inject
+    private ProviderService providerService;
    
     
 	@RequestMapping(value = "/collocation/{salePlanType}/{ruleId}", method = RequestMethod.GET)
@@ -93,8 +99,11 @@ public class CollocationController extends BaseController{
 	@ResponseBody
 	public BaseResult<String> notifyPayed(@PathVariable long orderId, @ModelAttribute(Constants.USER)User user) throws Exception{
 
-		baseOrderService.notifyPayed(orderId);
+		PaymentOrder order = baseOrderService.notifyPayed(orderId, "", "");
 		collocationService.AssginSupermarketOrder(orderId, user);
+		if (PaymentConstant.PAYMENT_STATUS_SUCCESS == order.getStatus()) {
+			providerService.notifyPay(orderId);
+		}
 		return new BaseResult<String>().success("success");
 	}
 	
@@ -109,7 +118,7 @@ public class CollocationController extends BaseController{
 	@ResponseBody
 	public BaseResult<String> renotify(@PathVariable long orderId, @ModelAttribute(Constants.USER)User user) throws Exception{
 
-		baseOrderService.notifyPayed(orderId);
+		baseOrderService.notifyPayed(orderId, "", "");
 		collocationService.AssginSupermarketOrder(orderId);
 		return new BaseResult<String>().success("success");
 	}

@@ -5,6 +5,7 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 import com.yumu.hexie.model.localservice.HomeCart;
@@ -22,12 +23,13 @@ public class RedisRepository {
     private RedisTemplate<String, HomeCart> homeCartRedisTemplate;
     @Inject
     private RedisTemplate<String, ShareAccessRecord> shareAccessRecordTemplate;
-    
     @Inject
     private RedisTemplate<String, SystemConfig> systemConfigRedisTemplate;
-    
     @Inject
     private RedisTemplate<String, OrderCarInfo> orderCarInfoRedisTemplate;//创建订单之前用户填写的车辆信息
+    @Inject
+    private StringRedisTemplate stringRedisTemplate;
+    
     
     /**
      * 获取订单车辆信息 
@@ -79,6 +81,39 @@ public class RedisRepository {
     
     public void removeShareRecord(String key) {
     	shareAccessRecordTemplate.delete(key);
+    }
+    
+    //登录token,120分钟有效
+    public void setToken(String key, String token) {
+    	stringRedisTemplate.opsForValue().set(Keys.tokenKey(key), token, 120, TimeUnit.MINUTES);	//120分钟过期
+    }
+    
+    public String getToken(String key) {
+    	return stringRedisTemplate.opsForValue().get(Keys.tokenKey(key));
+    }
+    
+    public void setProductPushRequest(String key, String json) {
+    	stringRedisTemplate.opsForValue().set(Keys.pushProductRequestKey(key), json, 24, TimeUnit.HOURS);
+    }
+    
+    public String getProductPushRequest(String key) {
+    	return stringRedisTemplate.opsForValue().get(Keys.pushProductRequestKey(key));
+    }
+    
+    public void deleteProductPushRequest(String key) {
+    	stringRedisTemplate.delete(Keys.pushProductRequestKey(key));
+    }
+    
+    public void setOrderPushRequest (String key, String json) {
+    	stringRedisTemplate.opsForValue().set(Keys.pushOrderRequestKey(key), json, 24, TimeUnit.HOURS);
+    }
+    
+    public String getOrderPushRequest(String key) {
+    	return stringRedisTemplate.opsForValue().get(Keys.pushOrderRequestKey(key));
+    }
+    
+    public void deleteOrderPushRequest(String key) {
+    	stringRedisTemplate.delete(Keys.pushOrderRequestKey(key));
     }
 
 //    

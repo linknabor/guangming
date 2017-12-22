@@ -2,6 +2,9 @@ package com.yumu.hexie.service.sales;
 
 import java.util.List;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import com.yumu.hexie.integration.wechat.entity.common.JsSign;
 import com.yumu.hexie.integration.wechat.entity.common.WxRefundOrder;
 import com.yumu.hexie.model.commonsupport.comment.Comment;
@@ -21,11 +24,11 @@ public interface BaseOrderService {
 	//创建订单
 	public ServiceOrder createOrder(CreateOrderReq req,Cart cart,long userId,String openId);
 	//发起支付
-	public JsSign requestPay(ServiceOrder order);
+	public JsSign requestPay(ServiceOrder order, String return_url);
 	//支付状态变更
 	public void update4Payment(PaymentOrder payment);
 	//通知支付成功
-	public void notifyPayed(long orderId);
+	public PaymentOrder notifyPayed(long orderId, String pay_status, String other_payId);
 	//取消订单
 	public ServiceOrder cancelOrder(ServiceOrder order);
 	//确认订单
@@ -35,9 +38,9 @@ public interface BaseOrderService {
 	//评价
 	public void comment(ServiceOrder order,Comment comment);
 	//退款
-	public ServiceOrder refund(ServiceOrder order);
+	public ServiceOrder refund(ServiceOrder order) throws JSONException;
 	//退款完成
-	public void finishRefund(WxRefundOrder wxRefundOrder);
+	public void finishRefund(JSONObject json) throws JSONException;
 	
 	public ServiceOrder findOne(long orderId);
 	

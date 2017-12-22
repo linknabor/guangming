@@ -18,4 +18,21 @@ public final class Keys {
     public static String orderCarInfoKey(long uid) {
     	return String.format("uid:%d:orderCarInfo", uid);
     }
+    
+    public static String tokenKey(String key){
+    	return String.format("provider.token:%s:key", key);
+    }
+    
+    public static String pushProductRequestKey(String key){
+    	return String.format("provider.pushProductsReq:%s:key", key);
+    }
+    
+    public static String pushOrderRequestKey(String key){
+    	return String.format("provider.updateOrderReq:%s:key", key);
+    }
+    
+    public static String appSecret(String appid) {
+    	return String.format("PROVIDERS_ILOHAS_%s", appid);
+    }
+    
 }
