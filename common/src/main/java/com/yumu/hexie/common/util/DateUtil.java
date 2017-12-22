@@ -249,10 +249,22 @@ public class DateUtil {
  
     }
     
+    /**
+	 * datetime转毫秒
+	 * @param dateTime 格式：yyyy-MM-dd HH:mm:ss
+	 * @return
+	 * @throws ParseException
+	 */
+	public static long getTimeByDateTime(String dateTime) throws ParseException{
+		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+		long millionSeconds = sdf.parse(dateTime).getTime();//毫秒
+		return millionSeconds;
+	}
+	
+    
     public static void main(String[] args) {
 
-System.out.println(Math.ceil((1) / (3600000 * 24d)));
-		System.out.println(DateUtil.getSqlDateFromString("2015-07-28 10:36:44"));
-		
-	}
+    	String date = dttmFormat(new Date());
+    	System.out.println(date);
+    }
 }

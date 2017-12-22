@@ -17,7 +17,7 @@ import com.yumu.hexie.integration.wechat.entity.AccessToken;
 import com.yumu.hexie.integration.wechat.util.WeixinUtil;
 import com.yumu.hexie.integration.wechat.util.WeixinUtilV2;
 import com.yumu.hexie.service.RefreshTokenService;
-import com.yumu.hexie.service.SharedSysConfigService;
+import com.yumu.hexie.service.common.SharedSysConfigService;
 import com.yumu.hexie.service.common.SystemConfigService;
 
 /**
