@@ -9,7 +9,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.yumu.hexie.backend.web.dto.BaseResult;
-import com.yumu.hexie.service.SharedSysConfigService;
+import com.yumu.hexie.service.common.SharedSysConfigService;
 
 @Controller
 public class CacheController extends BaseController{
