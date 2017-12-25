@@ -6,6 +6,8 @@ package com.yumu.hexie.service.o2o;
 
 import java.util.List;
 
+import org.json.JSONException;
+
 import com.yumu.hexie.integration.wechat.entity.common.JsSign;
 import com.yumu.hexie.model.localservice.bill.BaojieBill;
 import com.yumu.hexie.model.payment.PaymentOrder;

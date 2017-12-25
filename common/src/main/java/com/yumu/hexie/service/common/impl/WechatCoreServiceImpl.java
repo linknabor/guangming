@@ -238,7 +238,7 @@ public class WechatCoreServiceImpl implements WechatCoreService {
 	
 
 	@Override
-	public PaymentOrderResult queryOrder(String out_trade_no) {
+	public JSONObject queryOrder(String out_trade_no) {
 		try {
 			return FundService.queryOrder(out_trade_no);
 		} catch (Exception e) {

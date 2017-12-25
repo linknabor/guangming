@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -81,7 +82,7 @@ public class BaojieController extends BaseController{
     @RequestMapping(value = "/baojie/pay/{billId}", method = RequestMethod.POST)
     @ResponseBody
     public BaseResult<JsSign> pay(@ModelAttribute(Constants.USER)User user,@PathVariable long billId) {
-        return new BaseResult<JsSign>().success(baojieService.pay(billId,user));
+    	return new BaseResult<JsSign>().success(baojieService.pay(billId,user));
     }
 
     //保洁确认

@@ -189,6 +189,9 @@ public class WuyeUtil {
 	public static BaseResult<String> getOrderPay(String trade_no, String openId, String return_url, String price) throws ValidationException {
 		String url = REQUEST_ADDRESS + String.format(ORDER_PAY_URL, trade_no, CSPID, openId, return_url, price);
 		BaseResult<String> result = (BaseResult<String>)httpGet(url, String.class);
+		
+		Log.info("WuyeUtil result is :" + result);
+		Log.info("WuyeUtil result is check:" + result.isSuccess());
 		if (!result.isSuccess()) {
 			throw new ValidationException(result.getData().toString());
 		}
@@ -197,8 +200,12 @@ public class WuyeUtil {
 	}
 	
 	//17.商品支付通知查询
-	public static BaseResult<JSONObject> notifyPayed(String trade_no) {
+	public static BaseResult<JSONObject> notifyPayed(String trade_no) throws ValidationException {
 		String url = REQUEST_ADDRESS + String.format(ORDER_NOTIFY_URL, trade_no, CSPID);
+		BaseResult<JSONObject> result = (BaseResult<JSONObject>)httpGet(url, String.class);
+		if (!result.isSuccess()) {
+			throw new ValidationException(result.getData().toString());
+		}
 		return (BaseResult<JSONObject>)httpGet(url, String.class);
 	}
 	

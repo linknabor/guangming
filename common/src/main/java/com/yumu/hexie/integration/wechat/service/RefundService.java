@@ -3,6 +3,8 @@ package com.yumu.hexie.integration.wechat.service;
 import java.util.HashMap;
 import java.util.Map;
 
+import javax.xml.bind.ValidationException;
+
 import org.json.JSONObject;
 
 import com.yumu.hexie.integration.wechat.constant.ConstantWeChat;
@@ -58,11 +60,11 @@ public class RefundService {
 	 * @param out_refund_no
 	 * @param db
 	 * @return
+	 * @throws ValidationException 
 	 */
-	public static JSONObject refundQuery(String outTradeNo){
+	public static JSONObject refundQuery(String outTradeNo) throws ValidationException{
 		
-		BaseResult<JSONObject> result = WuyeUtil.notifyPayed(outTradeNo);
-		JSONObject json = result.getData();
+		return WuyeUtil.notifyPayed(outTradeNo).getData();
 		
 //		String nonce_str = WeixinUtil.buildRandom();	
 //		Map<String,String> map = new HashMap<String, String>();
@@ -75,9 +77,9 @@ public class RefundService {
 //		String requestXml = MessageUtil.createPayRequestXML(map);
 //		WxRefundOrder r = (WxRefundOrder)WeixinUtil.httpsRequestXml(
 //				REFUND_QUERY_URL,  "POST", requestXml,WxRefundOrder.class);
-		return json;
 	}
-	public static void main(String[] args) {
+	
+	public static void main(String[] args) throws ValidationException {
 		RefundOrder ro = new RefundOrder();
 		ro.setPaymentNo("201508101809P11817");
 		ro.setRefundNo("201508111626P58516");

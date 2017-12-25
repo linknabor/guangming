@@ -9,6 +9,8 @@ import java.util.TreeMap;
 
 import javax.xml.bind.ValidationException;
 
+import org.json.JSONObject;
+
 import com.yumu.hexie.common.util.JacksonJsonUtil;
 import com.yumu.hexie.integration.wechat.constant.ConstantWeChat;
 import com.yumu.hexie.integration.wechat.entity.common.CloseOrderResp;
@@ -41,10 +43,7 @@ public class FundService {
 	 */
 	public static String createOrder(PaymentOrder payOrder, String return_url) throws ValidationException{
 		
-		DecimalFormat decimalFormat=new DecimalFormat("0");
-		String price = decimalFormat.format(payOrder.getPrice()*100);
-		BaseResult<String> result = WuyeUtil.getOrderPay(payOrder.getOrderId()+"", payOrder.getOpenId(), return_url, price);
-		return result.getResult();
+		return WuyeUtil.getOrderPay(payOrder.getOrderId()+"", payOrder.getOpenId(), return_url, payOrder.getPrice()+"").getData();
 		
 //		InetAddress addr = null;
 //		try {
@@ -96,24 +95,27 @@ public class FundService {
 	 * 	err_code	错误代码（对应业务结果）
 	 * 	err_code_des错误描述（对应业务结果）
 	 * 	trade_state 交易状态
+	 * @throws ValidationException 
 	 * 
 	 */
-	public static PaymentOrderResult queryOrder(String out_trade_no){
-		Map<String, String>map = new TreeMap<String, String>();
-		String nonceStr = WeixinUtil.buildRandom();	//随机字符串
-		map.put("appid", ConstantWeChat.APPID_PAY);
-		map.put("mch_id", ConstantWeChat.MERCHANTID);
-		map.put("key", ConstantWeChat.KEY);
-		map.put("nonce_str", String.valueOf(nonceStr));
-		map.put("out_trade_no", out_trade_no);
-		String sign = WeixinUtil.createSign(map, ConstantWeChat.KEY);
-		//组装发送的XML
-		map.put("sign", sign);
-		map.remove("key");
-		String requestXml = JacksonJsonUtil.mapToXml(map);
-		PaymentOrderResult r = (PaymentOrderResult)WeixinUtil.httpsRequestXml(
-				QUERY_URL, "POST", requestXml, PaymentOrderResult.class);
-		return r;
+	public static JSONObject queryOrder(String out_trade_no) throws ValidationException{
+		
+		return WuyeUtil.notifyPayed(out_trade_no).getData();
+		
+//		Map<String, String>map = new TreeMap<String, String>();
+//		String nonceStr = WeixinUtil.buildRandom();	//随机字符串
+//		map.put("appid", ConstantWeChat.APPID_PAY);
+//		map.put("mch_id", ConstantWeChat.MERCHANTID);
+//		map.put("key", ConstantWeChat.KEY);
+//		map.put("nonce_str", String.valueOf(nonceStr));
+//		map.put("out_trade_no", out_trade_no);
+//		String sign = WeixinUtil.createSign(map, ConstantWeChat.KEY);
+//		//组装发送的XML
+//		map.put("sign", sign);
+//		map.remove("key");
+//		String requestXml = JacksonJsonUtil.mapToXml(map);
+//		PaymentOrderResult r = (PaymentOrderResult)WeixinUtil.httpsRequestXml(
+//				QUERY_URL, "POST", requestXml, PaymentOrderResult.class);
 	}
 	
 	

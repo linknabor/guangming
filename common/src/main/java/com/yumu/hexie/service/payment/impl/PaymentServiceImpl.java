@@ -109,6 +109,7 @@ public class PaymentServiceImpl implements PaymentService {
     /** 
      * @param payment
      * @return
+     * @throws JSONException 
      * @see com.yumu.hexie.service.payment.PaymentService#requestPay(com.yumu.hexie.model.payment.PaymentOrder)
      */
     @Override
@@ -116,9 +117,13 @@ public class PaymentServiceImpl implements PaymentService {
         validatePayRequest(pay);
         log.warn("[Payment-req]["+pay.getPaymentNo()+"]["+pay.getOrderId()+"]["+pay.getOrderType()+"]");
         //支付然后没继续的情景=----校验所需时间较长，是否需要如此操作
-        if(checkPaySuccess(pay.getPaymentNo())){
-            throw new BizValidateException(pay.getId(),"订单已支付成功，勿重复提交！").setError();
-        }
+        try {
+			if(checkPaySuccess(pay.getPaymentNo())){
+			    throw new BizValidateException(pay.getId(),"订单已支付成功，勿重复提交！").setError();
+			}
+		} catch (JSONException e) {
+			throw new BizValidateException(pay.getId(),"订单已支付成功，勿重复提交！").setError();
+		}
         String prepay_id = wechatCoreService.createOrder(pay, return_url);
         pay.setPrepayId(prepay_id);
         paymentOrderRepository.save(pay);
@@ -141,10 +146,11 @@ public class PaymentServiceImpl implements PaymentService {
         }
     }
 
-    private boolean checkPaySuccess(String paymentNo){
+    private boolean checkPaySuccess(String paymentNo) throws JSONException{
         log.warn("[Payment-check]begin["+paymentNo+"]");
-        PaymentOrderResult poResult = wechatCoreService.queryOrder(paymentNo);
-        return poResult.isSuccess()&&poResult.isPaySuccess();
+        JSONObject poResult = wechatCoreService.queryOrder(paymentNo);
+        PaymentOrder order = new PaymentOrder();
+        return order.isSuccess(poResult.getString("pay_status"));
     }
     /** 
      * @param payment
@@ -218,7 +224,8 @@ public class PaymentServiceImpl implements PaymentService {
         }
         validateRefundPayment(po);
         try{
-            if(!wechatCoreService.queryOrder(po.getPaymentNo()).isPaySuccess()){
+        	PaymentOrder order = new PaymentOrder();
+            if(!order.isSuccess(wechatCoreService.queryOrder(po.getPaymentNo()).getString("pay_status"))){
                 log.warn("[Payment-refundApply]notsuccess["+po.getOrderType()+"]["+po.getId()+"]");
                 po.setStatus(PaymentConstant.PAYMENT_STATUS_CANCEL);
                 po.setUpdateDate(System.currentTimeMillis());

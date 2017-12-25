@@ -12,6 +12,7 @@ import java.util.Properties;
 
 import javax.inject.Inject;
 
+import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.data.domain.PageRequest;
@@ -130,10 +131,11 @@ public class BaojieServiceImpl implements BaojieService {
      * @param billId
      * @param user
      * @return
+     * @throws JSONException 
      * @see com.yumu.hexie.service.o2o.BaojieService#pay(long, com.yumu.hexie.model.user.User)
      */
     @Override
-    public JsSign pay(long billId, User user) {
+    public JsSign pay(long billId, User user){
         BaojieBill bill = baojieBillRepository.findOne(billId);
         log.warn("发起支付[BEG]" + billId); 
         //获取支付单
