@@ -43,7 +43,7 @@ public class FundService {
 	 */
 	public static String createOrder(PaymentOrder payOrder, String return_url) throws ValidationException{
 		
-		return WuyeUtil.getOrderPay(payOrder.getOrderId()+"", payOrder.getOpenId(), return_url, payOrder.getPrice()+"").getData();
+		return WuyeUtil.getOrderPay(payOrder.getPaymentNo()+"", payOrder.getOpenId(), return_url, payOrder.getPrice()+"").getData();
 		
 //		InetAddress addr = null;
 //		try {
