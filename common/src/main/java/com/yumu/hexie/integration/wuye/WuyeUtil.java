@@ -248,6 +248,16 @@ public class WuyeUtil {
 				}
 			}
 			
+			if (reqUrl.indexOf("orderPaySDO.do")>=0) {
+				Map respMap = JacksonJsonUtil.json2map(resp);
+				String result = (String)respMap.get("result");
+				if (!"00".equals(result)) {
+					err_msg = (String)respMap.get("err_msg");
+					err_code = result;
+					throw new ExecutionException(err_code+", " +err_msg);
+				}
+			}
+			
 			Log.error("RESP:" + resp);
 			BaseResult v =jsonToBeanResult(resp, c);
 			return v;
