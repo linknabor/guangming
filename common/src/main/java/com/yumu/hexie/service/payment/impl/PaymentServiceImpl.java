@@ -149,8 +149,14 @@ public class PaymentServiceImpl implements PaymentService {
     private boolean checkPaySuccess(String paymentNo) throws JSONException{
         log.warn("[Payment-check]begin["+paymentNo+"]");
         JSONObject poResult = wechatCoreService.queryOrder(paymentNo);
-        PaymentOrder order = new PaymentOrder();
-        return order.isSuccess(poResult.getString("pay_status"));
+        log.error("poResult is :" + poResult);
+        if (poResult!=null) {
+        	PaymentOrder order = new PaymentOrder();
+            return order.isSuccess(poResult.getString("pay_status"));
+		} else {
+			return false;
+		}
+        
     }
     /** 
      * @param payment
