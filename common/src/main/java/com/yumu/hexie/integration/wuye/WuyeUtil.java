@@ -186,9 +186,14 @@ public class WuyeUtil {
 	}
 	
 	//16.商品支付
-	public static BaseResult<String> getOrderPay(String trade_no, String openId, String return_url, String price) {
+	public static BaseResult<String> getOrderPay(String trade_no, String openId, String return_url, String price) throws ValidationException {
 		String url = REQUEST_ADDRESS + String.format(ORDER_PAY_URL, trade_no, CSPID, openId, return_url, price);
+		BaseResult<String> result = (BaseResult<String>)httpGet(url, String.class);
+		if (!result.isSuccess()) {
+			throw new ValidationException(result.getData().toString());
+		}
 		return (BaseResult<String>)httpGet(url, String.class);
+		
 	}
 	
 	//17.商品支付通知查询

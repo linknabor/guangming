@@ -7,6 +7,8 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.TreeMap;
 
+import javax.xml.bind.ValidationException;
+
 import com.yumu.hexie.common.util.JacksonJsonUtil;
 import com.yumu.hexie.integration.wechat.constant.ConstantWeChat;
 import com.yumu.hexie.integration.wechat.entity.common.CloseOrderResp;
@@ -35,8 +37,9 @@ public class FundService {
 	 * 商品描述:body
 	 * @param db
 	 * @return
+	 * @throws ValidationException 
 	 */
-	public static String createOrder(PaymentOrder payOrder, String return_url){
+	public static String createOrder(PaymentOrder payOrder, String return_url) throws ValidationException{
 		
 		DecimalFormat decimalFormat=new DecimalFormat("0");
 		String price = decimalFormat.format(payOrder.getPrice()*100);
