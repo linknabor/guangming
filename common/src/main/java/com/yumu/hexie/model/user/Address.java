@@ -2,7 +2,7 @@ package com.yumu.hexie.model.user;
 
 import javax.persistence.Entity;
 import javax.persistence.Transient;
-
+import com.yumu.hexie.common.util.StringUtil;
 import org.springframework.beans.BeanUtils;
 
 import com.yumu.hexie.model.BaseModel;
@@ -54,6 +54,9 @@ public class Address  extends BaseModel{
 	@Transient
 	public String getRegionStr(){
 		String province = getProvince();
+		if (StringUtil.isEmpty(province)) {
+			return "";
+		}
 		if(getProvince().indexOf("上海")>=0
 				||getProvince().indexOf("北京")>=0
 				||getProvince().indexOf("重庆")>=0
