@@ -104,13 +104,24 @@ public class WechatController extends BaseController{
     @ResponseBody
     @RequestMapping(value = "/getUrlJsSign", method = RequestMethod.POST )
     public BaseResult<JsSign> getUrlJsSign(@RequestBody UrlSignReq urlReq) {
-    	JsSign s = wechatCoreService.getJsSign(urlReq.getUrl());
+    	JsSign s = wechatCoreService.getJsSign(urlReq.getUrl(), "");
     	if(s != null) {
     		return new BaseResult<JsSign>().success(s);
     	} else {
     		return new BaseResult<JsSign>().failMsg("支付初始化失败，请稍后重试！");
     	}
-    	
+    }
+    
+    //用于唤起扫码(光明集市走通联渠道，appid拿自己的)
+    @ResponseBody
+    @RequestMapping(value = "/getUrlJsSign1", method = RequestMethod.POST )
+    public BaseResult<JsSign> getUrlJsSign1(@RequestBody UrlSignReq urlReq) {
+    	JsSign s = wechatCoreService.getJsSign(urlReq.getUrl(), "1");//因为appid要拿自己的所以为了区分 加一个type
+    	if(s != null) {
+    		return new BaseResult<JsSign>().success(s);
+    	} else {
+    		return new BaseResult<JsSign>().failMsg("支付初始化失败，请稍后重试！");
+    	}
     }
 
     private boolean checkParams(String signature, String timestamp, String nonce){

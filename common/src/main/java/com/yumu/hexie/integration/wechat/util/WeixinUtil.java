@@ -104,11 +104,14 @@ public class WeixinUtil {
 		return accessToken;
 	}
 	
-	public static JsSign getJsSign(String url,String jsTicket) {
+	public static JsSign getJsSign(String url, String jsTicket, String type) {
 		long timestamp = new Date().getTime();
 		String param = JS_T_PARAM.replace("JS_TICKET",jsTicket).replace("TIMESTAMP", ""+timestamp).replace("URL", url);
 		JsSign r = new JsSign();
 		r.setAppId(ConstantWeChat.APPID);
+		if (!StringUtil.isEmpty(type)) {
+			r.setAppId(ConstantWeChat.BIND_APPID_PAY);
+		}
 		r.setNonceStr(NONCESTR);
 		r.setSignature(Sha1Util.getSha1(param));
 		r.setTimestamp(""+timestamp);
