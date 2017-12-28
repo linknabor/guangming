@@ -192,7 +192,7 @@ public class FundService {
 		map.put("appId", r.getAppId());
 		map.put("timeStamp", r.getTimestamp());
 		map.put("nonceStr", r.getNonceStr());
-		map.put("package", "prepay_id=" + prepay_id);
+		map.put("package", prepay_id);
 		map.put("signType", "MD5");
 		r.setSignature(WeixinUtil.createSign(map, ConstantWeChat.KEY));
 		return r;
