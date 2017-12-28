@@ -154,7 +154,7 @@ public class PaymentServiceImpl implements PaymentService {
         	PaymentOrder order = new PaymentOrder();
             return order.isSuccess(poResult.getString("pay_status"));
 		} else {
-			return false;
+			return true;
 		}
         
     }
