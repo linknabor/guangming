@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.JavaType;
 import com.yumu.hexie.common.util.JacksonJsonUtil;
 import com.yumu.hexie.common.util.MyHttpClient;
+import com.yumu.hexie.common.util.StringUtil;
 import com.yumu.hexie.integration.wuye.resp.BaseResult;
 import com.yumu.hexie.integration.wuye.resp.BillListVO;
 import com.yumu.hexie.integration.wuye.resp.CellListVO;
@@ -190,8 +191,6 @@ public class WuyeUtil {
 		String url = REQUEST_ADDRESS + String.format(ORDER_PAY_URL, trade_no, CSPID, openId, return_url, price);
 		BaseResult<String> result = (BaseResult<String>)httpGet(url, String.class);
 		
-		Log.info(">>>>>>WuyeUtil result is :" + result);
-		Log.info(">>>>>>WuyeUtil result is check:" + result.isSuccess());
 		if (!result.isSuccess()) {
 			throw new ValidationException(result.getData().toString());
 		}
@@ -207,10 +206,11 @@ public class WuyeUtil {
 		Log.info(">>>>>>WuyeUtil result notifyPayedis :" + result);
 		Log.info(">>>>>>WuyeUtil result notifyPayed is check:" + result.isSuccess());
 		
-		if (!result.isSuccess()) {
+		if (!result.isSuccess() && !StringUtil.isEmpty(result.getData())) {
 			throw new ValidationException(result.getData().toString());
+		}else {
+			return (BaseResult<JSONObject>)httpGet(url, String.class);
 		}
-		return (BaseResult<JSONObject>)httpGet(url, String.class);
 	}
 	
 	//18.商品支付退款
@@ -264,12 +264,14 @@ public class WuyeUtil {
 			
 			if (reqUrl.indexOf("orderNotifySDO.do")>=0) {
 				Log.info(">>>>>> resp is :"+ resp);
-				Map respMap = JacksonJsonUtil.json2map(resp);
-				String result = (String)respMap.get("result");
-				if (!"00".equals(result)) {
-					err_msg = (String)respMap.get("err_msg");
-					err_code = result;
-					throw new ExecutionException(err_code+", " +err_msg);
+				if (!StringUtil.isEmpty(resp)) {
+					Map respMap = JacksonJsonUtil.json2map(resp);
+					String result = (String)respMap.get("result");
+					if (!"00".equals(result)) {
+						err_msg = (String)respMap.get("err_msg");
+						err_code = result;
+						throw new ExecutionException(err_code+", " +err_msg);
+					}
 				}
 			}
 			
