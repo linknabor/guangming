@@ -184,7 +184,7 @@ public class FundService {
 	public static JsSign getPrepareSign(String prepay_id) {
 		Map<String,String> map = new HashMap<String, String>();
 		JsSign r = new JsSign();
-		r.setAppId(ConstantWeChat.BIND_APPID_PAY);//使用光明自己的appid
+		r.setAppId(ConstantWeChat.APPID_PAY);//使用光明自己的appid
 		r.setTimestamp(""+(int)(System.currentTimeMillis()/1000));
 		r.setNonceStr(WeixinUtil.buildRandom());
 		r.setPkgStr(prepay_id);
