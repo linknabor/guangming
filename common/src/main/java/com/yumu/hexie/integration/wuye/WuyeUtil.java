@@ -190,8 +190,8 @@ public class WuyeUtil {
 		String url = REQUEST_ADDRESS + String.format(ORDER_PAY_URL, trade_no, CSPID, openId, return_url, price);
 		BaseResult<String> result = (BaseResult<String>)httpGet(url, String.class);
 		
-		Log.info("WuyeUtil result is :" + result);
-		Log.info("WuyeUtil result is check:" + result.isSuccess());
+		Log.info(">>>>>>WuyeUtil result is :" + result);
+		Log.info(">>>>>>WuyeUtil result is check:" + result.isSuccess());
 		if (!result.isSuccess()) {
 			throw new ValidationException(result.getData().toString());
 		}
@@ -203,6 +203,10 @@ public class WuyeUtil {
 	public static BaseResult<JSONObject> notifyPayed(String trade_no) throws ValidationException {
 		String url = REQUEST_ADDRESS + String.format(ORDER_NOTIFY_URL, trade_no, CSPID);
 		BaseResult<JSONObject> result = (BaseResult<JSONObject>)httpGet(url, String.class);
+		
+		Log.info(">>>>>>WuyeUtil result notifyPayedis :" + result);
+		Log.info(">>>>>>WuyeUtil result notifyPayed is check:" + result.isSuccess());
+		
 		if (!result.isSuccess()) {
 			throw new ValidationException(result.getData().toString());
 		}
@@ -259,6 +263,7 @@ public class WuyeUtil {
 			}
 			
 			if (reqUrl.indexOf("orderNotifySDO.do")>=0) {
+				Log.info(">>>>>> resp is :"+ resp);
 				Map respMap = JacksonJsonUtil.json2map(resp);
 				String result = (String)respMap.get("result");
 				if (!"00".equals(result)) {
