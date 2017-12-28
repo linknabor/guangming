@@ -306,7 +306,7 @@ public class OrderController extends BaseController{
 	@ResponseBody
 	public BaseResult<ServiceOrder> createOrder(@RequestBody SingleItemOrder sOrder,@ModelAttribute(Constants.USER)User user) throws Exception {
 		sOrder.setUserId(user.getId());
-		sOrder.setOpenId(user.getOpenid());
+		sOrder.setOpenId(user.getBindOpenId());//取光明自己公众号的openid
 		return new BaseResult<ServiceOrder>().success(baseOrderService.createOrder(sOrder));
 	}
 
