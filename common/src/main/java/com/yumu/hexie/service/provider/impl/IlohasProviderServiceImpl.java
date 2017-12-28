@@ -96,7 +96,7 @@ public class IlohasProviderServiceImpl<T> implements ProviderService<T>{
 			throw new InteractionException(" destination is empty .");
 		}
     	
-    	logger.info("t is : " + t.toString());
+    	logger.info("sendMessageByJms, t is : " + t.toString());
     	
     	try {
 			jmsProducer.sendMessage(destination, JacksonJsonUtil.beanToJson(t));
@@ -109,6 +109,8 @@ public class IlohasProviderServiceImpl<T> implements ProviderService<T>{
 
 	@Override
 	public void checkSign(Map<String, Object> map) {
+		
+		logger.info("checkSign, map is :  " + map );
 
 		String appid = (String) map.get("appid");
 		ProviderLoginer loginer = new ProviderLoginer();
@@ -169,10 +171,10 @@ public class IlohasProviderServiceImpl<T> implements ProviderService<T>{
 	public void updateProducts(Long merchantId) {
 
 		List<IlohasProduct> proList = ilohasProductRepository.findAll();
-		
 		for (IlohasProduct ilohasProduct : proList) {
 			
 			Product product = productRepository.findByMerchanProductNo(ilohasProduct.getCode());
+			
 			ilohasProduct.setMerchantId(String.valueOf(merchantId));
 			//保存product
 			product = saveProdcut(ilohasProduct, product);

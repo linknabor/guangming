@@ -5,6 +5,8 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,6 +26,8 @@ import com.yumu.hexie.web.ProviderResult;
 @RequestMapping(value="provider")
 public class ProviderController extends BaseController {
 	
+	private static final Logger logger = LoggerFactory.getLogger(ProviderController.class);
+	
 	@SuppressWarnings("rawtypes")
 	@Inject
 	private ProviderService providerService;
@@ -33,6 +37,8 @@ public class ProviderController extends BaseController {
 	@RequestMapping(value = "/getToken", method = RequestMethod.POST)
 	@ResponseBody
     public String getToken(@RequestBody Map<String, String> map) throws Exception {
+		
+		logger.info("getToken, map is : " + map);
 		
 		String appid = map.get("appid");
 		String key = map.get("key");
@@ -51,6 +57,8 @@ public class ProviderController extends BaseController {
 	@RequestMapping(value = "/pushProducts", method = RequestMethod.POST)
 	@ResponseBody
     public String pushProducts(@RequestBody Map<String, Object> map) throws Exception {
+		
+		logger.info("pushProducts, map is : " + map);
 		
 		//校验签名
 		providerService.checkSign(map);
