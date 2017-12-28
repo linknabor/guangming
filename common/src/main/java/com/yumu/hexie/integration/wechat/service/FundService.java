@@ -187,7 +187,7 @@ public class FundService {
 		r.setAppId(ConstantWeChat.BIND_APPID_PAY);//使用光明自己的appid
 		r.setTimestamp(""+(int)(System.currentTimeMillis()/1000));
 		r.setNonceStr(WeixinUtil.buildRandom());
-		r.setPkgStr("prepay_id=" + prepay_id);
+		r.setPkgStr(prepay_id);
 		
 		map.put("appId", r.getAppId());
 		map.put("timeStamp", r.getTimestamp());
