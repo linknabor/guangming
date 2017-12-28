@@ -15,6 +15,8 @@ import com.yumu.hexie.integration.wechat.entity.common.PaymentOrderResult;
 import com.yumu.hexie.integration.wechat.entity.common.PrePaymentOrder;
 import com.yumu.hexie.integration.wechat.util.MessageUtil;
 import com.yumu.hexie.integration.wechat.util.WeixinUtil;
+import com.yumu.hexie.integration.wuye.WuyeUtil;
+import com.yumu.hexie.integration.wuye.resp.BaseResult;
 import com.yumu.hexie.model.payment.PaymentOrder;
 
 public class FundService {
@@ -34,45 +36,50 @@ public class FundService {
 	 * @param db
 	 * @return
 	 */
-	public static PrePaymentOrder createOrder(PaymentOrder payOrder){
+	public static String createOrder(PaymentOrder payOrder, String return_url){
 		
-		InetAddress addr = null;
-		try {
-			addr = InetAddress.getLocalHost();
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-			//throw new AppSystemException(e);
-		} 
-		
-//		notify_url = "http://180.168.39.14/";	//TODO 暂时用财付通的测试
-		
-		String spbill_create_ip = addr.getHostAddress().toString();	//订单生成的机器IP
-		String nonce_str = WeixinUtil.buildRandom();	//随机字符串
-		Map<String,String> map = new HashMap<String, String>();
-		map.put("appid", ConstantWeChat.APPID_PAY);
-		map.put("mch_id", ConstantWeChat.MERCHANTID);
-		map.put("notify_url", ConstantWeChat.NOTIFYURL);
-		map.put("trade_type", ConstantWeChat.TRADETYPE);
-		
-		map.put("spbill_create_ip", spbill_create_ip);
-		map.put("nonce_str", nonce_str);
-		
-		map.put("out_trade_no", payOrder.getPaymentNo());
-
 		DecimalFormat decimalFormat=new DecimalFormat("0");
 		String price = decimalFormat.format(payOrder.getPrice()*100);
-		map.put("total_fee", price);
-		map.put("body", payOrder.getProductName());
-		map.put("openid", payOrder.getOpenId());
+		BaseResult<String> result = WuyeUtil.getOrderPay(payOrder.getOrderId()+"", payOrder.getOpenId(), return_url, price);
+		return result.getResult();
 		
-		String sign = WeixinUtil.createSign(map, ConstantWeChat.KEY);	//生成签名
-		map.put("sign", sign);
-		map.remove("key");	//只有生成签名的时候需要将key加入，组建XML时无须使用KEY，不然会报错。
-		String requestXml = MessageUtil.createPayRequestXML(map);
-		//String requestXml = JacksonJsonUtil.mapToXml(map);
-		PrePaymentOrder r = (PrePaymentOrder)WeixinUtil.httpsRequestXml(
-				UNIPAY_URL,  "POST", requestXml,PrePaymentOrder.class);
-		return r; 
+//		InetAddress addr = null;
+//		try {
+//			addr = InetAddress.getLocalHost();
+//		} catch (UnknownHostException e) {
+//			e.printStackTrace();
+//			//throw new AppSystemException(e);
+//		} 
+//		
+////		notify_url = "http://180.168.39.14/";	//TODO 暂时用财付通的测试
+//		
+//		String spbill_create_ip = addr.getHostAddress().toString();	//订单生成的机器IP
+//		String nonce_str = WeixinUtil.buildRandom();	//随机字符串
+//		Map<String,String> map = new HashMap<String, String>();
+//		map.put("appid", ConstantWeChat.APPID_PAY);
+//		map.put("mch_id", ConstantWeChat.MERCHANTID);
+//		map.put("notify_url", ConstantWeChat.NOTIFYURL);
+//		map.put("trade_type", ConstantWeChat.TRADETYPE);
+//		
+//		map.put("spbill_create_ip", spbill_create_ip);
+//		map.put("nonce_str", nonce_str);
+//		
+//		map.put("out_trade_no", payOrder.getPaymentNo());
+//
+//		DecimalFormat decimalFormat=new DecimalFormat("0");
+//		String price = decimalFormat.format(payOrder.getPrice()*100);
+//		map.put("total_fee", price);
+//		map.put("body", payOrder.getProductName());
+//		map.put("openid", payOrder.getOpenId());
+//		
+//		String sign = WeixinUtil.createSign(map, ConstantWeChat.KEY);	//生成签名
+//		map.put("sign", sign);
+//		map.remove("key");	//只有生成签名的时候需要将key加入，组建XML时无须使用KEY，不然会报错。
+//		String requestXml = MessageUtil.createPayRequestXML(map);
+//		//String requestXml = JacksonJsonUtil.mapToXml(map);
+//		PrePaymentOrder r = (PrePaymentOrder)WeixinUtil.httpsRequestXml(
+//				UNIPAY_URL,  "POST", requestXml,PrePaymentOrder.class);
+//		return r; 
 	}
 	
 	/**

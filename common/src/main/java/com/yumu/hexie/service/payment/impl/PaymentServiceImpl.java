@@ -8,6 +8,8 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
@@ -110,19 +112,19 @@ public class PaymentServiceImpl implements PaymentService {
      * @see com.yumu.hexie.service.payment.PaymentService#requestPay(com.yumu.hexie.model.payment.PaymentOrder)
      */
     @Override
-    public JsSign requestPay(PaymentOrder pay) {
+    public JsSign requestPay(PaymentOrder pay, String return_url) {
         validatePayRequest(pay);
         log.warn("[Payment-req]["+pay.getPaymentNo()+"]["+pay.getOrderId()+"]["+pay.getOrderType()+"]");
         //支付然后没继续的情景=----校验所需时间较长，是否需要如此操作
         if(checkPaySuccess(pay.getPaymentNo())){
             throw new BizValidateException(pay.getId(),"订单已支付成功，勿重复提交！").setError();
         }
-        PrePaymentOrder preWechatOrder = wechatCoreService.createOrder(pay);
-        pay.setPrepayId(preWechatOrder.getPrepay_id());
+        String prepay_id = wechatCoreService.createOrder(pay, return_url);
+        pay.setPrepayId(prepay_id);
         paymentOrderRepository.save(pay);
         log.warn("[Payment-req]Saved["+pay.getPaymentNo()+"]["+pay.getOrderId()+"]["+pay.getOrderType()+"]");
         //3. 从微信获取签名
-        JsSign sign = wechatCoreService.getPrepareSign(preWechatOrder.getPrepay_id());
+        JsSign sign = wechatCoreService.getPrepareSign(prepay_id);
         log.warn("[Payment-req]sign["+sign.getSignature()+"]");
         return sign;
     }
@@ -150,31 +152,24 @@ public class PaymentServiceImpl implements PaymentService {
      * @see com.yumu.hexie.service.payment.PaymentService#refreshStatus(com.yumu.hexie.model.payment.PaymentOrder)
      */
     @Override
-    public PaymentOrder refreshStatus(PaymentOrder payment) {
+    public PaymentOrder refreshStatus(PaymentOrder payment, String pay_status, String other_payId) {
         log.warn("[Payment-refreshStatus]begin["+payment.getOrderType()+"]["+payment.getOrderId()+"]");
         if(payment.getStatus() != PaymentConstant.PAYMENT_STATUS_INIT){
             return payment;
         }
-        PaymentOrderResult poResult = wechatCoreService.queryOrder(payment.getPaymentNo());
-        if(poResult==null)
-        {
-        	return payment;
-        }
-        if(poResult.isPaying()) {//1. 支付中
+
+        if(payment.isPaying(pay_status)) {//1. 支付中
             log.warn("[Payment-refreshStatus]isPaying["+payment.getOrderType()+"]["+payment.getOrderId()+"]");
             return payment;
-        } else if(poResult.isPayFail()) {//2. 失败
+        } else if(payment.isPayFail(pay_status) || payment.isLack(pay_status) || payment.isTimeOut(pay_status)) {//2. 失败
             log.warn("[Payment-refreshStatus]isPayFail["+payment.getOrderType()+"]["+payment.getOrderId()+"]");
             payment.fail();
-        } else if(poResult.isClose()) {//3. 关闭
+        } else if(payment.isCancel(pay_status)) {//3. 关闭
             log.warn("[Payment-refreshStatus]isClose["+payment.getOrderType()+"]["+payment.getOrderId()+"]");
             payment.cancel();
-        } else if(poResult.isRefunding()) {//4. 退款中
-            log.warn("[Payment-refreshStatus]isRefunding["+payment.getOrderType()+"]["+payment.getOrderId()+"]");
-            payment.refunding();
-        } else if (poResult.isPaySuccess()) {//5. 成功
+        }else if (payment.isSuccess(pay_status)) {//5. 成功
             log.warn("[Payment-refreshStatus]isPaySuccess["+payment.getOrderType()+"]["+payment.getOrderId()+"]");
-            payment.paySuccess(poResult.getTransaction_id());
+            payment.paySuccess(other_payId);
         }
         return paymentOrderRepository.save(payment);
     }
@@ -211,10 +206,11 @@ public class PaymentServiceImpl implements PaymentService {
     /** 
      * @param paymentId
      * @return
+     * @throws JSONException 
      * @see com.yumu.hexie.service.payment.PaymentService#refundApply(long)
      */
     @Override
-    public boolean refundApply(PaymentOrder po) {
+    public boolean refundApply(PaymentOrder po) throws JSONException {
         log.warn("[Payment-refundApply]begin["+po.getOrderType()+"]["+po.getId()+"]");
         if(po.getStatus() == PaymentConstant.PAYMENT_STATUS_REFUNDED
                 || po.getStatus() == PaymentConstant.PAYMENT_STATUS_REFUNDING){
@@ -247,12 +243,14 @@ public class PaymentServiceImpl implements PaymentService {
     /** 
      * @param wxRefundOrder
      * @return
+     * @throws JSONException 
      * @see com.yumu.hexie.service.payment.PaymentService#updateRefundStatus(com.yumu.hexie.integration.wechat.entity.common.WxRefundOrder)
      */
     @Override
-    public PaymentOrder updateRefundStatus(WxRefundOrder wxRefundOrder) {
-        log.warn("[Payment-updateRefundStatus]begin["+wxRefundOrder.getOut_trade_no()+"]");
-        RefundOrder ro = refundService.updateRefundStatus(wxRefundOrder);
+    public PaymentOrder updateRefundStatus(JSONObject json) throws JSONException {
+    	String trade_no = json.getString("trade_no");
+        log.warn("[Payment-updateRefundStatus]begin["+trade_no+"]");
+        RefundOrder ro = refundService.updateRefundStatus(json);
         if(ro == null) {
             return null;
         }

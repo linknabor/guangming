@@ -3,11 +3,15 @@ package com.yumu.hexie.integration.wechat.service;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.json.JSONObject;
+
 import com.yumu.hexie.integration.wechat.constant.ConstantWeChat;
 import com.yumu.hexie.integration.wechat.entity.common.WxRefundOrder;
 import com.yumu.hexie.integration.wechat.entity.common.WxRefundResp;
 import com.yumu.hexie.integration.wechat.util.MessageUtil;
 import com.yumu.hexie.integration.wechat.util.WeixinUtil;
+import com.yumu.hexie.integration.wuye.WuyeUtil;
+import com.yumu.hexie.integration.wuye.resp.BaseResult;
 import com.yumu.hexie.model.payment.RefundOrder;
 
 public class RefundService {
@@ -20,28 +24,33 @@ public class RefundService {
 	 * @param tradeMap
 	 * @param db
 	 */
-	public static WxRefundResp requestRefund(RefundOrder refund){
-		Map<String,String> map = new HashMap<String, String>();
-		map.put("appid", ConstantWeChat.APPID_PAY);
-		map.put("mch_id", ConstantWeChat.MERCHANTID);
-		String nonce_str = WeixinUtil.buildRandom();
-		map.put("nonce_str", nonce_str);
-
-		map.put("out_trade_no", refund.getPaymentNo());
-		map.put("out_refund_no", refund.getRefundNo());
+	public static JSONObject requestRefund(RefundOrder refund){
 		
-		String totalFee = (int)(refund.getTotalFee()*100)+"";
-		String refundFee = (int)(refund.getRefundFee()*100)+"";
-		map.put("total_fee", totalFee);
-		map.put("refund_fee", refundFee);
-		map.put("op_user_id", ConstantWeChat.MERCHANTID);
 		
-		String sign = WeixinUtil.createSign(map, ConstantWeChat.KEY);
-		map.put("sign", sign);	
-		String requestXml = MessageUtil.createPayRequestXML(map);
-		WxRefundResp r = (WxRefundResp)WeixinUtil.httpsRequestXmlWithStore(
-				REFUND_URL,  "POST", requestXml,WxRefundResp.class);
-		return r; 
+		BaseResult<JSONObject> result = WuyeUtil.refundPayed(refund.getPaymentNo(), refund.getRefundNo(), refund.getRefundFee()+"");
+		JSONObject json = result.getData();
+		
+//		Map<String,String> map = new HashMap<String, String>();
+//		map.put("appid", ConstantWeChat.APPID_PAY);
+//		map.put("mch_id", ConstantWeChat.MERCHANTID);
+//		String nonce_str = WeixinUtil.buildRandom();
+//		map.put("nonce_str", nonce_str);
+//
+//		map.put("out_trade_no", refund.getPaymentNo());
+//		map.put("out_refund_no", refund.getRefundNo());
+//		
+//		String totalFee = (int)(refund.getTotalFee()*100)+"";
+//		String refundFee = (int)(refund.getRefundFee()*100)+"";
+//		map.put("total_fee", totalFee);
+//		map.put("refund_fee", refundFee);
+//		map.put("op_user_id", ConstantWeChat.MERCHANTID);
+//		
+//		String sign = WeixinUtil.createSign(map, ConstantWeChat.KEY);
+//		map.put("sign", sign);	
+//		String requestXml = MessageUtil.createPayRequestXML(map);
+//		WxRefundResp r = (WxRefundResp)WeixinUtil.httpsRequestXmlWithStore(
+//				REFUND_URL,  "POST", requestXml,WxRefundResp.class);
+		return json; 
 	}
 	
 	/**
@@ -50,19 +59,23 @@ public class RefundService {
 	 * @param db
 	 * @return
 	 */
-	public static WxRefundOrder refundQuery(String outTradeNo){
-		String nonce_str = WeixinUtil.buildRandom();	
-		Map<String,String> map = new HashMap<String, String>();
-		map.put("appid", ConstantWeChat.APPID_PAY);
-		map.put("mch_id", ConstantWeChat.MERCHANTID);
-		map.put("out_trade_no", outTradeNo);
-		map.put("nonce_str", nonce_str);
-		String sign = WeixinUtil.createSign(map, ConstantWeChat.KEY);	//生成签名
-		map.put("sign", sign);
-		String requestXml = MessageUtil.createPayRequestXML(map);
-		WxRefundOrder r = (WxRefundOrder)WeixinUtil.httpsRequestXml(
-				REFUND_QUERY_URL,  "POST", requestXml,WxRefundOrder.class);
-		return r; 
+	public static JSONObject refundQuery(String outTradeNo){
+		
+		BaseResult<JSONObject> result = WuyeUtil.notifyPayed(outTradeNo);
+		JSONObject json = result.getData();
+		
+//		String nonce_str = WeixinUtil.buildRandom();	
+//		Map<String,String> map = new HashMap<String, String>();
+//		map.put("appid", ConstantWeChat.APPID_PAY);
+//		map.put("mch_id", ConstantWeChat.MERCHANTID);
+//		map.put("out_trade_no", outTradeNo);
+//		map.put("nonce_str", nonce_str);
+//		String sign = WeixinUtil.createSign(map, ConstantWeChat.KEY);	//生成签名
+//		map.put("sign", sign);
+//		String requestXml = MessageUtil.createPayRequestXML(map);
+//		WxRefundOrder r = (WxRefundOrder)WeixinUtil.httpsRequestXml(
+//				REFUND_QUERY_URL,  "POST", requestXml,WxRefundOrder.class);
+		return json;
 	}
 	public static void main(String[] args) {
 		RefundOrder ro = new RefundOrder();

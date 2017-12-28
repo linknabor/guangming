@@ -115,7 +115,7 @@ public class BaojieController extends BaseController{
     public BaseResult<String> notifyPayed(@PathVariable long orderId,@ModelAttribute(Constants.USER)User user){
         baojieService.get(orderId, user);
         //为了作权限校验处理
-        baojieService.notifyPayed(orderId);
+        baojieService.notifyPayed(orderId, "", "");
         return new BaseResult<String>().success("通知完成");
     }
 

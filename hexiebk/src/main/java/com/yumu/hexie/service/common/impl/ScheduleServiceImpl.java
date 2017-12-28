@@ -6,16 +6,16 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
-
 import javax.inject.Inject;
-
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
-
 import com.yumu.hexie.common.util.StringUtil;
+import com.yumu.hexie.integration.wuye.WuyeUtil;
+import com.yumu.hexie.integration.wuye.resp.BaseResult;
 import com.yumu.hexie.model.ModelConstant;
 import com.yumu.hexie.model.distribution.region.Merchant;
 import com.yumu.hexie.model.distribution.region.MerchantRepository;
@@ -166,7 +166,13 @@ public class ScheduleServiceImpl implements ScheduleService{
         for(BaojieBill rule : bills) {
             try{
                 SCHEDULE_LOG.debug("XIYIBILL TimeOUt:" + rule.getId());
-                baojieService.timeout(rule.getId());
+                BaseResult<JSONObject> result = WuyeUtil.notifyPayed(rule.getId()+"");
+                JSONObject j = result.getData();
+                String pay_status = j.getString("pay_status");
+                SCHEDULE_LOG.debug("pay status is  " + pay_status);
+                String other_payId = j.getString("other_payId");
+                SCHEDULE_LOG.debug("pay other_payId is  " + other_payId);
+                baojieService.timeout(rule.getId(), pay_status, other_payId);
             } catch(Exception e){
                 SCHEDULE_LOG.error("超时保洁订单更新失败"+ rule.getId(),e);
                 recordError(e);
@@ -197,7 +203,15 @@ public class ScheduleServiceImpl implements ScheduleService{
         for(YunXiyiBill rule : bills) {
             try{
                 SCHEDULE_LOG.debug("XIYIBILL TimeOUt:" + rule.getId());
-                xiyiService.timeout(rule.getId());
+                
+                BaseResult<JSONObject> result = WuyeUtil.notifyPayed(rule.getId()+"");
+                JSONObject j = result.getData();
+                String pay_status = j.getString("pay_status");
+                SCHEDULE_LOG.debug("pay status is  " + pay_status);
+                String other_payId = j.getString("other_payId");
+                SCHEDULE_LOG.debug("pay other_payId is  " + other_payId);
+                
+                xiyiService.timeout(rule.getId(), pay_status, other_payId);
             } catch(Exception e){
                 SCHEDULE_LOG.error("超时洗衣订单更新失败"+ rule.getId(),e);
                 recordError(e);
@@ -229,7 +243,14 @@ public class ScheduleServiceImpl implements ScheduleService{
     	for(Long id : orderIds) {
 	    	SCHEDULE_LOG.debug("PayOrderNotify:" + id);
     		try{
-    			baseOrderService.notifyPayed(id);
+    			BaseResult<JSONObject> result = WuyeUtil.notifyPayed(id+"");
+                JSONObject j = result.getData();
+                String pay_status = j.getString("pay_status");
+                SCHEDULE_LOG.debug("pay status is  " + pay_status);
+                String other_payId = j.getString("other_payId");
+                SCHEDULE_LOG.debug("pay other_payId is  " + other_payId);
+                
+    			baseOrderService.notifyPayed(id, pay_status, other_payId);
     		} catch(Exception e){
     			SCHEDULE_LOG.error("支付状态同步失败"+ id,e);
     			recordError(e);
@@ -286,7 +307,8 @@ public class ScheduleServiceImpl implements ScheduleService{
     		try{
     	    	SCHEDULE_LOG.debug("Refund:" + order.getId());
 	    	    if(order.getOrderType() == PaymentConstant.TYPE_MARKET_ORDER){
-	    	        baseOrderService.finishRefund(wechatCoreService.refundQuery(order.getPaymentNo()));
+	    	    	JSONObject json = wechatCoreService.refundQuery(order.getPaymentNo());
+	    	        baseOrderService.finishRefund(json);
 	            } else {
 	                //xiyiService.update4Payment(payment);
 	            }
@@ -444,7 +466,7 @@ public class ScheduleServiceImpl implements ScheduleService{
 			if (asginList == null || asginList.size()==0) {
 				
 				SCHEDULE_LOG.warn("start to reassign, orderId " + orderId);
-				baseOrderService.notifyPayed(orderId);
+				baseOrderService.notifyPayed(orderId, "", "");
 				billAssignService.assginSupermarketOrder(serviceOrder);
 			}
 			

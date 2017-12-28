@@ -99,8 +99,8 @@ public class CollocationController extends BaseController{
 	@ResponseBody
 	public BaseResult<String> notifyPayed(@PathVariable long orderId, @ModelAttribute(Constants.USER)User user) throws Exception{
 
-		PaymentOrder order = baseOrderService.notifyPayed(orderId);
-//		collocationService.AssginSupermarketOrder(orderId, user);
+		PaymentOrder order = baseOrderService.notifyPayed(orderId, "", "");
+		collocationService.AssginSupermarketOrder(orderId, user);
 		if (PaymentConstant.PAYMENT_STATUS_SUCCESS == order.getStatus()) {
 			providerService.notifyPay(orderId);
 		}
@@ -118,7 +118,7 @@ public class CollocationController extends BaseController{
 	@ResponseBody
 	public BaseResult<String> renotify(@PathVariable long orderId, @ModelAttribute(Constants.USER)User user) throws Exception{
 
-		baseOrderService.notifyPayed(orderId);
+		baseOrderService.notifyPayed(orderId, "", "");
 		collocationService.AssginSupermarketOrder(orderId);
 		return new BaseResult<String>().success("success");
 	}

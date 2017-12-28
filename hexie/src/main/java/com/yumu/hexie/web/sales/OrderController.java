@@ -1,9 +1,17 @@
 package com.yumu.hexie.web.sales;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.TreeMap;
 
 import javax.inject.Inject;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -16,6 +24,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.yumu.hexie.common.Constants;
+import com.yumu.hexie.common.util.MD5Util;
+import com.yumu.hexie.integration.wechat.constant.ConstantWeChat;
 import com.yumu.hexie.integration.wechat.entity.common.JsSign;
 import com.yumu.hexie.model.ModelConstant;
 import com.yumu.hexie.model.commonsupport.comment.Comment;
@@ -229,17 +239,6 @@ public class OrderController extends BaseController{
 				supportedAddress.setProvince(province.getName());
 				xiaoquCount++;
 				
-			}else {
-				supportedAddress.setXiaoquId(0);
-				supportedAddress.setXiaoquName("");
-				supportedAddress.setXiaoquAddr("");
-				supportedAddress.setCountyId(0);
-				supportedAddress.setCounty("");
-				supportedAddress.setCityId(0);
-				supportedAddress.setCity("");
-				supportedAddress.setProvinceId(0);
-				supportedAddress.setProvince("");
-				xiaoquCount++;
 			}
 		}
 		
@@ -272,17 +271,27 @@ public class OrderController extends BaseController{
 		if(user.getId() != order.getUserId()) {
 			return new BaseResult<JsSign>().failMsg("无法支付他人订单");
 		}
-		return new BaseResult<JsSign>().success(baseOrderService.requestPay(order));
+		
+		Properties props = new Properties();
+        try {
+			props.load(Thread.currentThread().getContextClassLoader()
+					.getResourceAsStream("wechat.properties"));
+		} catch (FileNotFoundException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+        
+		String buyReturnUrl = props.getProperty("buyReturnUrl");
+		return new BaseResult<JsSign>().success(baseOrderService.requestPay(order, buyReturnUrl));
 	}
-
 
 	@RequestMapping(value = "/notifyPayed/{orderId}", method = RequestMethod.GET)
 	@ResponseBody
 	public BaseResult<String> notifyPayed(@PathVariable long orderId,@ModelAttribute(Constants.USER)User user) throws Exception {
-		baseOrderService.notifyPayed(orderId);
+		baseOrderService.notifyPayed(orderId, "", "");
 		return new BaseResult<String>().success("通知成功");
 	}
-	
 
 	@RequestMapping(value = "/cancelOrder/{orderId}", method = RequestMethod.GET)
 	@ResponseBody
@@ -418,7 +427,5 @@ public class OrderController extends BaseController{
 		return new BaseResult<List<ServiceOrder>>().success(serviceOrderRepository.
 					findByStatusAndMerchatIdAndOrderType(status, so.getMerchantId(), ModelConstant.ORDER_TYPE_ONSALE));
     }
-	
-	
 	
 }

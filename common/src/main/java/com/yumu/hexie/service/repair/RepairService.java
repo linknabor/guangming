@@ -29,7 +29,8 @@ public interface RepairService {
     public boolean finish(long orderId,User user);
     public JsSign requestPay(long orderId, float amount, User user);
     public void payOffline(long orderId, float amount, User user);
-    public void notifyPaySuccess(long orderId,User user);
+    public void notifyPaySuccess(long orderId, String pay_status, String other_payId, User user);
+    public void notifyPaySuccess(long orderId, String pay_status, String other_payId);
     public void cancel(RepairCancelReq req,User user);
 
     public void deleteByUser(long orderId,User user);

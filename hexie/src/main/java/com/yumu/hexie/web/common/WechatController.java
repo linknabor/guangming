@@ -82,7 +82,7 @@ public class WechatController extends BaseController{
     	LOGGER.error("orderNotify:（"+paymentOrderResult.isSuccess()+"）" + JacksonJsonUtil.beanToJson(paymentOrderResult));
     	if(paymentOrderResult.isSuccess()) {
 			PaymentOrder payment = paymentService.findByPaymentNo(paymentOrderResult.getOut_trade_no());
-			payment = paymentService.refreshStatus(payment);
+			payment = paymentService.refreshStatus(payment, "", "");
 			if(payment.getOrderType() == PaymentConstant.TYPE_MARKET_ORDER){
 	            baseOrderService.update4Payment(payment);
 			} else if(payment.getOrderType() == PaymentConstant.TYPE_XIYI_ORDER) {

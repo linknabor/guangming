@@ -47,6 +47,28 @@ public class PaymentOrder  extends BaseModel {
     private Date refundApplyDate;
     private Date refundDate;
 
+    
+	public boolean isSuccess(String pay_status) {
+		return "0000".equalsIgnoreCase(pay_status);
+	}
+	public boolean isTimeOut(String pay_status) {
+		return "3045,3088".equalsIgnoreCase(pay_status)
+				||"3088".equalsIgnoreCase(pay_status);
+	}
+	public boolean isLack(String pay_status){
+		return "3008".equalsIgnoreCase(pay_status);
+	}
+	public boolean isPayFail(String pay_status) {
+		return "3999".equalsIgnoreCase(pay_status);
+	}
+	public boolean isPaying(String pay_status){
+		return "2008".equalsIgnoreCase(pay_status);
+	}
+	public boolean isCancel(String pay_status){
+		return "3050".equalsIgnoreCase(pay_status);
+	}
+	
+    
 	public void refreshOrder() {
 		paymentNo = OrderNoUtil.generatePaymentOrderNo();
 	}
