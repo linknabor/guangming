@@ -124,13 +124,14 @@ public class PaymentServiceImpl implements PaymentService {
 		} catch (JSONException e) {
 			throw new BizValidateException(pay.getId(),"订单已支付成功，勿重复提交！").setError();
 		}
-        String prepay_id = wechatCoreService.createOrder(pay, return_url);
-        pay.setPrepayId(prepay_id);
+        JsSign sign = wechatCoreService.createOrder(pay, return_url);
+        
+        pay.setPrepayId(sign.getPkgStr());
         paymentOrderRepository.save(pay);
         log.warn("[Payment-req]Saved["+pay.getPaymentNo()+"]["+pay.getOrderId()+"]["+pay.getOrderType()+"]");
-        //3. 从微信获取签名
-        JsSign sign = wechatCoreService.getPrepareSign(prepay_id);
-        log.warn("[Payment-req]sign["+sign.getSignature()+"]");
+//        //3. 从微信获取签名
+//        JsSign sign = wechatCoreService.getPrepareSign(prepay_id);
+//        log.warn("[Payment-req]sign["+sign.getSignature()+"]");
         return sign;
     }
     

@@ -17,7 +17,8 @@ public class ConstantWeChat {
 	 * 第三方用户唯一凭证
 	 */
 	public static String APPID = ConfigUtil.get("appId");
-
+	public static String bindAppId = ConfigUtil.get("bindAppId");
+	
 	/**
 	 * 第三方用户唯一凭证密钥
 	 */
@@ -36,7 +37,7 @@ public class ConstantWeChat {
 	 */
 	public static String APPID_PAY = ConfigUtil.get("appId");
 	
-	public static String BIND_APPID_PAY = ConfigUtil.get("bindAppId");
+	public static String BIND_APPID_PAY = ConfigUtil.get("bindPayAppId");
 			
 	/**
 	 */

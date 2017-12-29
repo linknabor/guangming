@@ -41,7 +41,7 @@ public class FundService {
 	 * @return
 	 * @throws ValidationException 
 	 */
-	public static String createOrder(PaymentOrder payOrder, String return_url) throws ValidationException{
+	public static JsSign createOrder(PaymentOrder payOrder, String return_url) throws ValidationException{
 		
 		return WuyeUtil.getOrderPay(payOrder.getPaymentNo()+"", payOrder.getOpenId(), return_url, payOrder.getPrice()+"").getData();
 		
@@ -184,7 +184,7 @@ public class FundService {
 	public static JsSign getPrepareSign(String prepay_id) {
 		Map<String,String> map = new HashMap<String, String>();
 		JsSign r = new JsSign();
-		r.setAppId(ConstantWeChat.BIND_APPID_PAY);//使用光明自己的appid
+		r.setAppId(ConstantWeChat.APPID);
 		r.setTimestamp(""+(int)(System.currentTimeMillis()/1000));
 		r.setNonceStr(WeixinUtil.buildRandom());
 		r.setPkgStr(prepay_id);
