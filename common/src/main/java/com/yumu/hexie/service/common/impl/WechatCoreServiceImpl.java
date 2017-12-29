@@ -167,9 +167,9 @@ public class WechatCoreServiceImpl implements WechatCoreService {
 	}
 
 	@Override
-	public JsSign getJsSign(String url, String type) {
+	public JsSign getJsSign(String url) {
 		try {
-			return WeixinUtil.getJsSign(url,systemConfigService.queryJsTickets(), type);
+			return WeixinUtil.getJsSign(url,systemConfigService.queryJsTickets());
 		} catch (Exception e) {
 			processError(e);
 		}
