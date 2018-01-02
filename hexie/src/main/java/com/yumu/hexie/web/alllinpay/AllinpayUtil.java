@@ -7,9 +7,13 @@ import java.util.TreeMap;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.yumu.hexie.common.util.MD5Util;
 
 public class AllinpayUtil {
+	private static final Logger Log = LoggerFactory.getLogger(AllinpayUtil.class);
 	
 	public static TreeMap<String, String> resParam(HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException {
 		request.setCharacterEncoding("gbk");//通知传输的编码为GBK
@@ -17,8 +21,10 @@ public class AllinpayUtil {
 		
 		TreeMap<String, String> map = new TreeMap<String, String>();
 		Map reqMap = request.getParameterMap();
+		Log.error(">>>>>>>>"+ reqMap.toString());
 		for(Object key:reqMap.keySet()){
 			String value = ((String[])reqMap.get(key))[0];
+			Log.error(key+";"+value);
 			map.put(key.toString(),value);
 		}
 		return map;

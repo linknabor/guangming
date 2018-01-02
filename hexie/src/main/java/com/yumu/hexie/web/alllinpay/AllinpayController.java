@@ -46,9 +46,10 @@ public class AllinpayController  extends BaseController{
 	@ResponseBody
 	public String notifyOrderPay(HttpServletRequest request, HttpServletResponse response)  throws Exception{
 		TreeMap<String, String> map = AllinpayUtil.resParam(request, response);
-		Log.info("团购回调:"+map.toString());
+		Log.error("团购回调:"+map.toString());
 		try {
 			boolean flag = AllinpayUtil.validSign(map, ConstantWeChat.ALLIN_APPKEY);
+			Log.error("团购回调签名结果:"+flag);
 			if (flag) {
 				baseOrderService.notifyPayed(Long.parseLong(map.get("cusorderid")), map.get("trxstatus"), map.get("trxid"));
 			}else {

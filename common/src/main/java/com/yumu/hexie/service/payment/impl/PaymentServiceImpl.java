@@ -166,7 +166,7 @@ public class PaymentServiceImpl implements PaymentService {
      */
     @Override
     public PaymentOrder refreshStatus(PaymentOrder payment, String pay_status, String other_payId) {
-        log.warn("[Payment-refreshStatus]begin["+payment.getOrderType()+"]["+payment.getOrderId()+"]");
+        log.warn("[Payment-refreshStatus]begin["+payment.getOrderType()+"]["+payment.getOrderId()+"]["+pay_status+"]");
         if(payment.getStatus() != PaymentConstant.PAYMENT_STATUS_INIT){
             return payment;
         }
