@@ -42,7 +42,7 @@ public class AlllinpayController  extends BaseController{
 	 * @throws ServletException
 	 * @throws IOException
 	 */
-	@RequestMapping(value = "/notifyOrderPay", method = RequestMethod.POST)
+	@RequestMapping(value = "/notifyOrderPay", method = RequestMethod.GET)
 	@ResponseBody
 	public void notifyOrderPay(HttpServletRequest request, HttpServletResponse response)  throws ServletException, IOException{
 		TreeMap<String, String> map = AllinpayUtil.resParam(request, response);
@@ -67,7 +67,7 @@ public class AlllinpayController  extends BaseController{
 	 * @throws ServletException
 	 * @throws IOException
 	 */
-	@RequestMapping(value = "/notifyXiYiPay", method = RequestMethod.POST)
+	@RequestMapping(value = "/notifyXiYiPay", method = RequestMethod.GET)
 	@ResponseBody
 	public void notifyXiYiPay(HttpServletRequest request, HttpServletResponse response)  throws ServletException, IOException{
 		TreeMap<String, String> map = AllinpayUtil.resParam(request, response);
@@ -92,7 +92,7 @@ public class AlllinpayController  extends BaseController{
 	 * @throws ServletException
 	 * @throws IOException
 	 */
-	@RequestMapping(value = "/notifyRepairPay", method = RequestMethod.POST)
+	@RequestMapping(value = "/notifyRepairPay", method = RequestMethod.GET)
 	@ResponseBody
 	public void notifyRepairPay(HttpServletRequest request, HttpServletResponse response)  throws ServletException, IOException{
 		TreeMap<String, String> map = AllinpayUtil.resParam(request, response);
@@ -117,7 +117,7 @@ public class AlllinpayController  extends BaseController{
 	 * @throws ServletException
 	 * @throws IOException
 	 */
-	@RequestMapping(value = "/notifyBaijiePay", method = RequestMethod.POST)
+	@RequestMapping(value = "/notifyBaijiePay", method = RequestMethod.GET)
 	@ResponseBody
 	public void notifyBaijiePay(HttpServletRequest request, HttpServletResponse response)  throws ServletException, IOException{
 		TreeMap<String, String> map = AllinpayUtil.resParam(request, response);
