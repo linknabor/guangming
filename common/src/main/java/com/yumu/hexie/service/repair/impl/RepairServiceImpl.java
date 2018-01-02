@@ -178,19 +178,6 @@ public class RepairServiceImpl implements RepairService {
     }
     
     /** 
-     * @param orderId
-     * @param user
-     * @see com.yumu.hexie.service.repair.RepairService#notifyPaySuccess(long, com.yumu.hexie.model.user.User)
-     */
-    @Override
-    public void notifyPaySuccess(long orderId, String pay_status, String other_payId) {
-        RepairOrder ro = repairOrderRepository.findOne(orderId);
-        if(ro.getOrderId()!=null&&ro.getOrderId()!=0){
-            baseOrderService.notifyPayed(ro.getOrderId(), pay_status, other_payId);
-        }
-    }
-
-    /** 
      * @param req
      * @param user
      * @see com.yumu.hexie.service.repair.RepairService#cancel(com.yumu.hexie.service.repair.req.RepairCancelReq, com.yumu.hexie.model.user.User)

@@ -16,9 +16,10 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.yumu.hexie.integration.wechat.constant.ConstantWeChat;
+import com.yumu.hexie.model.payment.PaymentOrder;
 import com.yumu.hexie.service.o2o.BaojieService;
 import com.yumu.hexie.service.o2o.XiyiService;
-import com.yumu.hexie.service.repair.RepairService;
+import com.yumu.hexie.service.payment.PaymentService;
 import com.yumu.hexie.service.sales.BaseOrderService;
 import com.yumu.hexie.web.BaseController;
 
@@ -31,9 +32,9 @@ public class AllinpayController  extends BaseController{
 	@Inject
     private XiyiService xiyiService;
 	@Inject
-    private RepairService repairService;
-	@Inject
     private BaojieService baojieService;
+	@Inject
+	private PaymentService paymentService;
 	
 	/**
 	 * 团购回调
@@ -51,7 +52,9 @@ public class AllinpayController  extends BaseController{
 			boolean flag = AllinpayUtil.validSign(map, ConstantWeChat.ALLIN_APPKEY);
 			Log.error("团购回调签名结果:"+flag);
 			if (flag) {
-				baseOrderService.notifyPayed(Long.parseLong(map.get("cusorderid")), map.get("trxstatus"), map.get("trxid"));
+				PaymentOrder payment = paymentService.findByPaymentNo(map.get("cusorderid"));
+				payment = paymentService.refreshStatus(payment, map.get("trxstatus"), map.get("trxid"));
+				baseOrderService.update4Payment(payment);
 			}else {
 				Log.error("团购回调签名验证不通过:"+map.toString());
 			}
@@ -76,7 +79,9 @@ public class AllinpayController  extends BaseController{
 		try {
 			boolean flag = AllinpayUtil.validSign(map, ConstantWeChat.ALLIN_APPKEY);
 			if (flag) {
-				xiyiService.notifyPayed(Long.parseLong(map.get("cusorderid")), map.get("trxstatus"), map.get("trxid"));
+				PaymentOrder payment = paymentService.findByPaymentNo(map.get("cusorderid"));
+				payment = paymentService.refreshStatus(payment, map.get("trxstatus"), map.get("trxid"));
+				xiyiService.update4Payment(payment);
 			}else {
 				Log.error("洗衣回调签名验证不通过:"+map.toString());
 			}
@@ -101,7 +106,9 @@ public class AllinpayController  extends BaseController{
 		try {
 			boolean flag = AllinpayUtil.validSign(map, ConstantWeChat.ALLIN_APPKEY);
 			if (flag) {
-				repairService.notifyPaySuccess(Long.parseLong(map.get("cusorderid")), map.get("trxstatus"), map.get("trxid"));
+				PaymentOrder payment = paymentService.findByPaymentNo(map.get("cusorderid"));
+				payment = paymentService.refreshStatus(payment, map.get("trxstatus"), map.get("trxid"));
+				baseOrderService.update4Payment(payment);
 			}else {
 				Log.error("维修回调签名验证不通过:"+map.toString());
 			}
@@ -126,7 +133,9 @@ public class AllinpayController  extends BaseController{
 		try {
 			boolean flag = AllinpayUtil.validSign(map, ConstantWeChat.ALLIN_APPKEY);
 			if (flag) {
-				baojieService.notifyPayed(Long.parseLong(map.get("cusorderid")), map.get("trxstatus"), map.get("trxid"));
+				PaymentOrder payment = paymentService.findByPaymentNo(map.get("cusorderid"));
+				payment = paymentService.refreshStatus(payment, map.get("trxstatus"), map.get("trxid"));
+				baojieService.update4Payment(payment);
 			}else {
 				Log.error("保洁回调签名验证不通过:"+map.toString());
 			}
