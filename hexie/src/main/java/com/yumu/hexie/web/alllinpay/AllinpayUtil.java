@@ -13,7 +13,7 @@ public class AllinpayUtil {
 	
 	public static TreeMap<String, String> resParam(HttpServletRequest request, HttpServletResponse response) throws UnsupportedEncodingException {
 		request.setCharacterEncoding("gbk");//通知传输的编码为GBK
-		response.setCharacterEncoding("gbk");
+		response.setCharacterEncoding("gbk");//通知传输的编码为GBK
 		
 		TreeMap<String, String> map = new TreeMap<String, String>();
 		Map reqMap = request.getParameterMap();
