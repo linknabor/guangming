@@ -21,10 +21,8 @@ public class AllinpayUtil {
 		
 		TreeMap<String, String> map = new TreeMap<String, String>();
 		Map reqMap = request.getParameterMap();
-		Log.error(">>>>>>>>"+ reqMap.toString());
 		for(Object key:reqMap.keySet()){
 			String value = ((String[])reqMap.get(key))[0];
-			Log.error(key+";"+value);
 			map.put(key.toString(),value);
 		}
 		return map;
