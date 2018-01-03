@@ -3,7 +3,6 @@ package com.yumu.hexie.service.sales.impl;
 import java.util.List;
 
 import javax.inject.Inject;
-
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -12,12 +11,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
 import com.yumu.hexie.common.util.ConfigUtil;
 import com.yumu.hexie.common.util.StringUtil;
 import com.yumu.hexie.integration.wechat.entity.common.JsSign;
-import com.yumu.hexie.integration.wechat.entity.common.WxRefundOrder;
 import com.yumu.hexie.integration.wechat.service.TemplateMsgService;
+import com.yumu.hexie.integration.wuye.WuyeUtil;
 import com.yumu.hexie.model.ModelConstant;
 import com.yumu.hexie.model.commonsupport.comment.Comment;
 import com.yumu.hexie.model.commonsupport.comment.CommentConstant;
@@ -298,6 +296,20 @@ public class BaseOrderServiceImpl extends BaseOrderProcessor implements BaseOrde
 		if(!order.cancelable()) {
             throw new BizValidateException(order.getId(),"该订单不能取消！").setError();
         }
+		
+		//1.1在取消订单之前 需要去到通联查一次，该订单是否已经支付，如果已经支付那么更新订单状态已支付，否则就取消订单
+    	PaymentOrder po = paymentService.queryPaymentOrder(PaymentConstant.TYPE_MARKET_ORDER, order.getId());
+    	try {
+			JSONObject json = WuyeUtil.notifyPayed(po.getPaymentNo()).getData();
+			if (json!=null) {
+				paymentService.refreshStatus(po, json.getString("pay_status"), json.getString("other_payId"));
+				order.payed();
+				return order;
+			}
+		} catch (Exception e) {
+			throw new BizValidateException(po.getOrderId(),"该订单异常，无法取消！").setError();
+		}
+    	
 		//2. 取消支付单
 	    paymentService.cancelPayment(PaymentConstant.TYPE_MARKET_ORDER, order.getId());
         log.warn("[cancelOrder]payment:"+order.getId());

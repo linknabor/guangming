@@ -6,13 +6,16 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+
 import javax.inject.Inject;
+
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
+
 import com.yumu.hexie.common.util.StringUtil;
 import com.yumu.hexie.integration.wuye.WuyeUtil;
 import com.yumu.hexie.integration.wuye.resp.BaseResult;
@@ -32,6 +35,7 @@ import com.yumu.hexie.model.market.saleplan.RgroupRuleRepository;
 import com.yumu.hexie.model.op.ScheduleRecord;
 import com.yumu.hexie.model.op.ScheduleRecordRepository;
 import com.yumu.hexie.model.payment.PaymentConstant;
+import com.yumu.hexie.model.payment.PaymentOrder;
 import com.yumu.hexie.model.payment.PaymentOrderRepository;
 import com.yumu.hexie.model.payment.RefundOrder;
 import com.yumu.hexie.model.payment.RefundOrderRepository;
@@ -48,6 +52,7 @@ import com.yumu.hexie.service.exception.BizValidateException;
 import com.yumu.hexie.service.o2o.BaojieService;
 import com.yumu.hexie.service.o2o.BillAssignService;
 import com.yumu.hexie.service.o2o.XiyiService;
+import com.yumu.hexie.service.payment.PaymentService;
 import com.yumu.hexie.service.provider.ProviderService;
 import com.yumu.hexie.service.sales.BaseOrderService;
 import com.yumu.hexie.service.sales.RgroupService;
@@ -99,6 +104,8 @@ public class ScheduleServiceImpl implements ScheduleService{
     @SuppressWarnings("rawtypes")
 	@Inject
     private ProviderService providerService;
+    @Inject
+	private PaymentService paymentService;
     
 	
 	//1. 订单超时
@@ -226,35 +233,42 @@ public class ScheduleServiceImpl implements ScheduleService{
 
 	/************************************定时任务，由各业务自行调用 **************************/
 	//3. 支付状态查询
-    private void executeMarketPayOrderStatusJob(List<Long> orderIds) {
+    private void executeMarketPayOrderStatusJob(List<PaymentOrder> orderIds) {
     	SCHEDULE_LOG.debug("--------------------executePayOrderStatusJob[B]-------------------");
     	if(orderIds.size() == 0) {
     		SCHEDULE_LOG.error("**************executePayOrderStatusJob没有记录");
     		return;
     	}
     	String ids = "";
-    	for(Long id : orderIds) {
-    		ids += id+",";
+    	for(PaymentOrder order : orderIds) {
+    		ids += order.getId()+",";
     	}
     	ScheduleRecord sr = new ScheduleRecord(ModelConstant.SCHEDULE_TYPE_PAY_STATUS,ids);
     	sr = scheduleRecordRepository.save(sr);
     	
     	
-    	for(Long id : orderIds) {
-	    	SCHEDULE_LOG.debug("PayOrderNotify:" + id);
+    	for(PaymentOrder order : orderIds) {
+	    	SCHEDULE_LOG.debug("PayOrderNotify:" + order.getId());
     		try{
-    			BaseResult<JSONObject> result = WuyeUtil.notifyPayed(id+"");
-                JSONObject j = result.getData();
-                String pay_status = j.getString("pay_status");
+    			JSONObject result = WuyeUtil.notifyPayed(order.getPaymentNo()).getData();
+                String pay_status = result.getString("pay_status");
                 SCHEDULE_LOG.debug("pay status is  " + pay_status);
-                String other_payId = j.getString("other_payId");
+                String other_payId = result.getString("other_payId");
                 SCHEDULE_LOG.debug("pay other_payId is  " + other_payId);
                 
-    			baseOrderService.notifyPayed(id, pay_status, other_payId);
+                order = paymentService.refreshStatus(order, pay_status, other_payId);
+                
+                if(order.getOrderType() == PaymentConstant.TYPE_MARKET_ORDER){
+    	            baseOrderService.update4Payment(order);
+    			} else if(order.getOrderType() == PaymentConstant.TYPE_XIYI_ORDER) {
+                    xiyiService.update4Payment(order);
+                } else if(order.getOrderType() == PaymentConstant.TYPE_BAOJIE_ORDER) {
+                    baojieService.update4Payment(order);
+                }
     		} catch(Exception e){
-    			SCHEDULE_LOG.error("支付状态同步失败"+ id,e);
+    			SCHEDULE_LOG.error("支付状态同步失败，ID："+ order.getId(),e);
     			recordError(e);
-    			sr.addErrorCount(""+id);
+    			sr.addErrorCount(order.getId()+"");
     		}
     	}
     	sr.setFinishDate(new Date());
@@ -279,6 +293,7 @@ public class ScheduleServiceImpl implements ScheduleService{
     	for(ServiceOrder order : serviceOrders) {
     		try{
     	    	SCHEDULE_LOG.debug("CancelOrder:" + order.getId());
+    	    	
     	    	baseOrderService.cancelOrder(order);
     		} catch(Exception e){
     			SCHEDULE_LOG.error("超时支付单失败orderID"+ order.getId(),e);

@@ -82,7 +82,7 @@ public class RgroupServiceImpl implements RgroupService {
 	private void finishValidate(RgroupRule rule) {
         if(rule.getGroupStatus() == ModelConstant.RGROUP_STAUS_CANCEL || rule.getCurrentNum() < rule.getGroupMinNum()){
             throw new BizValidateException(ModelConstant.EXCEPTION_BIZ_TYPE_RGROUP,rule.getId(),"该团购已取消或人数不足！").setError();
-        }
+        } 
     }
 	private void finishGroup(RgroupRule rule) {
         log.error("finishGroup:"+rule.getId());

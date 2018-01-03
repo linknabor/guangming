@@ -192,7 +192,6 @@ public class WuyeUtil {
 		String url = REQUEST_ADDRESS + String.format(ORDER_PAY_URL, trade_no, CSPID, openId, return_url, price);
 		BaseResult<JsSign> result = (BaseResult<JsSign>)httpGet(url, JsSign.class);
 		
-		Log.debug(">>>>>>>>>>>>>>result: "+ result);
 		if (!result.isSuccess()) {
 			throw new ValidationException(result.getData().toString());
 		}
@@ -203,9 +202,6 @@ public class WuyeUtil {
 	public static BaseResult<JSONObject> notifyPayed(String trade_no) throws ValidationException {
 		String url = REQUEST_ADDRESS + String.format(ORDER_NOTIFY_URL, trade_no, CSPID);
 		BaseResult<JSONObject> result = (BaseResult<JSONObject>)httpGet(url, String.class);
-		
-		Log.info(">>>>>>WuyeUtil result notifyPayedis :" + result);
-		Log.info(">>>>>>WuyeUtil result notifyPayed is check:" + result.isSuccess());
 		
 		if (!result.isSuccess() && !StringUtil.isEmpty(result.getData())) {
 			throw new ValidationException(result.getData().toString());
