@@ -260,6 +260,28 @@ public class DateUtil {
 		long millionSeconds = sdf.parse(dateTime).getTime();//毫秒
 		return millionSeconds;
 	}
+
+	/**
+	 * 获取当前系统日期
+	 * @return	yyyyMMdd格式
+	 */
+	public static String getSysDate(){
+		
+		SimpleDateFormat simpledateformat = new SimpleDateFormat("yyyyMMdd");
+		String s = simpledateformat.format(Calendar.getInstance().getTime());
+		return s;
+	}
+	
+	/**
+	 * 获取当前系统时间
+	 * @return	HHmmss格式
+	 */
+	public static String getSysTime(){
+		
+		SimpleDateFormat simpledateformat = new SimpleDateFormat("HHmmss");
+		String s = simpledateformat.format(Calendar.getInstance().getTime());
+		return s;
+	}
 	
     
     public static void main(String[] args) {

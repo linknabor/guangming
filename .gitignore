@@ -32,3 +32,8 @@
 /hexiebk/logs/bk/common-integration.log
 /hexiebk/logs/bk/common-schedue.log
 /hexiebk/logs/bk/common-spring.log
+/hexie/target/classes/com/yumu/hexie/web/user/*.class
+/hexie/target/classes/com/yumu/hexie/biz/aspect/*.class
+*.class
+*.jar
+classes

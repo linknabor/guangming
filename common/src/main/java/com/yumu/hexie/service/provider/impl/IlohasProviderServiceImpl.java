@@ -9,6 +9,7 @@ import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeanUtils;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
@@ -21,6 +22,7 @@ import com.yumu.hexie.integration.provider.ilohas.entity.ProviderLoginer;
 import com.yumu.hexie.integration.provider.ilohas.resp.Order;
 import com.yumu.hexie.integration.provider.ilohas.resp.OrderItem;
 import com.yumu.hexie.integration.provider.ilohas.resp.ResponseOrder;
+import com.yumu.hexie.integration.provider.ilohas.resp.ResponseOrders;
 import com.yumu.hexie.integration.provider.ilohas.service.ProviderOrderService;
 import com.yumu.hexie.model.ModelConstant;
 import com.yumu.hexie.model.commonsupport.info.Product;
@@ -37,6 +39,11 @@ import com.yumu.hexie.model.market.ServiceOrder;
 import com.yumu.hexie.model.market.ServiceOrderRepository;
 import com.yumu.hexie.model.market.saleplan.OnSaleRule;
 import com.yumu.hexie.model.market.saleplan.OnSaleRuleRepository;
+import com.yumu.hexie.model.provider.ProviderConstant;
+import com.yumu.hexie.model.provider.ilohas.IlohasOrder;
+import com.yumu.hexie.model.provider.ilohas.IlohasOrderItem;
+import com.yumu.hexie.model.provider.ilohas.IlohasOrderItemRepository;
+import com.yumu.hexie.model.provider.ilohas.IlohasOrderRepository;
 import com.yumu.hexie.model.provider.ilohas.IlohasProduct;
 import com.yumu.hexie.model.provider.ilohas.IlohasProductRepository;
 import com.yumu.hexie.model.redis.Keys;
@@ -78,6 +85,10 @@ public class IlohasProviderServiceImpl<T> implements ProviderService<T>{
 	private ServiceOrderRepository serviceOrderRepository;
 	@Inject
 	private SystemConfigService systemConfigService;
+	@Inject
+	private IlohasOrderRepository ilohasOrderRepository;
+	@Inject
+	private IlohasOrderItemRepository ilohasOrderItemRepository;
 	
 	@Override
 	public String getToken(ProviderLoginer loginer){
@@ -96,7 +107,7 @@ public class IlohasProviderServiceImpl<T> implements ProviderService<T>{
 			throw new InteractionException(" destination is empty .");
 		}
     	
-    	logger.info("t is : " + t.toString());
+    	logger.info("sendMessageByJms, t is : " + t.toString());
     	
     	try {
 			jmsProducer.sendMessage(destination, JacksonJsonUtil.beanToJson(t));
@@ -109,6 +120,8 @@ public class IlohasProviderServiceImpl<T> implements ProviderService<T>{
 
 	@Override
 	public void checkSign(Map<String, Object> map) {
+		
+		logger.info("checkSign, map is :  " + map );
 
 		String appid = (String) map.get("appid");
 		ProviderLoginer loginer = new ProviderLoginer();
@@ -169,10 +182,10 @@ public class IlohasProviderServiceImpl<T> implements ProviderService<T>{
 	public void updateProducts(Long merchantId) {
 
 		List<IlohasProduct> proList = ilohasProductRepository.findAll();
-		
 		for (IlohasProduct ilohasProduct : proList) {
 			
 			Product product = productRepository.findByMerchanProductNo(ilohasProduct.getCode());
+			
 			ilohasProduct.setMerchantId(String.valueOf(merchantId));
 			//保存product
 			product = saveProdcut(ilohasProduct, product);
@@ -451,7 +464,7 @@ public class IlohasProviderServiceImpl<T> implements ProviderService<T>{
 		ilohasOrder.setPayTotalPrice(String.valueOf(serviceOrder.getTotalAmount()-serviceOrder.getDiscountAmount()));
 		ilohasOrder.setPhone(serviceOrder.getTel());
 		ilohasOrder.setRemarks(serviceOrder.getMemo());
-		ilohasOrder.setStatus("1");	//已支付确认
+		ilohasOrder.setStatus(ProviderConstant.ILOHAS_ORDER_STATUS_PAID);	//已支付
 		ilohasOrder.setTotalPrice(String.valueOf(serviceOrder.getTotalAmount()));
 		ilohasOrder.setUserName(serviceOrder.getReceiverName());
 		ilohasOrder.setOrderItemList(ilohasOrderList);
@@ -459,6 +472,14 @@ public class IlohasProviderServiceImpl<T> implements ProviderService<T>{
 		ResponseOrder responseOrder = new ResponseOrder();
 		responseOrder.setOrder(ilohasOrder);
 		responseOrder.setTimestamp(String.valueOf(System.currentTimeMillis()));
+		
+		/*
+		 * 1.将已支付的订单保存到数据库，状态为已 1已支付待确认。
+		 * 2.通知对方数系统订单已支付
+		 * 3.如果通知失败，则对方会发起定时轮循，来请求合协订单结果
+		 * 4.综上，通知对方的动作作为异步响应执行，如果失败了不做处理，等对方轮循
+		 */
+		saveIlohasOrder(ProviderConstant.ILOHAS_MERCHANT_ID, ilohasOrder);
 		ProviderOrderService.notifyIlohasOrder(responseOrder);
 		
 	}
@@ -505,16 +526,92 @@ public class IlohasProviderServiceImpl<T> implements ProviderService<T>{
 		
 		
 	}
+	
+	/**
+	 * 保存ilohas的商品订单
+	 * @param merchantId
+	 * @param responseOrder
+	 */
+	private void saveIlohasOrder(String merchantId, Order responseOrder){
+		
+		IlohasOrder ilohasOrder = new IlohasOrder();
+		try {
+			BeanUtils.copyProperties(responseOrder, ilohasOrder);
+		} catch (Exception e) {
+			throw new InteractionException(e.getMessage());
+		}
+		ilohasOrder.setMerchantId(merchantId);
+		ilohasOrder.setPayDate(DateUtil.getSysDate());
+		ilohasOrder.setPayTime(DateUtil.getSysTime());
+		ilohasOrderRepository.save(ilohasOrder);
+		
+		List<OrderItem>orderItems = responseOrder.getOrderItemList();
+		for (OrderItem orderItem : orderItems) {
+			IlohasOrderItem iloahsOrderItem = new IlohasOrderItem();
+			BeanUtils.copyProperties(orderItem, iloahsOrderItem);
+			iloahsOrderItem.setIlohasOrder(ilohasOrder);
+			ilohasOrderItemRepository.save(iloahsOrderItem);
+			
+		}
+		
+	}
 
 	@Override
-	//TODO 需要时候再更新状态??? 按流程，当支付完成时，serviceOrder就已经更改了
+	//再更新乐活订单状态。
 	public void updateOrderStatus(Long merchantId) {
+		
+		logger.info("merchantId is : " + merchantId);
 
-//		List<IlohasOrder> ilohasOrders = ilohasOrderRepository.findByUpdated(Boolean.FALSE);	
-//		for (IlohasOrder ilohasOrder : ilohasOrders) {
-//			ServiceOrder serviceOrder = serviceOrderRepository.findByOrderNo(ilohasOrder.getOrderNo());
-//		}
+		List<Integer> statusList = new ArrayList<Integer>();
+		statusList.add(ModelConstant.ORDER_STATUS_PAYED);
+		List<ServiceOrder> orderList = serviceOrderRepository.findByStatusAndMerchatIdAndOrderType(statusList, merchantId, ModelConstant.ORDER_TYPE_ONSALE);
+		
+		for (ServiceOrder serviceOrder : orderList) {
+			IlohasOrder ilohasOrder = ilohasOrderRepository.findByOrderNo(serviceOrder.getOrderNo());
+			String iOrderNo = ilohasOrder.getOrderNo();
+			String iOrderStatus = ilohasOrder.getStatus();
+			
+			logger.info("iOrderNo is : " + iOrderNo + ", iOrderStatus is : " + iOrderStatus);
+			
+			if (ProviderConstant.ILOHAS_ORDER_STATUS_CONFIRMED.equals(iOrderStatus)) {
+				serviceOrder.setStatus(ModelConstant.ORDER_STATUS_CONFIRM);
+				serviceOrder.setGroupStatus(ModelConstant.GROUP_STAUS_FINISH);
+			}else if (ProviderConstant.ILOHAS_ORDER_STATUS_DELIVERED.equals(iOrderStatus)) {
+				serviceOrder.setStatus(ModelConstant.ORDER_STATUS_CONFIRM);
+				serviceOrder.setGroupStatus(ModelConstant.GROUP_STAUS_FINISH);
+			}else if (ProviderConstant.ILOHAS_ORDER_STATUS_FINISHED.equals(iOrderStatus)) {
+				serviceOrder.setStatus(ModelConstant.ORDER_STATUS_CONFIRM);
+				serviceOrder.setGroupStatus(ModelConstant.GROUP_STAUS_FINISH);
+			}
+			serviceOrderRepository.save(serviceOrder);
+		}
 	
+	}
+
+	@Override
+	public ResponseOrders getIlohasOrderList(String orderStatus, String beginDate, String endDate) {
+		
+		if (StringUtil.isEmpty(beginDate)||StringUtil.isEmpty(endDate)) {
+			throw new InteractionException("起始日期、结束日期不能为空。");
+		}
+
+		List<IlohasOrder> ilohasOrders = ilohasOrderRepository.findByStatusAndPayDate(orderStatus, beginDate, endDate);	//找出已支付未确认的
+
+		List<Order> orderList = new ArrayList<Order>();
+		for (IlohasOrder ilohasOrder : ilohasOrders) {
+			Order order = new Order();
+			try {
+				BeanUtils.copyProperties(ilohasOrder, order);
+				orderList.add(order);
+			} catch (Exception e) {
+				throw new InteractionException(e.getMessage());
+			}
+		}
+		ResponseOrders respOrders = new ResponseOrders();
+		respOrders.setOrderList(orderList);
+		respOrders.setTimestamp(String.valueOf(System.currentTimeMillis()));
+		
+		return respOrders;
 	}
 
 	

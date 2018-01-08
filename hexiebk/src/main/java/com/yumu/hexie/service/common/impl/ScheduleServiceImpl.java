@@ -501,7 +501,7 @@ public class ScheduleServiceImpl implements ScheduleService{
 
 	@Override
 	@Scheduled(cron = "0 0/10 * * * ?")
-	public void executeUPdateIlohasOrderStatus() {
+	public void executeUpdateIlohasOrderStatus() {
 
 		providerService.updateOrderStatus(Long.valueOf(ProviderConstant.ILOHAS_MERCHANT_ID));
 	}
