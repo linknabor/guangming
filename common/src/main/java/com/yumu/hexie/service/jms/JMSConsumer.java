@@ -21,6 +21,7 @@ import com.yumu.hexie.model.provider.ilohas.IlohasOrderRepository;
 import com.yumu.hexie.model.provider.ilohas.IlohasProduct;
 import com.yumu.hexie.model.provider.ilohas.IlohasProductRepository;
 import com.yumu.hexie.service.exception.BizValidateException;
+import com.yumu.hexie.service.exception.InteractionException;
 
 @Component
 public class JMSConsumer {
@@ -78,21 +79,25 @@ public class JMSConsumer {
 			logger.info("接收到消息：" + message);
 			IlohasOrder newOrder = (IlohasOrder) JacksonJsonUtil.jsonToBean(message, IlohasOrder.class);
 			IlohasOrder entity = ilohasOrderRepository.findByOrderNo(newOrder.getOrderNo());
-			Date nowTime = new Date();
+			
 			if (entity == null) {
-				newOrder.setMerchantId(ProviderConstant.ILOHAS_MERCHANT_ID);
-				newOrder.setReceivedTime(DateUtil.dttmFormat(nowTime));
-				ilohasOrderRepository.save(newOrder);
-			}else {
-				if (!entity.getUpdated()) {	//还未更新的可以更改order信息
-					logger.info("order is updated ! orderNo : " + entity.getOrderNo());
-					newOrder.setId(entity.getId());
-					newOrder.setReceivedTime(DateUtil.dttmFormat(nowTime));
-					ilohasOrderRepository.save(newOrder);
-				}
-				
+				throw new InteractionException("未查询到订单 ： " + newOrder.getOrderNo());
 			}
 			
+			entity.setStatus(newOrder.getStatus());
+			if (ProviderConstant.ILOHAS_ORDER_STATUS_CONFIRMED.equals(newOrder.getStatus())) {
+				entity.setConfirmDate(DateUtil.getSysDate());
+				entity.setConfirmTime(DateUtil.getSysTime());
+			}else if (ProviderConstant.ILOHAS_ORDER_STATUS_DELIVERED.equals(newOrder.getStatus())) {
+				entity.setDeliveredDate(DateUtil.getSysDate());
+				entity.setDeliveredtime(DateUtil.getSysTime());
+			}else if (ProviderConstant.ILOHAS_ORDER_STATUS_FINISHED.equals(newOrder.getStatus())) {
+				entity.setFinishDate(DateUtil.getSysDate());
+				entity.setFinishTime(DateUtil.getSysTime());
+			}
+			ilohasOrderRepository.save(newOrder);
+			
+			logger.info("order is updated ! orderNo : " + entity.getOrderNo());
 			
         } catch (Exception e) {
 			throw new BizValidateException(e.toString());

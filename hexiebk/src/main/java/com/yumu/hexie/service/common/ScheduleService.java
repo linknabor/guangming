@@ -22,6 +22,6 @@ public interface ScheduleService {
     //9.更新供应商(ilohas)的商品信息
     public void executeUpdateIlohasProductInfo();
     //10.更新供应商(ilohas)的账单状态
-    public void executeUPdateIlohasOrderStatus();
+    public void executeUpdateIlohasOrderStatus();
     
 }

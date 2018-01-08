@@ -228,7 +228,6 @@ public class HttpUtil {
             stringEntity.setContentEncoding(codePage);
             stringEntity.setContentType("application/json");
             httpPost.setEntity(stringEntity);
-            httpPost.setHeader("Accept", "application/json");
             response = httpClient.execute(httpPost);
             HttpEntity entity = response.getEntity();
             logger.info("response statusCode "+response.getStatusLine().getStatusCode());

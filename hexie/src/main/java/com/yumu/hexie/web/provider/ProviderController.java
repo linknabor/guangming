@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.yumu.hexie.integration.provider.ilohas.entity.ProviderLoginer;
+import com.yumu.hexie.integration.provider.ilohas.resp.ResponseOrders;
 import com.yumu.hexie.model.provider.ProviderConstant;
 import com.yumu.hexie.model.provider.ilohas.IlohasOrder;
 import com.yumu.hexie.model.redis.Keys;
@@ -34,6 +35,12 @@ public class ProviderController extends BaseController {
 	@Inject
 	private SystemConfigService systemConfigService;
 	
+	/**
+	 * 获取TOKEN
+	 * @param map
+	 * @return
+	 * @throws Exception
+	 */
 	@RequestMapping(value = "/getToken", method = RequestMethod.POST)
 	@ResponseBody
     public String getToken(@RequestBody Map<String, String> map) throws Exception {
@@ -53,6 +60,12 @@ public class ProviderController extends BaseController {
         
     }
 	
+	/**
+	 * 商品推送 悦活-->合协
+	 * @param map
+	 * @return
+	 * @throws Exception
+	 */
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/pushProducts", method = RequestMethod.POST)
 	@ResponseBody
@@ -90,6 +103,12 @@ public class ProviderController extends BaseController {
 		return ProviderResult.success(String.valueOf(appid), key);
 	}
 	
+	/**
+	 * 订单状态变更。悦活-->合协
+	 * @param map
+	 * @return
+	 * @throws Exception
+	 */
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value="/updateOrder", method = RequestMethod.POST)
 	@ResponseBody
@@ -99,19 +118,21 @@ public class ProviderController extends BaseController {
 		providerService.checkSign(map);
 		//最后一次推送存redis，比较时间戳和随机数，如果时间戳相近并且随机数一样，不做更新操作
 		boolean isDuplcated = providerService.checkUpdateOrderStatusDuplicate(map);
+		String merchantId = (String)map.get("appid");
 		if (!isDuplcated) {
 			
 			String orderNo = (String)map.get("orderNo");
 			String status = (String)map.get("status");
-			String remark = (String)map.get("remark");
+			String remarks = (String)map.get("remarks");
 			
-			IlohasOrder ion = new IlohasOrder(orderNo, status, remark);
+			
+			IlohasOrder ion = new IlohasOrder(orderNo, status, merchantId);
+			ion.setRemarks(remarks);
 			String destination = "hexie.providers.orderStatus";
 			providerService.sendMessageByJms(ion, destination);
 		}
-		String appid = (String) map.get("appid");
-		String key = systemConfigService.queryValueByKey(Keys.systemConfigKey(appid));
-		return ProviderResult.success(appid, key);
+		String key = systemConfigService.queryValueByKey(Keys.systemConfigKey(merchantId));
+		return ProviderResult.success(merchantId, key);
 		
 	}
 	
@@ -126,11 +147,32 @@ public class ProviderController extends BaseController {
 		
 	}
 	
+	@SuppressWarnings("unchecked")
+	@RequestMapping(value="/getOrderList", method = RequestMethod.POST)
+	@ResponseBody
+	public String getPaidOrderList(@RequestBody Map<String, Object> map) throws Exception {
+		//校验签名
+		providerService.checkSign(map);
+		String appid = (String)map.get("appid");
+		String key = systemConfigService.queryValueByKey(Keys.systemConfigKey(String.valueOf(appid)));
+		
+		String beginDate = (String)map.get("begin_date");
+		String end_date = (String)map.get("end_date");
+		ResponseOrders orders = providerService.getIlohasOrderList(ProviderConstant.ILOHAS_ORDER_STATUS_PAID, beginDate, end_date);
+		return ProviderResult.success(orders, appid, key);
 	
+	}
+	
+	/**
+	 * 异常处理
+	 * @param e
+	 * @return
+	 */
 	@ExceptionHandler(InteractionException.class)
 	@ResponseBody
 	public String handleException(InteractionException e){
 		
+		logger.info("provider controller : " + e.getMessage(), e);
 		return ProviderResult.fail(e.getMessage());
 	}
 	

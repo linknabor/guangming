@@ -71,8 +71,10 @@
     <logger name="com.yumu.hexie.schedule"  level="INFO" additivity="false">  
 	    <appender-ref ref="SCHEDUE"/>  
 	</logger>
-    <root level="INFO">
+	<root level="ERROR">
         <appender-ref ref="STDOUT"/>
+    </root>
+    <root level="INFO">
         <appender-ref ref="COMMONERROR"/>
     </root>
 </configuration>
