@@ -320,7 +320,7 @@ public class OrderController extends BaseController{
 		if(cart.getOrderType() < 0){
 			return new BaseResult<ServiceOrder>().failMsg("商品信息获取异常，请重新选择你需要购买的商品！");
 		}
-		ServiceOrder o = baseOrderService.createOrder(req,cart,user.getId(),user.getOpenid());
+		ServiceOrder o = baseOrderService.createOrder(req,cart,user.getId(),user.getBindOpenId());
 		if(o == null) {
 			return new BaseResult<ServiceOrder>().failMsg("订单提交失败，请稍后重试！");
 		} else {
