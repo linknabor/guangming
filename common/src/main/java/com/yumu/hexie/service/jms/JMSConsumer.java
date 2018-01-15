@@ -54,11 +54,9 @@ public class JMSConsumer {
 					ilohasProduct.setMerchantId(ProviderConstant.ILOHAS_MERCHANT_ID);
 					ilohasProductRepository.save(ilohasProduct);
 				}else {
-					if (!entity.getUpdated()) {
-						ilohasProduct.setId(entity.getId());
-						ilohasProduct.setReceivedTime(DateUtil.dttmFormat(nowTime));
-						ilohasProductRepository.save(ilohasProduct);
-					}
+					ilohasProduct.setId(entity.getId());
+					ilohasProduct.setReceivedTime(DateUtil.dttmFormat(nowTime));
+					ilohasProductRepository.save(ilohasProduct);
 					
 				}
 				

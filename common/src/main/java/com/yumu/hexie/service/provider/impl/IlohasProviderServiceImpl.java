@@ -185,8 +185,12 @@ public class IlohasProviderServiceImpl<T> implements ProviderService<T>{
 		for (IlohasProduct ilohasProduct : proList) {
 			
 			Product product = productRepository.findByMerchanProductNo(ilohasProduct.getCode());
-			
 			ilohasProduct.setMerchantId(String.valueOf(merchantId));
+			//1.新过来的商品如果下架或者卖完了，直接跳过不上架。2.如果之前有的商品卖完了,则需要更新状态到下架
+			if (isWithdraw(ilohasProduct)) {
+				continue;
+			}
+			
 			//保存product
 			product = saveProdcut(ilohasProduct, product);
 			
@@ -258,6 +262,9 @@ public class IlohasProviderServiceImpl<T> implements ProviderService<T>{
 		product.setOriPrice(price);
 		product.setSinglePrice(price);
 		product.setStatus(ModelConstant.PRODUCT_ONSALE);	//上架
+		if (!isNew&&isWithdraw(ilohasProduct)) {
+			product.setStatus(ModelConstant.PRODUCT_OFF);
+		}
 		product.setTotalCount(Integer.valueOf(ilohasProduct.getStock()));
 		product.setShortName(ilohasProduct.getName());
 		product.setTitleName(ilohasProduct.getName());
@@ -614,5 +621,15 @@ public class IlohasProviderServiceImpl<T> implements ProviderService<T>{
 		return respOrders;
 	}
 
+	private boolean isWithdraw(IlohasProduct ilohasProduct){
+		
+		boolean flag = false;
+		String ilohasStatus = ilohasProduct.getOpenState();	//销售状态，0上架、1下架、售罄,供应商的商品状态
+		//1.新过来的商品如果下架或者卖完了，直接跳过不上架。2.如果之前有的商品卖完了,则需要更新状态到下架
+		if ("1".equals(ilohasStatus)) {	
+			flag = true;
+		}
+		return flag;
+	}
 	
 }
