@@ -187,7 +187,7 @@ public class IlohasProviderServiceImpl<T> implements ProviderService<T>{
 			Product product = productRepository.findByMerchanProductNo(ilohasProduct.getCode());
 			ilohasProduct.setMerchantId(String.valueOf(merchantId));
 			//1.新过来的商品如果下架或者卖完了，直接跳过不上架。2.如果之前有的商品卖完了,则需要更新状态到下架
-			if (isWithdraw(ilohasProduct)) {
+			if (null==product && isWithdraw(ilohasProduct)) {
 				continue;
 			}
 			
@@ -262,7 +262,7 @@ public class IlohasProviderServiceImpl<T> implements ProviderService<T>{
 		product.setOriPrice(price);
 		product.setSinglePrice(price);
 		product.setStatus(ModelConstant.PRODUCT_ONSALE);	//上架
-		if (!isNew&&isWithdraw(ilohasProduct)) {
+		if (isWithdraw(ilohasProduct)) {
 			product.setStatus(ModelConstant.PRODUCT_OFF);
 		}
 		product.setTotalCount(Integer.valueOf(ilohasProduct.getStock()));
@@ -395,7 +395,10 @@ public class IlohasProviderServiceImpl<T> implements ProviderService<T>{
 		item.setRuleName(onSaleRule.getName());
 		item.setSalePlanId(onSaleRule.getId());
 		item.setSalePlanType(onSaleRule.getSalePlanType());
-		item.setStatus(1);
+		item.setStatus(ModelConstant.COLLOCATION_STATUS_AVAILABLE);
+		if (product.getStatus()!=ModelConstant.PRODUCT_ONSALE) {
+			item.setStatus(ModelConstant.COLLOCATION_STATUS_INVAILID);
+		}
 		item.setCollocationId(collocation.getId());
 		collocationItemRepository.save(item);
 		
@@ -406,7 +409,7 @@ public class IlohasProviderServiceImpl<T> implements ProviderService<T>{
 	
 		ilohasProduct.setUpdated(Boolean.TRUE);
 		Date nowDate = new Date();
-		ilohasProduct.setUpdateTime(DateUtil.dtFormat(nowDate));
+		ilohasProduct.setUpdateTime(DateUtil.dttmFormat(nowDate));
 		ilohasProductRepository.save(ilohasProduct);
 	}
 	
@@ -628,7 +631,7 @@ public class IlohasProviderServiceImpl<T> implements ProviderService<T>{
 		boolean flag = false;
 		String ilohasStatus = ilohasProduct.getOpenState();	//销售状态，0上架、1下架、售罄,供应商的商品状态
 		//1.新过来的商品如果下架或者卖完了，直接跳过不上架。2.如果之前有的商品卖完了,则需要更新状态到下架
-		if ("1".equals(ilohasStatus)) {	
+		if (!"0".equals(ilohasStatus)) {	
 			flag = true;
 		}
 		return flag;

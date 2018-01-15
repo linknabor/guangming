@@ -1,5 +1,9 @@
 package com.yumu.hexie.web.sales;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+
 import javax.inject.Inject;
 
 import org.springframework.stereotype.Controller;
@@ -11,8 +15,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.yumu.hexie.common.Constants;
+import com.yumu.hexie.model.ModelConstant;
 import com.yumu.hexie.model.market.Cart;
 import com.yumu.hexie.model.market.Collocation;
+import com.yumu.hexie.model.market.CollocationItem;
+import com.yumu.hexie.model.market.CollocationItemRepository;
 import com.yumu.hexie.model.payment.PaymentConstant;
 import com.yumu.hexie.model.payment.PaymentOrder;
 import com.yumu.hexie.model.redis.Keys;
@@ -60,6 +67,15 @@ public class CollocationController extends BaseController{
 		Collocation c = collocationService.findOneWithItem(collId);
 		if(c!=null) {
 			c.setProducts(c.getItems());
+		}
+		List<CollocationItem>removeList = new ArrayList<CollocationItem>();
+		for (CollocationItem item : c.getItems()) {
+			if (item.getStatus()==ModelConstant.COLLOCATION_STATUS_INVAILID) {
+				removeList.add(item);
+			}
+		}
+		for (CollocationItem collocationItem : removeList) {
+			c.getItems().remove(collocationItem);
 		}
 		return new BaseResult<Collocation>().success(c);
     }
