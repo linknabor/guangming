@@ -623,6 +623,8 @@ public class IlohasProviderServiceImpl<T> implements ProviderService<T>{
 
 	private boolean isWithdraw(IlohasProduct ilohasProduct){
 		
+		logger.info("ilohasProduct code : " + ilohasProduct.getCode());
+		logger.info("ilohasProduct status : " + ilohasProduct.getOpenState());
 		boolean flag = false;
 		String ilohasStatus = ilohasProduct.getOpenState();	//销售状态，0上架、1下架、售罄,供应商的商品状态
 		//1.新过来的商品如果下架或者卖完了，直接跳过不上架。2.如果之前有的商品卖完了,则需要更新状态到下架
