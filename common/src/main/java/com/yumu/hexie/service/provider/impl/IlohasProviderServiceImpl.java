@@ -298,7 +298,7 @@ public class IlohasProviderServiceImpl<T> implements ProviderService<T>{
 		onSaleRule.setPrice(product.getMiniPrice());
 		onSaleRule.setStatus(product.getStatus());
 		onSaleRule.setTimeoutForPay(1800000);
-		onSaleRule.setProductType(1);
+		onSaleRule.setProductType(10);
 		onSaleRule.setName(product.getName());
 		return onSaleRuleRepository.save(onSaleRule);
 		
