@@ -252,7 +252,7 @@ public class IlohasProviderServiceImpl<T> implements ProviderService<T>{
 		if (isNew) {
 			product.setProductNo(getProductNo());
 		}
-		product.setProductType("其他-乐活社区");
+		product.setProductType("其他-乐活社区");	//TODO
 		product.setName(ilohasProduct.getName());
 		product.setPictures(ilohasProduct.getHeadLog());
 		product.setMainPicture(ilohasProduct.getHeadLog());
@@ -298,7 +298,7 @@ public class IlohasProviderServiceImpl<T> implements ProviderService<T>{
 		onSaleRule.setPrice(product.getMiniPrice());
 		onSaleRule.setStatus(product.getStatus());
 		onSaleRule.setTimeoutForPay(1800000);
-		onSaleRule.setProductType(1);
+		onSaleRule.setProductType(10);
 		onSaleRule.setName(product.getName());
 		return onSaleRuleRepository.save(onSaleRule);
 		
@@ -396,6 +396,7 @@ public class IlohasProviderServiceImpl<T> implements ProviderService<T>{
 		item.setSalePlanId(onSaleRule.getId());
 		item.setSalePlanType(onSaleRule.getSalePlanType());
 		item.setStatus(ModelConstant.COLLOCATION_STATUS_AVAILABLE);
+		item.setProductType(product.getProductType());
 		if (product.getStatus()!=ModelConstant.PRODUCT_ONSALE) {
 			item.setStatus(ModelConstant.COLLOCATION_STATUS_INVAILID);
 		}
