@@ -252,7 +252,7 @@ public class IlohasProviderServiceImpl<T> implements ProviderService<T>{
 		if (isNew) {
 			product.setProductNo(getProductNo());
 		}
-		product.setProductType("其他-乐活社区");
+		product.setProductType("其他-乐活社区");	//TODO
 		product.setName(ilohasProduct.getName());
 		product.setPictures(ilohasProduct.getHeadLog());
 		product.setMainPicture(ilohasProduct.getHeadLog());
@@ -275,8 +275,8 @@ public class IlohasProviderServiceImpl<T> implements ProviderService<T>{
 		product.setEndDate(endDate);
 		product.setMerchanProductNo(ilohasProduct.getCode());
 		product.setProvenance(2);
-		product.setFirstType("00");
-		product.setSecondType("00");
+		product.setFirstType(ilohasProduct.getOneClassifyLabel());
+		product.setSecondType(ilohasProduct.getTwoClassifyLabel());
 		product.setPostageFee(0f);	//TODO
 		return productRepository.save(product);
 		
@@ -396,10 +396,13 @@ public class IlohasProviderServiceImpl<T> implements ProviderService<T>{
 		item.setSalePlanId(onSaleRule.getId());
 		item.setSalePlanType(onSaleRule.getSalePlanType());
 		item.setStatus(ModelConstant.COLLOCATION_STATUS_AVAILABLE);
+		item.setProductType(product.getProductType());
 		if (product.getStatus()!=ModelConstant.PRODUCT_ONSALE) {
 			item.setStatus(ModelConstant.COLLOCATION_STATUS_INVAILID);
 		}
 		item.setCollocationId(collocation.getId());
+		item.setFirstType(product.getFirstType());
+		item.setSecondType(product.getSecondType());
 		collocationItemRepository.save(item);
 		
 

@@ -24,6 +24,10 @@ public class IlohasProduct extends BaseModel {
 	private String stock;	//库存
 	private String openState;	//销售状态，0上架、1下架、售罄,供应商的商品状态
 	private String headLog;	//商品图片
+	
+	private String oneClassifyLabel;	//商品一级分类
+	private String twoClassifyLabel;	//二级分类
+	
 	private String receivedTime;//接收到商品推送的时间
 	private String updateTime;	//更新时间
 	private Boolean updated = Boolean.FALSE;	//合协社区产品状态：false未更新到product表，true，已经更新到product
@@ -101,16 +105,29 @@ public class IlohasProduct extends BaseModel {
 	public void setReceivedTime(String receivedTime) {
 		this.receivedTime = receivedTime;
 	}
+	public String getOneClassifyLabel() {
+		return oneClassifyLabel;
+	}
+	public void setOneClassifyLabel(String oneClassifyLabel) {
+		this.oneClassifyLabel = oneClassifyLabel;
+	}
+	public String getTwoClassifyLabel() {
+		return twoClassifyLabel;
+	}
+	public void setTwoClassifyLabel(String twoClassifyLabel) {
+		this.twoClassifyLabel = twoClassifyLabel;
+	}
 	@Override
 	public String toString() {
 		return "IlohasProduct [code=" + code + ", name=" + name
 				+ ", supplierName=" + supplierName + ", unit=" + unit
 				+ ", price=" + price + ", stock=" + stock + ", openState="
-				+ openState + ", headLog=" + headLog + ", receivedTime="
-				+ receivedTime + ", updateTime=" + updateTime + ", updated="
-				+ updated + ", merchantId=" + merchantId + "]";
+				+ openState + ", headLog=" + headLog + ", oneClassifyLabel="
+				+ oneClassifyLabel + ", twoClassifyLabel=" + twoClassifyLabel
+				+ ", receivedTime=" + receivedTime + ", updateTime="
+				+ updateTime + ", updated=" + updated + ", merchantId="
+				+ merchantId + "]";
 	}
-	
 	
 	
 }

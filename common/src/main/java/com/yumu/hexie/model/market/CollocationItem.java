@@ -34,6 +34,10 @@ public class CollocationItem extends BaseModel {
 	private Float price;
 	private Integer limitNumOnce;
 	private String ruleName;
+	private String productType;
+	
+	private String firstType;	//商品一级分类
+	private String secondType;	//二级分类
 
 	@JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY,cascade = {CascadeType.REFRESH }, optional = true)
@@ -56,6 +60,7 @@ public class CollocationItem extends BaseModel {
 		this.productPic = product.getSmallPicture();
 		this.productName = product.getName();
 		this.oriPrice = product.getOriPrice();
+		this.productType = product.getProductType();
 	}
 	public int getSalePlanType() {
 		return salePlanType;
@@ -135,4 +140,25 @@ public class CollocationItem extends BaseModel {
 	public void setSelected(boolean selected) {
 		this.selected = selected;
 	}
+	public String getProductType() {
+		return productType;
+	}
+	public void setProductType(String productType) {
+		this.productType = productType;
+	}
+	public String getFirstType() {
+		return firstType;
+	}
+	public void setFirstType(String firstType) {
+		this.firstType = firstType;
+	}
+	public String getSecondType() {
+		return secondType;
+	}
+	public void setSecondType(String secondType) {
+		this.secondType = secondType;
+	}
+	
+	
+	
 }
