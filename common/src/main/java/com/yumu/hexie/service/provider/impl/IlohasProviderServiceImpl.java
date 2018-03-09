@@ -7,6 +7,7 @@ import java.util.Map;
 
 import javax.inject.Inject;
 
+import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeanUtils;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.yumu.hexie.common.util.DateUtil;
+import com.yumu.hexie.common.util.HttpUtil;
 import com.yumu.hexie.common.util.JacksonJsonUtil;
 import com.yumu.hexie.common.util.StringUtil;
 import com.yumu.hexie.integration.provider.ilohas.entity.ProviderLoginer;
@@ -491,7 +493,22 @@ public class IlohasProviderServiceImpl<T> implements ProviderService<T>{
 		 * 4.综上，通知对方的动作作为异步响应执行，如果失败了不做处理，等对方轮循
 		 */
 		saveIlohasOrder(ProviderConstant.ILOHAS_MERCHANT_ID, ilohasOrder);
-		ProviderOrderService.notifyIlohasOrder(responseOrder);
+		String json = "";
+		try {
+			json = JacksonJsonUtil.beanToJson(responseOrder);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		
+		String response = "";
+		try {
+			response = HttpUtil.doPostJsonStr(ProviderOrderService.ILOHAS_ORDER_NOTIFY_URL, json, ProviderOrderService.DEFAULT_CHARACTER);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		logger.info("response is : " + response);
+		
+//		ProviderOrderService.notifyIlohasOrder(json);
 		
 	}
 
