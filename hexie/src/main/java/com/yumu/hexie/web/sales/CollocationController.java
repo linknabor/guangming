@@ -1,7 +1,6 @@
 package com.yumu.hexie.web.sales;
 
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -19,7 +18,6 @@ import com.yumu.hexie.model.ModelConstant;
 import com.yumu.hexie.model.market.Cart;
 import com.yumu.hexie.model.market.Collocation;
 import com.yumu.hexie.model.market.CollocationItem;
-import com.yumu.hexie.model.market.CollocationItemRepository;
 import com.yumu.hexie.model.payment.PaymentConstant;
 import com.yumu.hexie.model.payment.PaymentOrder;
 import com.yumu.hexie.model.redis.Keys;

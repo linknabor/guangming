@@ -35,6 +35,9 @@ public class CollocationItem extends BaseModel {
 	private Integer limitNumOnce;
 	private String ruleName;
 	private String productType;
+	
+	private String firstType;	//商品一级分类
+	private String secondType;	//二级分类
 
 	@JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY,cascade = {CascadeType.REFRESH }, optional = true)
@@ -143,6 +146,19 @@ public class CollocationItem extends BaseModel {
 	public void setProductType(String productType) {
 		this.productType = productType;
 	}
+	public String getFirstType() {
+		return firstType;
+	}
+	public void setFirstType(String firstType) {
+		this.firstType = firstType;
+	}
+	public String getSecondType() {
+		return secondType;
+	}
+	public void setSecondType(String secondType) {
+		this.secondType = secondType;
+	}
+	
 	
 	
 }

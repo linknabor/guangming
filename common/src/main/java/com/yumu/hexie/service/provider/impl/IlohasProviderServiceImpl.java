@@ -275,8 +275,8 @@ public class IlohasProviderServiceImpl<T> implements ProviderService<T>{
 		product.setEndDate(endDate);
 		product.setMerchanProductNo(ilohasProduct.getCode());
 		product.setProvenance(2);
-		product.setFirstType("00");
-		product.setSecondType("00");
+		product.setFirstType(ilohasProduct.getOneClassifyLabel());
+		product.setSecondType(ilohasProduct.getTwoClassifyLabel());
 		product.setPostageFee(0f);	//TODO
 		return productRepository.save(product);
 		
@@ -401,6 +401,8 @@ public class IlohasProviderServiceImpl<T> implements ProviderService<T>{
 			item.setStatus(ModelConstant.COLLOCATION_STATUS_INVAILID);
 		}
 		item.setCollocationId(collocation.getId());
+		item.setFirstType(product.getFirstType());
+		item.setSecondType(product.getSecondType());
 		collocationItemRepository.save(item);
 		
 
