@@ -34,6 +34,7 @@ import com.yumu.hexie.model.market.Collocation;
 import com.yumu.hexie.model.market.CollocationItem;
 import com.yumu.hexie.model.market.CollocationItemRepository;
 import com.yumu.hexie.model.market.CollocationRepository;
+import com.yumu.hexie.model.market.OrderItemRepository;
 import com.yumu.hexie.model.market.ServiceAreaItem;
 import com.yumu.hexie.model.market.ServiceAreaItemRepository;
 import com.yumu.hexie.model.market.ServiceOrder;
@@ -90,6 +91,8 @@ public class IlohasProviderServiceImpl<T> implements ProviderService<T>{
 	private IlohasOrderRepository ilohasOrderRepository;
 	@Inject
 	private IlohasOrderItemRepository ilohasOrderItemRepository;
+	@Inject
+	private OrderItemRepository orderItemRepository;
 	
 	@Override
 	public String getToken(ProviderLoginer loginer){
@@ -445,7 +448,8 @@ public class IlohasProviderServiceImpl<T> implements ProviderService<T>{
 	public void notifyPay(Long orderId) {
 
 		ServiceOrder serviceOrder = serviceOrderRepository.findOne(orderId);
-		List<com.yumu.hexie.model.market.OrderItem> orderItems = serviceOrder.getItems();
+		orderItemRepository.findByServiceOrder(serviceOrder);
+		List<com.yumu.hexie.model.market.OrderItem> orderItems = orderItemRepository.findByServiceOrder(serviceOrder);
 		
 		//将合协系统中的orderItem 转换成 ilohas 的orderItem
 		List<OrderItem> ilohasOrderList = new ArrayList<OrderItem>();
