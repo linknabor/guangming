@@ -27,7 +27,7 @@ public class OrderItem  extends BaseModel {
 	private int orderType;
 
 	@JsonIgnore
-	@ManyToOne(fetch = FetchType.LAZY,cascade = {CascadeType.REFRESH }, optional = true)
+	@ManyToOne(fetch = FetchType.EAGER,cascade = {CascadeType.REFRESH }, optional = true)
     @JoinColumn(name = "orderId")
 	private ServiceOrder serviceOrder;
 
