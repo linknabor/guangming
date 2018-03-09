@@ -2,7 +2,6 @@ package com.yumu.hexie.integration.provider.ilohas.service;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.scheduling.annotation.Async;
 
 import com.yumu.hexie.common.util.ConfigUtil;
 import com.yumu.hexie.common.util.HttpUtil;
@@ -17,7 +16,6 @@ public class ProviderOrderService {
 	private static final String ILOHAS_ORDER_NOTIFY_URL = ConfigUtil.get("ilohasOrderNotifyUrl");
 	private static final String DEFAULT_CHARACTER = "UTF-8";
 	
-	@Async
 	public static String notifyIlohasOrder(ResponseOrder responseOrder){
 		
 		try {
