@@ -63,7 +63,7 @@ public class CollocationController extends BaseController{
 	@ResponseBody
 	public BaseResult<Collocation> collocation(@RequestBody Map<String, Object> map) throws Exception {
 		
-		String collId = (String) map.get("collId");
+		Integer collId = (Integer) map.get("collId");
 		String firstType = (String) map.get("firstType");
 		String secondType = (String) map.get("secondType");
 		
