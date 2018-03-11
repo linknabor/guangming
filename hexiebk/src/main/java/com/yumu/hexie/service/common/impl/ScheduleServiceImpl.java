@@ -481,9 +481,9 @@ public class ScheduleServiceImpl implements ScheduleService{
 //	@Scheduled(cron = "0 0/10 * * * ?")
 	public void executeUpdateIlohasProductInfo() {
 
-//		SCHEDULE_LOG.info("--------------------start updateIlohasProductInfo-----------------------------------");
-//		providerService.updateProducts(Long.valueOf(ProviderConstant.ILOHAS_MERCHANT_ID));
-//		SCHEDULE_LOG.info("--------------------end updateIlohasProductInfo-----------------------------------");
+		SCHEDULE_LOG.info("--------------------start updateIlohasProductInfo-----------------------------------");
+		providerService.updateProducts(Long.valueOf(ProviderConstant.ILOHAS_MERCHANT_ID));
+		SCHEDULE_LOG.info("--------------------end updateIlohasProductInfo-----------------------------------");
 		
 	}
 

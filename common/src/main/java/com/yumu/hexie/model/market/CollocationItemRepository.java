@@ -23,4 +23,13 @@ public interface CollocationItemRepository extends JpaRepository<CollocationItem
 	@Query("from CollocationItem c left join fetch c.collocation where c.collocation.salePlanType=?1 "
 			+ "and c.salePlanId=?2 and c.status="+ModelConstant.COLLOCATION_STATUS_AVAILABLE)
 	public List<CollocationItem> findByPlanTypeAndId(int type,long planId,Sort sort);
+	
+	
+	public List<CollocationItem> findByCollocationAndStatus(Collocation collocation, int status);
+	
+	public List<CollocationItem> findByCollocationAndStatusAndFirstType(Collocation collocation, int status, String firtType);
+	
+//	@Query("select distinct c.firstType, c.secondType from CollocationItem c left join fetch c.collocation where c.collocation.id = ?1 and c.status = ?2 ")
+//	public List<CollocationItem> getCollocationItemCategory(long collId, int status);
+	
 }

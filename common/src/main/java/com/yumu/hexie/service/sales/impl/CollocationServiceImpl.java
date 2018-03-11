@@ -1,6 +1,10 @@
 package com.yumu.hexie.service.sales.impl;
 
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -10,6 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
+import com.yumu.hexie.model.ModelConstant;
 import com.yumu.hexie.model.commonsupport.info.Product;
 import com.yumu.hexie.model.market.Cart;
 import com.yumu.hexie.model.market.Collocation;
@@ -20,6 +25,7 @@ import com.yumu.hexie.model.market.OrderItem;
 import com.yumu.hexie.model.market.ServiceOrder;
 import com.yumu.hexie.model.market.ServiceOrderRepository;
 import com.yumu.hexie.model.market.saleplan.SalePlan;
+import com.yumu.hexie.model.provider.CollocationCategory;
 import com.yumu.hexie.model.user.User;
 import com.yumu.hexie.service.exception.BizValidateException;
 import com.yumu.hexie.service.o2o.BillAssignService;
@@ -107,6 +113,52 @@ public class CollocationServiceImpl implements CollocationService {
 
 		billAssignService.assginSupermarketOrder(order);
 		
+	}
+
+	@Override
+	public List<CollocationCategory> getCollocatoinCategory(long collId) {
+
+		Collocation collocation = collocationRepository.findOne(collId);
+		List<CollocationItem> itemList = collocationItemRepository.findByCollocationAndStatus(collocation, ModelConstant.COLLOCATION_STATUS_AVAILABLE);
+		List<CollocationCategory> categoryList = new ArrayList<CollocationCategory>();
+		Map<String, List<String>> map = new HashMap<String, List<String>>();
+		for (int i = 0; i < itemList.size(); i++) {
+			String firstType = itemList.get(i).getFirstType();
+			String secondType = itemList.get(i).getSecondType();
+			if (!map.containsKey(firstType)) {
+				List<String> secTypeList = new ArrayList<String>();
+				secTypeList.add(secondType);
+				map.put(firstType, secTypeList);
+			}else {
+				List<String> secTypeList = map.get(firstType);
+				if (!secTypeList.contains(secondType)) {
+					secTypeList.add(secondType);
+				}
+			}
+		}
+		
+		Iterator<Map.Entry<String, List<String>>> it = map.entrySet().iterator();
+		while (it.hasNext()) {
+			Map.Entry<String, List<String>> entry = (Map.Entry<String, List<String>>) it.next();
+			String firstType = entry.getKey();
+			List<String>secTypeList = entry.getValue();
+			CollocationCategory cate = new CollocationCategory();
+			cate.setFirstType(firstType);
+			cate.setSecondTypes(secTypeList);
+			categoryList.add(cate);
+		}
+		
+		
+		return categoryList;
+	}
+
+	@Override
+	public Collocation findWithFirstType(long collId, String firstType) {
+			
+		Collocation collocation = collocationRepository.findOne(collId);
+		List<CollocationItem> itemList = collocationItemRepository.findByCollocationAndStatusAndFirstType(collocation, ModelConstant.COLLOCATION_STATUS_AVAILABLE, firstType);
+		collocation.setProducts(itemList);
+		return collocation;
 	}
 	
 	

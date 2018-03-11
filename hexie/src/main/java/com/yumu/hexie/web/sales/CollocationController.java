@@ -1,7 +1,7 @@
 package com.yumu.hexie.web.sales;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.inject.Inject;
 
@@ -14,12 +14,12 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.yumu.hexie.common.Constants;
-import com.yumu.hexie.model.ModelConstant;
+import com.yumu.hexie.common.util.StringUtil;
 import com.yumu.hexie.model.market.Cart;
 import com.yumu.hexie.model.market.Collocation;
-import com.yumu.hexie.model.market.CollocationItem;
 import com.yumu.hexie.model.payment.PaymentConstant;
 import com.yumu.hexie.model.payment.PaymentOrder;
+import com.yumu.hexie.model.provider.CollocationCategory;
 import com.yumu.hexie.model.redis.Keys;
 import com.yumu.hexie.model.redis.RedisRepository;
 import com.yumu.hexie.model.user.User;
@@ -58,24 +58,25 @@ public class CollocationController extends BaseController{
 		return new BaseResult<Collocation>().success(c);
     }
 	
-
-	@RequestMapping(value = "/collocation/{collId}", method = RequestMethod.GET)
+	@RequestMapping(value = "/collocation/{collId}/", method = RequestMethod.POST)
 	@ResponseBody
-	public BaseResult<Collocation> collocation(@PathVariable long collId) throws Exception {
-		Collocation c = collocationService.findOneWithItem(collId);
-		if(c!=null) {
-			c.setProducts(c.getItems());
+	public BaseResult<Collocation> collocation(@PathVariable long collId, @RequestBody Map<String, Object> map) throws Exception {
+		
+		String firstType = (String) map.get("firstType");
+		if (StringUtil.isEmpty(firstType)) {
+			firstType = "休闲零食";
 		}
-		List<CollocationItem>removeList = new ArrayList<CollocationItem>();
-		for (CollocationItem item : c.getItems()) {
-			if (item.getStatus()==ModelConstant.COLLOCATION_STATUS_INVAILID) {
-				removeList.add(item);
-			}
-		}
-		for (CollocationItem collocationItem : removeList) {
-			c.getItems().remove(collocationItem);
-		}
+		Collocation c = collocationService.findWithFirstType(collId, firstType);
 		return new BaseResult<Collocation>().success(c);
+    }
+	
+
+	@RequestMapping(value = "/collocation/getCategory/{collId}", method = RequestMethod.GET)
+	@ResponseBody
+	public BaseResult<List<CollocationCategory>> getCollocationCategory(@PathVariable long collId) throws Exception {
+		
+		List<CollocationCategory>cateList = collocationService.getCollocatoinCategory(collId);
+		return new BaseResult<List<CollocationCategory>>().success(cateList);
     }
 	
 
