@@ -14,6 +14,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.domain.Sort.Direction;
 import org.springframework.stereotype.Service;
 
+import com.yumu.hexie.common.util.StringUtil;
 import com.yumu.hexie.model.ModelConstant;
 import com.yumu.hexie.model.commonsupport.info.Product;
 import com.yumu.hexie.model.market.Cart;
@@ -156,7 +157,13 @@ public class CollocationServiceImpl implements CollocationService {
 	public Collocation findWithFirstType(long collId, String firstType, String secondType) {
 			
 		Collocation collocation = collocationRepository.findOne(collId);
-		List<CollocationItem> itemList = collocationItemRepository.findByCollocationAndStatusAndFirstTypeAndSecondType(collocation, ModelConstant.COLLOCATION_STATUS_AVAILABLE, firstType, secondType);
+		List<CollocationItem> itemList = null;
+		if (StringUtil.isEmpty(secondType)) {
+			itemList = collocationItemRepository.findByCollocationAndStatusAndFirstType(collocation, ModelConstant.COLLOCATION_STATUS_AVAILABLE, firstType);
+		}else {
+			itemList = collocationItemRepository.findByCollocationAndStatusAndFirstTypeAndSecondType(collocation, ModelConstant.COLLOCATION_STATUS_AVAILABLE, firstType, secondType);
+		}
+		
 		collocation.setProducts(itemList);
 		return collocation;
 	}

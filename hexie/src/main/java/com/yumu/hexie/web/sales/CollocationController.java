@@ -74,9 +74,6 @@ public class CollocationController extends BaseController{
 		if (StringUtil.isEmpty(firstType)) {
 			firstType = "休闲零食";
 		}
-		if (StringUtil.isEmpty(secondType)) {
-			secondType = "膨化食品";
-		}
 		Long collocationId = Long.valueOf(collId);
 		Collocation c = collocationService.findWithFirstType(collocationId, firstType, secondType);
 		return new BaseResult<Collocation>().success(c);
