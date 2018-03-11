@@ -153,10 +153,10 @@ public class CollocationServiceImpl implements CollocationService {
 	}
 
 	@Override
-	public Collocation findWithFirstType(long collId, String firstType) {
+	public Collocation findWithFirstType(long collId, String firstType, String secondType) {
 			
 		Collocation collocation = collocationRepository.findOne(collId);
-		List<CollocationItem> itemList = collocationItemRepository.findByCollocationAndStatusAndFirstType(collocation, ModelConstant.COLLOCATION_STATUS_AVAILABLE, firstType);
+		List<CollocationItem> itemList = collocationItemRepository.findByCollocationAndStatusAndFirstTypeAndSecondType(collocation, ModelConstant.COLLOCATION_STATUS_AVAILABLE, firstType, secondType);
 		collocation.setProducts(itemList);
 		return collocation;
 	}

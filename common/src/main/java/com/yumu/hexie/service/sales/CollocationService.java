@@ -24,6 +24,6 @@ public interface CollocationService {
 	
 	public List<CollocationCategory> getCollocatoinCategory(long collId);
 	
-	public Collocation findWithFirstType(long collId, String firstType);
+	public Collocation findWithFirstType(long collId, String firstType, String secondType);
 	
 }

@@ -58,15 +58,20 @@ public class CollocationController extends BaseController{
 		return new BaseResult<Collocation>().success(c);
     }
 	
-	@RequestMapping(value = "/collocation/{collId}/", method = RequestMethod.POST)
+	@RequestMapping(value = "/collocation", method = RequestMethod.POST)
 	@ResponseBody
-	public BaseResult<Collocation> collocation(@PathVariable long collId, @RequestBody Map<String, Object> map) throws Exception {
+	public BaseResult<Collocation> collocation(@RequestBody Map<String, Object> map) throws Exception {
 		
+		Long collId = (Long) map.get("collId");
 		String firstType = (String) map.get("firstType");
+		String secondType = (String) map.get("secondType");
 		if (StringUtil.isEmpty(firstType)) {
 			firstType = "休闲零食";
 		}
-		Collocation c = collocationService.findWithFirstType(collId, firstType);
+		if (StringUtil.isEmpty(secondType)) {
+			secondType = "膨化食品";
+		}
+		Collocation c = collocationService.findWithFirstType(collId, firstType, secondType);
 		return new BaseResult<Collocation>().success(c);
     }
 	

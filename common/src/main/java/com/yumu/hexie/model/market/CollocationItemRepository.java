@@ -27,7 +27,7 @@ public interface CollocationItemRepository extends JpaRepository<CollocationItem
 	
 	public List<CollocationItem> findByCollocationAndStatus(Collocation collocation, int status);
 	
-	public List<CollocationItem> findByCollocationAndStatusAndFirstType(Collocation collocation, int status, String firtType);
+	public List<CollocationItem> findByCollocationAndStatusAndFirstTypeAndSecondType(Collocation collocation, int status, String firtType, String secondType);
 	
 //	@Query("select distinct c.firstType, c.secondType from CollocationItem c left join fetch c.collocation where c.collocation.id = ?1 and c.status = ?2 ")
 //	public List<CollocationItem> getCollocationItemCategory(long collId, int status);
