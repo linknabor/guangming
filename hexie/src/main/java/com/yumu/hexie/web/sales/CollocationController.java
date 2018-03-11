@@ -23,6 +23,7 @@ import com.yumu.hexie.model.provider.CollocationCategory;
 import com.yumu.hexie.model.redis.Keys;
 import com.yumu.hexie.model.redis.RedisRepository;
 import com.yumu.hexie.model.user.User;
+import com.yumu.hexie.service.exception.BizValidateException;
 import com.yumu.hexie.service.provider.ProviderService;
 import com.yumu.hexie.service.sales.BaseOrderService;
 import com.yumu.hexie.service.sales.CollocationService;
@@ -62,16 +63,22 @@ public class CollocationController extends BaseController{
 	@ResponseBody
 	public BaseResult<Collocation> collocation(@RequestBody Map<String, Object> map) throws Exception {
 		
-		Long collId = (Long) map.get("collId");
+		String collId = (String) map.get("collId");
 		String firstType = (String) map.get("firstType");
 		String secondType = (String) map.get("secondType");
+		
+		if (StringUtil.isEmpty(collId)) {
+			throw new BizValidateException("collId不能为空。");
+		}
+		
 		if (StringUtil.isEmpty(firstType)) {
 			firstType = "休闲零食";
 		}
 		if (StringUtil.isEmpty(secondType)) {
 			secondType = "膨化食品";
 		}
-		Collocation c = collocationService.findWithFirstType(collId, firstType, secondType);
+		Long collocationId = Long.valueOf(collId);
+		Collocation c = collocationService.findWithFirstType(collocationId, firstType, secondType);
 		return new BaseResult<Collocation>().success(c);
     }
 	
