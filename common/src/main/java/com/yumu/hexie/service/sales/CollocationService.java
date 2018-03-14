@@ -1,7 +1,10 @@
 package com.yumu.hexie.service.sales;
 
+import java.util.List;
+
 import com.yumu.hexie.model.market.Cart;
 import com.yumu.hexie.model.market.Collocation;
+import com.yumu.hexie.model.provider.CollocationCategory;
 import com.yumu.hexie.model.user.User;
 
 public interface CollocationService {
@@ -18,5 +21,9 @@ public interface CollocationService {
 	public void AssginSupermarketOrder(long orderId, User user);
 	
 	public void AssginSupermarketOrder(long orderId);
+	
+	public List<CollocationCategory> getCollocatoinCategory(long collId);
+	
+	public Collocation findWithFirstType(long collId, String firstType, String secondType);
 	
 }
