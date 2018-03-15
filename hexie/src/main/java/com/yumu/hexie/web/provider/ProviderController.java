@@ -71,7 +71,7 @@ public class ProviderController extends BaseController {
 	@ResponseBody
     public String pushProducts(@RequestBody Map<String, Object> map) throws Exception {
 		
-		logger.info("pushProducts, map is : " + map);
+//		logger.info("pushProducts, map is : " + map);
 		
 		//校验签名
 		providerService.checkSign(map);
