@@ -189,9 +189,9 @@ public class AddressServiceImpl implements AddressService {
     @Override
     public void deleteAddress(long id, long userId) {
         Address addr = addressRepository.findOne(id);
-        if(addr.isMain()) {
-            throw new BizValidateException("无法删除默认地址！");
-        }
+//        if(addr.isMain()) {
+//            throw new BizValidateException("无法删除默认地址！");
+//        }
         if(addr.getUserId() != userId) {
             throw new BizValidateException("无法删除该地址！");
         }
