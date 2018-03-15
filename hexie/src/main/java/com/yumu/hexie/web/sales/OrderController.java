@@ -23,9 +23,6 @@ import com.yumu.hexie.integration.wechat.entity.common.JsSign;
 import com.yumu.hexie.model.ModelConstant;
 import com.yumu.hexie.model.commonsupport.comment.Comment;
 import com.yumu.hexie.model.commonsupport.info.Product;
-import com.yumu.hexie.model.distribution.RuleDistribution;
-import com.yumu.hexie.model.distribution.region.Region;
-import com.yumu.hexie.model.distribution.region.RegionRepository;
 import com.yumu.hexie.model.localservice.HomeServiceConstant;
 import com.yumu.hexie.model.localservice.ServiceOperator;
 import com.yumu.hexie.model.localservice.ServiceOperatorRepository;
@@ -38,10 +35,7 @@ import com.yumu.hexie.model.market.SupermarketAssginRepository;
 import com.yumu.hexie.model.market.saleplan.SalePlan;
 import com.yumu.hexie.model.redis.Keys;
 import com.yumu.hexie.model.redis.RedisRepository;
-import com.yumu.hexie.model.user.Address;
 import com.yumu.hexie.model.user.User;
-import com.yumu.hexie.model.user.Xiaoqu;
-import com.yumu.hexie.model.user.XiaoquRepository;
 import com.yumu.hexie.service.o2o.SendGoodsService;
 import com.yumu.hexie.service.sales.BaseOrderService;
 import com.yumu.hexie.service.sales.ProductService;
@@ -81,10 +75,6 @@ public class OrderController extends BaseController{
 	private SendGoodsService sendGoodsService;
 	@Inject
 	private ServiceOperatorRepository serviceOperatorRepository;
-	@Inject
-	private RegionRepository regionRepository;
-	@Inject
-	private XiaoquRepository xiaoquRepository;
 	
 	@RequestMapping(value = "/getProduct/{productId}", method = RequestMethod.GET)
 	@ResponseBody
@@ -204,46 +194,10 @@ public class OrderController extends BaseController{
 	@ResponseBody
 	public BaseResult<BuyInfoVO> queryBuyInfo(@ModelAttribute(Constants.USER)User user,@PathVariable int type,@PathVariable long ruleId) throws Exception {
 		SalePlan sp = salePlanService.getService(type).findSalePlan(ruleId);
-		List<RuleDistribution> list = salePlanService.getService(type).findRuleDistribution(sp.getProductId(), ruleId);
-		
-		int xiaoquCount = 0;
-		Address supportedAddress = new Address();
-		for (int i = 0; i < list.size(); i++) {
-			RuleDistribution rd = list.get(i);
-			int regionType = rd.getRegionType();
-			if (ModelConstant.REGION_XIAOQU == regionType) {
-				Region sect = regionRepository.findOne(rd.getRegionId());
-				supportedAddress.setXiaoquId(sect.getId());
-				supportedAddress.setXiaoquName(sect.getName());
-				
-				Xiaoqu xq = xiaoquRepository.findByXiaoquId(sect.getId());
-				supportedAddress.setXiaoquAddr(xq.getXiaoquAddr());
-				
-				Region county = regionRepository.findOne(sect.getParentId());
-				supportedAddress.setCountyId(county.getId());
-				supportedAddress.setCounty(county.getName());
-				
-				Region city = regionRepository.findOne(county.getParentId());
-				supportedAddress.setCityId(city.getId());
-				supportedAddress.setCity(city.getName());
-				
-				Region province = regionRepository.findOne(city.getParentId());
-				supportedAddress.setProvinceId(province.getId());
-				supportedAddress.setProvince(province.getName());
-				xiaoquCount++;
-				
-			}
-		}
-		
-		if (xiaoquCount>1) {
-			return new BaseResult<BuyInfoVO>().failMsg("当前商品规则配置了多个小区，请检查商品配置。");
-		}
-		
 		BuyInfoVO vo = new BuyInfoVO();
 		vo.setRule(sp);
 		vo.setProduct(productService.getProduct(sp.getProductId()));
 		vo.setAddress(addressService.queryDefaultAddress(user));
-		vo.setSupportedAddress(supportedAddress);
 		return new BaseResult<BuyInfoVO>().success(vo);
     }
 	

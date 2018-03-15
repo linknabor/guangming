@@ -1,13 +1,10 @@
 package com.yumu.hexie.service.sales.impl;
 
-import java.util.List;
-
 import javax.inject.Inject;
 
 import org.springframework.stereotype.Service;
 
 import com.yumu.hexie.model.ModelConstant;
-import com.yumu.hexie.model.distribution.RuleDistribution;
 import com.yumu.hexie.model.market.OrderItem;
 import com.yumu.hexie.model.market.ServiceOrder;
 import com.yumu.hexie.model.market.saleplan.OnSaleRule;
@@ -65,14 +62,4 @@ public class CustomOnSaleServiceImpl extends CustomOrderServiceImpl {
     public void postOrderCancel(ServiceOrder order) {
     }
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public List<RuleDistribution> findRuleDistribution(long productId, long ruleId) {
-		
-		OnSaleRule rule = new OnSaleRule();
-		rule.setId(ruleId);
-		rule.setProductId(productId);
-		return (List<RuleDistribution>) distributionService.queryOnsalesByRules(rule);
-	}
-	
 }

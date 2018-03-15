@@ -41,8 +41,6 @@ public interface RgroupAreaItemRepository extends JpaRepository<RgroupAreaItem, 
 	
 	public List<RgroupAreaItem> findByRuleId(long ruleId);
 	
-	public List<RgroupAreaItem> findByProductIdAndRuleId(long productId, long ruleId);
-	
 	@Query("from RgroupAreaItem m where m.status="+ModelConstant.DISTRIBUTION_STATUS_ON+" and ((m.regionType=0) "
 			+ "or (m.regionType=1 and m.regionId=?1) "
 			+ "or (m.regionType=2 and m.regionId=?2) "

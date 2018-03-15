@@ -33,6 +33,4 @@ public interface DistributionService {
     public List<Long> queryO2OServiceIds(long regionId, long type);
     public List<Long> queryO2OItemIds(long regionId, long type);
     
-    List<?> queryOnsalesByRules(OnSaleRule rule);
-    List<?> queryRgroupsByRules(RgroupRule rule);
 }
