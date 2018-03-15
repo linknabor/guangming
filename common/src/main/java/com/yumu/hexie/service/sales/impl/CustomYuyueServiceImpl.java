@@ -7,7 +7,6 @@ import javax.inject.Inject;
 import org.springframework.stereotype.Service;
 
 import com.yumu.hexie.model.ModelConstant;
-import com.yumu.hexie.model.distribution.RuleDistribution;
 import com.yumu.hexie.model.localservice.oldversion.YuyueOrder;
 import com.yumu.hexie.model.localservice.oldversion.YuyueOrderRepository;
 import com.yumu.hexie.model.localservice.oldversion.thirdpartyorder.FlowerPlusOrder;
@@ -148,12 +147,8 @@ public class CustomYuyueServiceImpl extends CustomOrderServiceImpl {
 	public SalePlan findSalePlan(long ruleId) {
 		return yuyueRuleRepository.findOne(ruleId);
 	}
-	@Override
-	public List<RuleDistribution> findRuleDistribution(long productId,
-			long ruleId) {
-		// TODO Auto-generated method stub
-		return null;
-	}
+
+
 }
 
 

@@ -62,4 +62,5 @@ public interface OnSaleAreaItemRepository extends JpaRepository<OnSaleAreaItem, 
 	public List<OnSaleAreaItem> findByRuleId(long ruleId);
 	
 	public List<OnSaleAreaItem> findByProductIdAndRuleId(long productId, long ruleId);
+	
 }

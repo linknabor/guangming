@@ -189,16 +189,5 @@ public class DistributionServiceImpl implements DistributionService {
         return homeDistributionRepository.queryItemIdsByParent(regionId, typeId);
     }
 
-	@Override
-	public List<?> queryOnsalesByRules(OnSaleRule rule) {
-		
-		return (List<?>) onSaleAreaItemRepository.findByProductIdAndRuleId(rule.getProductId(), rule.getId());
-	}
-
-	@Override
-	public List<?> queryRgroupsByRules(RgroupRule rule) {
-		
-		return (List<?>) rgroupAreaItemRepository.findByProductIdAndRuleId(rule.getProductId(), rule.getId());
-	}
     
 }

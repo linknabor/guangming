@@ -4,9 +4,6 @@
  */
 package com.yumu.hexie.service.sales;
 
-import java.util.List;
-
-import com.yumu.hexie.model.distribution.RuleDistribution;
 import com.yumu.hexie.model.market.OrderItem;
 import com.yumu.hexie.model.market.ServiceOrder;
 import com.yumu.hexie.model.market.saleplan.SalePlan;
@@ -27,7 +24,5 @@ public interface CustomOrderService {
     public void postOrderCancel(ServiceOrder order);
     public void postOrderConfirm(ServiceOrder order) ;
     public void validateRule(ServiceOrder order,SalePlan rule, OrderItem item, Address address);
-    
-    public List<RuleDistribution> findRuleDistribution(long productId, long ruleId);
     
 }
