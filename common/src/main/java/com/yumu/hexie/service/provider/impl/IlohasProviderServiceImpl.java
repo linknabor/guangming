@@ -191,7 +191,7 @@ public class IlohasProviderServiceImpl<T> implements ProviderService<T>{
 			Product product = productRepository.findByMerchanProductNo(ilohasProduct.getCode());
 			ilohasProduct.setMerchantId(String.valueOf(merchantId));
 			//1.新过来的商品如果下架或者卖完了，直接跳过不上架。2.如果之前有的商品卖完了,则需要更新状态到下架
-			if (null==product && isWithdraw(ilohasProduct)) {
+			if (null==product) {
 				continue;
 			}
 			
@@ -407,7 +407,13 @@ public class IlohasProviderServiceImpl<T> implements ProviderService<T>{
 		item.setCollocationId(collocation.getId());
 		item.setFirstType(product.getFirstType());
 		item.setSecondType(product.getSecondType());
-		collocationItemRepository.save(item);
+		
+		if (ModelConstant.COLLOCATION_STATUS_INVAILID == item.getStatus()) {
+			collocationItemRepository.delete(item);
+		}else {
+			collocationItemRepository.save(item);
+		}
+		
 		
 
 	}
@@ -485,6 +491,7 @@ public class IlohasProviderServiceImpl<T> implements ProviderService<T>{
 		ilohasOrder.setTotalPrice(String.valueOf(serviceOrder.getTotalAmount()));
 		ilohasOrder.setUserName(serviceOrder.getReceiverName());
 		ilohasOrder.setOrderItemList(ilohasOrderList);
+		ilohasOrder.setDeliveryFee(String.valueOf(serviceOrder.getShipFee()));	//运费
 		
 		ResponseOrder responseOrder = new ResponseOrder();
 		responseOrder.setOrder(ilohasOrder);
@@ -648,8 +655,8 @@ public class IlohasProviderServiceImpl<T> implements ProviderService<T>{
 
 	private boolean isWithdraw(IlohasProduct ilohasProduct){
 		
-		logger.info("ilohasProduct code : " + ilohasProduct.getCode());
-		logger.info("ilohasProduct status : " + ilohasProduct.getOpenState());
+//		logger.info("ilohasProduct code : " + ilohasProduct.getCode());
+//		logger.info("ilohasProduct status : " + ilohasProduct.getOpenState());
 		boolean flag = false;
 		String ilohasStatus = ilohasProduct.getOpenState();	//销售状态，0上架、1下架、售罄,供应商的商品状态
 		//1.新过来的商品如果下架或者卖完了，直接跳过不上架。2.如果之前有的商品卖完了,则需要更新状态到下架
