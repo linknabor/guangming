@@ -40,7 +40,7 @@ public class JMSConsumer {
 	@JmsListener(destination = "hexie.providers.products")
     public void receiveProductQueue(String message) {
         try {
-			logger.info("接收到消息：" + message);
+//			logger.info("接收到消息：" + message);
 			List<IlohasProduct>list = new ArrayList<IlohasProduct>();
 
 			list = new ObjectMapper().readValue(message, new TypeReference<List<IlohasProduct>>() { });

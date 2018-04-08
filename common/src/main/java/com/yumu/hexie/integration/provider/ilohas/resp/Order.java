@@ -16,6 +16,7 @@ public class Order extends BaseResp {
 	private String discountTotalPrice;	//优惠金额
 	private String status;	//订单状态：0待支付  1已支付确认 2已确认待出库 3已出库 4已完成
 	private String remarks;
+	private String deliveryFee;		//运费金额
 	List<OrderItem> orderItemList;
 	
 	public String getOrderNo() {
@@ -84,14 +85,23 @@ public class Order extends BaseResp {
 	public void setOrderItemList(List<OrderItem> orderItemList) {
 		this.orderItemList = orderItemList;
 	}
+	public String getDeliveryFee() {
+		return deliveryFee;
+	}
+	public void setDeliveryFee(String deliveryFee) {
+		this.deliveryFee = deliveryFee;
+	}
 	@Override
 	public String toString() {
-		return "OrderItem [orderNo=" + orderNo + ", createdTime=" + createdTime
+		return "Order [orderNo=" + orderNo + ", createdTime=" + createdTime
 				+ ", userName=" + userName + ", phone=" + phone + ", address="
 				+ address + ", totalPrice=" + totalPrice + ", payTotalPrice="
 				+ payTotalPrice + ", discountTotalPrice=" + discountTotalPrice
 				+ ", status=" + status + ", remarks=" + remarks
-				+ ", orderItemList=" + orderItemList + "]";
+				+ ", deliveryFee=" + deliveryFee + ", orderItemList="
+				+ orderItemList + "]";
 	}
+	
+	
 	
 }
