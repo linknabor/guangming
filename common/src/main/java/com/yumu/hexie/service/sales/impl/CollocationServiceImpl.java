@@ -169,4 +169,16 @@ public class CollocationServiceImpl implements CollocationService {
 	}
 	
 	
+	@Override
+	public Collocation findByCollId(long collId) {
+			
+		Collocation collocation = collocationRepository.findOne(collId);
+		List<CollocationItem> itemList = null;
+			itemList = collocationItemRepository.findByCollocationAndStatus(collocation, ModelConstant.COLLOCATION_STATUS_AVAILABLE);
+		
+		collocation.setProducts(itemList);
+		return collocation;
+	}
+	
+	
 }

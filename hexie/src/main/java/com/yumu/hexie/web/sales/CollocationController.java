@@ -70,12 +70,15 @@ public class CollocationController extends BaseController{
 		if (StringUtil.isEmpty(collId)) {
 			throw new BizValidateException("collId不能为空。");
 		}
-		
-		if (StringUtil.isEmpty(firstType)) {
-			firstType = "休闲零食";
-		}
+
 		Long collocationId = Long.valueOf(collId);
-		Collocation c = collocationService.findWithFirstType(collocationId, firstType, secondType);
+		Collocation c = null;
+		if (StringUtil.isEmpty(firstType)) {
+			c = collocationService.findByCollId(collId);
+		}else {
+			c = collocationService.findWithFirstType(collocationId, firstType, secondType);
+		}
+		
 		return new BaseResult<Collocation>().success(c);
     }
 	

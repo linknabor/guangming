@@ -26,4 +26,6 @@ public interface CollocationService {
 	
 	public Collocation findWithFirstType(long collId, String firstType, String secondType);
 	
+	public Collocation findByCollId(long collId);
+	
 }
