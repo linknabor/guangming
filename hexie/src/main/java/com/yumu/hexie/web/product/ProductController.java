@@ -6,14 +6,16 @@ import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.yumu.hexie.model.commonsupport.info.Product;
 import com.yumu.hexie.service.sales.ProductService;
 import com.yumu.hexie.web.BaseController;
 
-@RestController(value="shangpinController")
+@Controller
+@RequestMapping(value="productCotroller")
 public class ProductController extends BaseController{
 	
 	private static final Logger log = LoggerFactory.getLogger(ProductController.class);
@@ -27,6 +29,7 @@ public class ProductController extends BaseController{
 	 * @return
 	 */
 	@RequestMapping("/search")
+	@ResponseBody
 	public List<Product> search(String name) {
 		
 		List<Product> list = product.getByNameProduct(name);
