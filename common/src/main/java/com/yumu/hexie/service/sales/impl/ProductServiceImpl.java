@@ -1,5 +1,7 @@
 package com.yumu.hexie.service.sales.impl;
 
+import java.util.List;
+
 import javax.inject.Inject;
 
 import org.springframework.stereotype.Service;
@@ -22,6 +24,16 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	@Override
+	public List<Product> getAllProduct() {
+		return productRepository.findAll();
+	}
+
+	@Override
+	public List<Product> getByNameProduct(String name) {
+		return productRepository.getByNameProduct(name);
+	}
+	
+	@Override
 	public void checkSalable(Product product, int count) {
 		if(product.getStatus() != ModelConstant.PRODUCT_ONSALE){
 			throw new BizValidateException("您晚到了一步，商品已下架！");
@@ -38,6 +50,7 @@ public class ProductServiceImpl implements ProductService {
 	public void freezeCount(Product product, int count) {
 		product.setFreezeNum(product.getFreezeNum() +count);
 		productRepository.save(product);
+		
 	}
 
 	@Override

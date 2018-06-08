@@ -1,5 +1,7 @@
 package com.yumu.hexie.model.commonsupport.info;
 
+import java.util.List;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -11,4 +13,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 	String getMaxProductNo(String start, String end);
 	
 	Product findByMerchanProductNo(String merchantProductNo);
+	
+	@Query("from Product where name like ?1% and status = 1 and endDate > NOW() AND startDate < NOW() AND totalCount > 0 ")
+	List<Product> getByNameProduct(String name);
 }
