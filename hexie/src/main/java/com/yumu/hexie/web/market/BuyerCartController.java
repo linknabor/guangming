@@ -118,7 +118,7 @@ public class BuyerCartController extends BaseController {
 				}
 			}
 			
-			if (null == buyerCart) {
+			if (null != buyerCart) {
 				insertBuyerCartToRedis(buyerCart, user.getId());
 				//清空Cookie 设置存活时间为0, 立马销毁
 				Cookie cookie = new Cookie(Constants.BUYER_CART, null);
