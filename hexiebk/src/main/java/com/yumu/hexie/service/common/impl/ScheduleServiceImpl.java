@@ -493,7 +493,7 @@ public class ScheduleServiceImpl implements ScheduleService{
 	}
 	
 	@Override
-	@Scheduled(cron = "0 0/10 * * * ?")
+	//@Scheduled(cron = "0 0/10 * * * ?")
 	public void executeUpdateIlohasProductInfo() {
 
 		SCHEDULE_LOG.info("--------------------start updateIlohasProductInfo-----------------------------------");
@@ -503,7 +503,7 @@ public class ScheduleServiceImpl implements ScheduleService{
 	}
 
 	@Override
-	@Scheduled(cron = "0 0/10 * * * ?")
+	//@Scheduled(cron = "0 0/10 * * * ?")
 	public void executeUpdateIlohasOrderStatus() {
 
 		SCHEDULE_LOG.info("--------------------start updateIlohasOrderStatus-----------------------------------");
