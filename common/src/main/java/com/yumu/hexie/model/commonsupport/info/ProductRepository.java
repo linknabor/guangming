@@ -16,4 +16,15 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 	
 	@Query("from Product where name like %?1% and status = 1 and endDate > NOW() AND startDate < NOW() AND totalCount > 0 ")
 	List<Product> getByNameProduct(String name);
+	
+	@Query(value = "select a.* from product a, onsaleareaitem b , onsalerule c "
+			+ "where a.id = b.productId "
+			+ "and b.ruleId = c.id "
+			+ "and b.featured='1' "
+			+ "and a.status = '1' "
+			+ "and b.status='1' "
+			+ "and c.status='1' "
+			+ "and a.endDate>=CURDATE() "
+			+ "and c.endDate >=CURDATE() " ,nativeQuery=true)
+	List<Product> findByProduct();
 }

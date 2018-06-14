@@ -38,6 +38,40 @@ public class BuyerCartController extends BaseController {
 	@Inject
 	private ProductService productservice;
 	
+	/**
+	 * 首页商品推荐
+	 * @return
+	 */
+	@RequestMapping(value = "/shopping/homepage/shopshow", method = RequestMethod.GET)
+	@ResponseBody
+	public BaseResult<?> shopshow() {
+		List<Product> list = productservice.getSelectedProduct();
+		return BaseResult.successResult(list);
+	}
+	
+	/**
+	 * 商品详情页下方商品推荐
+	 * @return
+	 */
+	@RequestMapping(value = "/shopping/detail/shopshow", method = RequestMethod.GET)
+	@ResponseBody
+	public BaseResult<?> detailShopShow() {
+		List<Product> list = productservice.getSelectedProduct();
+		return BaseResult.successResult(list);
+	}
+	
+	/**
+	 * 购物车下方商品推荐
+	 * @return
+	 */
+	@RequestMapping(value = "/shopping/cart/shopshow", method = RequestMethod.GET)
+	@ResponseBody
+	public BaseResult<?> cartShopShow() {
+		List<Product> list = productservice.getSelectedProduct();
+		return BaseResult.successResult(list);
+	}
+	
+	
 	//添加购物车
 	@RequestMapping(value = "/shopping/buyerCart", method = RequestMethod.GET)
 	@ResponseBody
@@ -170,7 +204,7 @@ public class BuyerCartController extends BaseController {
 					return new BaseResult().failMsg("无货!");
 				}
 			}
-			return new BaseResult().success(true);
+			return new BaseResult().success(items);
 		}else {
 			return new BaseResult().failMsg("无货!");
 		}
