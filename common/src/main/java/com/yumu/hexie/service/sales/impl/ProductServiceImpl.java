@@ -67,9 +67,4 @@ public class ProductServiceImpl implements ProductService {
 		product.setFreezeNum(product.getFreezeNum()-count);
 		productRepository.save(product);
 	}
-
-	@Override
-	public List<Product> getSelectedProduct() {
-		return productRepository.findByProduct();
-	}
 }

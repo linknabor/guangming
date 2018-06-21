@@ -18,6 +18,4 @@ public interface ProductService {
 	public void freezeCount(Product product,int count);
 	public void unfreezeCount(long productId,int count);
 	public void saledCount(long productId,int count);
-	
-	public List<Product> getSelectedProduct();
 }
