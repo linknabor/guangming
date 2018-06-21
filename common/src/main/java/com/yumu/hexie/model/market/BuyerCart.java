@@ -15,7 +15,25 @@ public class BuyerCart implements Serializable{
 
 	private static final long serialVersionUID = 1L;
 	
+	private String merchantName; //商户名称
+	
 	private List<BuyerItem> items = new ArrayList<BuyerItem>(); //商品结果集
+	
+	public String getMerchantName() {
+		return merchantName;
+	}
+
+	public void setMerchantName(String merchantName) {
+		this.merchantName = merchantName;
+	}
+
+	public List<BuyerItem> getItems() {
+		return items;
+	}
+
+	public void setItems(List<BuyerItem> items) {
+		this.items = items;
+	}
 	
 	//添加购物项到购物车
 	public void addItem(BuyerItem item){
@@ -30,14 +48,6 @@ public class BuyerCart implements Serializable{
 		}else {
 			items.add(item);
 		}
-	}
-	
-	public List<BuyerItem> getItems() {
-		return items;
-	}
-
-	public void setItems(List<BuyerItem> items) {
-		this.items = items;
 	}
 
 	//小计：商品数量

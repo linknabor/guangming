@@ -4,25 +4,35 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+
 import javax.inject.Inject;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
+
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yumu.hexie.common.Constants;
 import com.yumu.hexie.model.commonsupport.info.Product;
+import com.yumu.hexie.model.distribution.region.Merchant;
+import com.yumu.hexie.model.distribution.region.MerchantRepository;
 import com.yumu.hexie.model.market.BuyerCart;
 import com.yumu.hexie.model.market.BuyerItem;
+import com.yumu.hexie.model.market.saleplan.OnSaleRule;
+import com.yumu.hexie.model.market.saleplan.OnSaleRuleRepository;
 import com.yumu.hexie.model.redis.RedisRepository;
 import com.yumu.hexie.model.user.User;
 import com.yumu.hexie.service.sales.ProductService;
@@ -32,50 +42,31 @@ import com.yumu.hexie.web.BaseResult;
 @Controller(value = "buyerCartController")
 public class BuyerCartController extends BaseController {
 	
+	private static Log logger = LogFactory.getLog(BuyerCartController.class);
 	@Inject
 	private RedisRepository redisRepository;
 	
 	@Inject
 	private ProductService productservice;
 	
-	/**
-	 * 首页商品推荐
-	 * @return
-	 */
-	@RequestMapping(value = "/shopping/homepage/shopshow", method = RequestMethod.GET)
-	@ResponseBody
-	public BaseResult<?> shopshow() {
-		List<Product> list = productservice.getSelectedProduct();
-		return BaseResult.successResult(list);
-	}
+	@Inject
+	private MerchantRepository merchantRepository;
+	
+	@Inject
+	private OnSaleRuleRepository onSaleRuleRepository;
 	
 	/**
-	 * 商品详情页下方商品推荐
+	 * 添加购物车
+	 * @param user
+	 * @param skuId
+	 * @param amount
+	 * @param request
+	 * @param response
 	 * @return
 	 */
-	@RequestMapping(value = "/shopping/detail/shopshow", method = RequestMethod.GET)
-	@ResponseBody
-	public BaseResult<?> detailShopShow() {
-		List<Product> list = productservice.getSelectedProduct();
-		return BaseResult.successResult(list);
-	}
-	
-	/**
-	 * 购物车下方商品推荐
-	 * @return
-	 */
-	@RequestMapping(value = "/shopping/cart/shopshow", method = RequestMethod.GET)
-	@ResponseBody
-	public BaseResult<?> cartShopShow() {
-		List<Product> list = productservice.getSelectedProduct();
-		return BaseResult.successResult(list);
-	}
-	
-	
-	//添加购物车
 	@RequestMapping(value = "/shopping/buyerCart", method = RequestMethod.GET)
 	@ResponseBody
-	public BaseResult<?> buyerCart(@ModelAttribute(Constants.USER)User user, Long skuId, Integer amount, HttpServletRequest request, HttpServletResponse response){
+	public BaseResult<?> buyerCart(@ModelAttribute(Constants.USER)User user, Long skuId, Long ruleId, Integer amount, HttpServletRequest request, HttpServletResponse response){
 		try {
 			ObjectMapper om = new ObjectMapper();
 			om.setSerializationInclusion(Include.NON_NULL);
@@ -97,15 +88,19 @@ public class BuyerCartController extends BaseController {
 			}
 
 			//3.将当前款商品追加到购物车
-			if (null != skuId && null != amount) {
+			if (null != skuId && null != ruleId && null != amount) {
 				Product sku = new Product();
 				sku.setId(skuId);
 				BuyerItem buyerItem = new BuyerItem();
 				buyerItem.setSku(sku);
 				//设置数量
 				buyerItem.setAmount(amount);
+				//设置规则ID
+				buyerItem.setRuleId(ruleId);
 				//添加购物项到购物车
 				buyerCart.addItem(buyerItem);
+			} else {
+				return BaseResult.fail("参数不合法");
 			}
 			
 			//排序  倒序
@@ -134,8 +129,8 @@ public class BuyerCartController extends BaseController {
 	//购物车展示页面
 	@RequestMapping(value="/shopping/toCart", method = RequestMethod.GET)
 	@ResponseBody
-	public BaseResult<List<BuyerItem>> toCart(@ModelAttribute(Constants.USER)User user, HttpServletRequest request, HttpServletResponse response) {
-		List<BuyerItem> items = new ArrayList<BuyerItem>();
+	public BaseResult<List<BuyerCart>> toCart(@ModelAttribute(Constants.USER)User user, HttpServletRequest request, HttpServletResponse response) {
+		List<BuyerCart> list = new ArrayList<BuyerCart>();
 		try {
 			ObjectMapper om = new ObjectMapper();
 			om.setSerializationInclusion(Include.NON_NULL);
@@ -161,53 +156,156 @@ public class BuyerCartController extends BaseController {
 				response.addCookie(cookie);
 			}
 			//3, 取出Redis中的购物车
-			buyerCart = selectBuyerCartFromRedis(user.getId());
+			Map mapCart = redisRepository.getBuyerCart(user.getId());
 			
 			//4, 没有 则创建购物车
-			if (null == buyerCart) {
+			if (mapCart.size()==0) {
 				buyerCart = new BuyerCart();
 			}
+			Map<String, BuyerCart> map = new HashMap<String, BuyerCart>();
+			List<BuyerItem> items = new ArrayList<BuyerItem>();
 			
-			//5, 将购物车装满, 前面只是将skuId装进购物车, 这里还需要查出sku详情
-			items = buyerCart.getItems();
-			if(items.size() > 0){
-				//只有购物车中有购物项, 才可以将sku相关信息加入到购物项中
-				for (BuyerItem buyerItem : items) {
-					buyerItem.setSku(productservice.getProduct(buyerItem.getSku().getId()));
+			Set<Entry<String, String>> entrySet = mapCart.entrySet();
+			for (Entry<String, String> entry : entrySet) {
+				String[] str = entry.getKey().split("-");
+				
+				if(str.length!=2) {
+					return BaseResult.fail("购物车商品异常，请刷新后重试");
 				}
+				String sku_id = str[0]; //商品ID
+				String ruleId = str[1]; //规则ID
+				String sku_num = entry.getValue(); //商品数量
+				
+				//查询商品对应商户信息及商品详细信息
+				Product p = productservice.getProduct(Long.parseLong(sku_id));
+				
+				Merchant merchant = merchantRepository.findOne(p.getMerchantId());
+				
+				//商户名称
+				String merchantName = merchant.getName(); 
+				
+				if (map.containsKey(merchantName)) { //如果map里面没有这个商户号，那么直接放进去
+					//先取出已经放进去的内容
+					buyerCart = map.get(merchantName);
+					items = buyerCart.getItems();
+				} else {
+					buyerCart = new BuyerCart();
+					items = new ArrayList<BuyerItem>();
+				}
+				
+				BuyerItem buyerItem = new BuyerItem();
+				buyerItem.setSku(p);
+				buyerItem.setRuleId(Long.parseLong(ruleId));
+				buyerItem.setAmount(Integer.parseInt(sku_num));
+				
+				items.add(buyerItem);
+				buyerCart.setItems(items);
+				buyerCart.setMerchantName(merchantName);
+				
+				map.put(merchantName, buyerCart);
+			}
+			
+			for (String key : map.keySet()) {
+				list.add(map.get(key));
 			}
 		}catch(Exception e) {
 			return BaseResult.fail(e.getMessage());
 		}
-		return BaseResult.successResult(items);
+		return BaseResult.successResult(list);
 	}
 	
+	/**
+	 * 购物车支付页面
+	 * @param user
+	 * @param skuIds
+	 * @return
+	 */
 	@RequestMapping(value="/buyer/trueBuy", method = RequestMethod.GET)
 	@ResponseBody
-	public BaseResult trueBuy(@ModelAttribute(Constants.USER)User user, String skuIds) {
-		//1, 购物车必须有商品
-		BuyerCart buyerCart = selectBuyerCartFromRedisBySkuIds(skuIds, user.getId());
-		List<BuyerItem> items = buyerCart.getItems();
-		if (items.size() > 0) {
-			Boolean flag = true;
-			for (BuyerItem buyerItem : items) {
-				//装满购物车的购物项, 当前购物项只有skuId这一个东西, 我们还需要购物项的数量去判断是否有货
-				buyerItem.setSku(productservice.getProduct(buyerItem.getSku().getId()));
-				//校验库存
-				if (buyerItem.getAmount() > buyerItem.getSku().getTotalCount()) {
-					//无货
-					//buyerItem.setIsHave(false);
-					flag = false;
+	public BaseResult<List<BuyerCart>> trueBuy(@ModelAttribute(Constants.USER)User user, String skuIds) {
+		List<BuyerCart> list = new ArrayList<BuyerCart>();
+		try {
+			String[] skuIdArr = skuIds.split(",");
+			//获取购物车存放的商品
+			Map mapCart = redisRepository.getBuyerCart(user.getId());
+			
+			Map<String, BuyerCart> map = new HashMap<String, BuyerCart>();
+			List<BuyerItem> items = new ArrayList<BuyerItem>();
+			BuyerCart buyerCart = new BuyerCart();
+			
+			if (mapCart.size()>0) {
+				Set<Entry<String, String>> entrySet = mapCart.entrySet();
+				for (Entry<String, String> entry : entrySet) {
+					String[] str = entry.getKey().split("-");
+					
+					String sku_id = str[0]; //商品ID
+					String ruleId = str[1]; //规则ID
+					String sku_num = entry.getValue(); //商品数量
+					
+					//只有购物车里有的商品才处理，不存在的不处理
+					for (String skuId : skuIdArr) {
+						if (skuId.equals(sku_id)) {
+							
+							//查询商品对应商户信息及商品详细信息
+							Product p = productservice.getProduct(Long.parseLong(sku_id));
+							
+							//先判断是否有货  暂时不实现
+							if (Integer.parseInt(sku_num) > p.getTotalCount()) {
+								
+							}
+							
+							//查询商户信息
+							Merchant merchant = merchantRepository.findOne(p.getMerchantId());
+							
+							//商户名称
+							String merchantName = merchant.getName(); 
+							
+							//获取商品规则信息
+							OnSaleRule saleRule = onSaleRuleRepository.findOne(Long.parseLong(ruleId));
+							float postageFee = saleRule.getPostageFee(); //邮费
+							int freeNum = saleRule.getFreeShippingNum(); //包邮件数
+							
+							//如果当前商品购买数大于等于包邮件数，那么邮费为0，否则显示相应邮费
+							if (Integer.parseInt(sku_num) >= freeNum) {
+								postageFee = 0;
+							}
+							
+							if (map.containsKey(merchantName)) { //如果map里面没有这个商户号，那么直接放进去
+								//先取出已经放进去的内容
+								buyerCart = map.get(merchantName);
+								items = buyerCart.getItems();
+							} else {
+								buyerCart = new BuyerCart();
+								items = new ArrayList<BuyerItem>();
+							}
+							
+							BuyerItem buyerItem = new BuyerItem();
+							buyerItem.setSku(p);
+							buyerItem.setRuleId(Long.parseLong(ruleId));
+							buyerItem.setAmount(Integer.parseInt(sku_num));
+							buyerItem.setPostageFee(postageFee);
+							
+							items.add(buyerItem);
+							buyerCart.setItems(items);
+							buyerCart.setMerchantName(merchantName);
+							
+							map.put(merchantName, buyerCart);
+							
+						}
+					}
 				}
-				if (!flag) {
-					//无货
-					return new BaseResult().failMsg("无货!");
+				for (String key : map.keySet()) {
+					list.add(map.get(key));
 				}
+			} else {
+				return new BaseResult().failMsg("购买商品不存在，请确认后下单!");
 			}
-			return new BaseResult().success(items);
-		}else {
-			return new BaseResult().failMsg("无货!");
+		} catch(Exception e) {
+			logger.error("/buyer/trueBuy error: ", e);
+			return new BaseResult().failMsg(e.getMessage());
 		}
+		
+		return new BaseResult().success(list);
 	}
 	
 	/**
@@ -223,12 +321,12 @@ public class BuyerCartController extends BaseController {
 			Map<String, String> hash = new HashMap<String, String>();
 			for (BuyerItem item : items) {
 				//判断是否已经存在
-				Object o = redisRepository.getBuyerCartByKey(userId, String.valueOf(item.getSku().getId()));
+				Object o = redisRepository.getBuyerCartByKey(userId, String.valueOf(item.getSku().getId()) + "-" + String.valueOf(item.getRuleId()));
 				if (o!= null) {
 					//存在就累加
-					redisRepository.incrementBuyerCart(userId, String.valueOf(item.getSku().getId()), item.getAmount());
+					redisRepository.incrementBuyerCart(userId, String.valueOf(item.getSku().getId()) + "-" + String.valueOf(item.getRuleId()), item.getAmount());
 				} else {
-					hash.put(String.valueOf(item.getSku().getId()), String.valueOf(item.getAmount()));
+					hash.put(String.valueOf(item.getSku().getId()) + "-" + String.valueOf(item.getRuleId()), String.valueOf(item.getAmount()));
 				}
 			}
 			
@@ -239,26 +337,11 @@ public class BuyerCartController extends BaseController {
 	}
 	
 	/**
-	 * 获取redis里的商品
+	 * 通过一堆skuid获取redis的商品
+	 * @param skuIdStr
 	 * @param userId
 	 * @return
 	 */
-	public BuyerCart selectBuyerCartFromRedis(long userId) {
-		BuyerCart buyerCart = new BuyerCart();
-		//获取所有商品, redis中保存的是skuId 为key , amount 为value的Map集合
-		Map mapCart = redisRepository.getBuyerCart(userId);
-		Set<Entry<String, String>> entrySet = mapCart.entrySet();
-		for (Entry<String, String> entry : entrySet) {
-			Product sku = new Product();
-			sku.setId(Long.parseLong(entry.getKey()));
-			BuyerItem buyerItem = new BuyerItem();
-			buyerItem.setSku(sku);
-			buyerItem.setAmount(Integer.parseInt(entry.getValue()));
-			buyerCart.addItem(buyerItem);
-		}
-		return buyerCart;
-	}
-	
 	public BuyerCart selectBuyerCartFromRedisBySkuIds(String skuIdStr, Long userId) {
 		String [] skuIds = skuIdStr.split(",");
 		BuyerCart buyerCart = new BuyerCart();
