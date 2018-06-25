@@ -13,6 +13,7 @@ public class BuyerItem implements Serializable{
 	private Integer amount = 1; //购买数量
 	private Long ruleId; //规则ID
 	private float postageFee; //邮费
+	private boolean skuSelected = false; //商品是否选中，默认false
 	
 	
 	public Product getSku() {
@@ -38,6 +39,12 @@ public class BuyerItem implements Serializable{
 	}
 	public void setPostageFee(float postageFee) {
 		this.postageFee = postageFee;
+	}
+	public boolean isSkuSelected() {
+		return skuSelected;
+	}
+	public void setSkuSelected(boolean skuSelected) {
+		this.skuSelected = skuSelected;
 	}
 	
 }

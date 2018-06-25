@@ -16,6 +16,7 @@ public class BuyerCart implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
 	private String merchantName; //商户名称
+	private boolean merchSelected = false; //是否选中，默认false
 	
 	private List<BuyerItem> items = new ArrayList<BuyerItem>(); //商品结果集
 	
@@ -25,6 +26,14 @@ public class BuyerCart implements Serializable{
 
 	public void setMerchantName(String merchantName) {
 		this.merchantName = merchantName;
+	}
+
+	public boolean isMerchSelected() {
+		return merchSelected;
+	}
+
+	public void setMerchSelected(boolean merchSelected) {
+		this.merchSelected = merchSelected;
 	}
 
 	public List<BuyerItem> getItems() {
