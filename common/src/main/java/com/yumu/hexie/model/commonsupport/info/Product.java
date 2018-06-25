@@ -72,8 +72,12 @@ public class Product extends BaseModel {
 	private float postageFee = 0;//快递费
 	
 	//商品规格
-	private String spec;	//商品规格
-	private String specVal;	//规格值
+	private String spec1;	//商品规格1
+	private String spec1val;//规格1值
+	private String spec2;	//商品规格2
+	private String spec2val;	//规格2值
+	private String spec3;	//商品规格3
+	private String spec3val;	//规格3值
 	
 	@JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY,cascade = {CascadeType.REFRESH }, optional = true)
@@ -326,18 +330,41 @@ public class Product extends BaseModel {
 	public void setPostageFee(float postageFee) {
 		this.postageFee = postageFee;
 	}
-	
-	public String getSpec() {
-		return spec;
+	public String getSpec1() {
+		return spec1;
 	}
-	public void setSpec(String spec) {
-		this.spec = spec;
+	public void setSpec1(String spec1) {
+		this.spec1 = spec1;
 	}
-	public String getSpecVal() {
-		return specVal;
+	public String getSpec1val() {
+		return spec1val;
 	}
-	public void setSpecVal(String specVal) {
-		this.specVal = specVal;
+	public void setSpec1val(String spec1val) {
+		this.spec1val = spec1val;
+	}
+	public String getSpec2() {
+		return spec2;
+	}
+	public void setSpec2(String spec2) {
+		this.spec2 = spec2;
+	}
+	public String getSpec2val() {
+		return spec2val;
+	}
+	public void setSpec2val(String spec2val) {
+		this.spec2val = spec2val;
+	}
+	public String getSpec3() {
+		return spec3;
+	}
+	public void setSpec3(String spec3) {
+		this.spec3 = spec3;
+	}
+	public String getSpec3val() {
+		return spec3val;
+	}
+	public void setSpec3val(String spec3val) {
+		this.spec3val = spec3val;
 	}
 	public ProductItem getProductItem() {
 		return productItem;
