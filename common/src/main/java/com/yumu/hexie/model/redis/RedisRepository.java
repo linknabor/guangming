@@ -120,7 +120,6 @@ public class RedisRepository {
     /* 新版购物车 */
     
     public Object getBuyerCartByKey(long userId, String valueKey) {
-    	System.out.println("123:"+Keys.uidCardKey(userId));
     	return stringRedisTemplate.opsForHash().get(Keys.uidCardKey(userId), valueKey);
     	
     }
@@ -131,6 +130,10 @@ public class RedisRepository {
     
     public void incrementBuyerCart(long userId, String hashKey, long acount) {
     	stringRedisTemplate.opsForHash().increment(Keys.uidCardKey(userId), hashKey, acount);
+    }
+    
+    public void deleteBuyerCart(long userId, String hashKey) {
+    	stringRedisTemplate.opsForHash().delete(Keys.uidCardKey(userId), hashKey);
     }
     
     public Map<?, ?> getBuyerCart(long userId) {

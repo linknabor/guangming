@@ -4,27 +4,21 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-
 import javax.inject.Inject;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
-
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import com.yumu.hexie.common.Constants;
 import com.yumu.hexie.model.commonsupport.info.Product;
 import com.yumu.hexie.model.distribution.region.Merchant;
@@ -66,42 +60,38 @@ public class BuyerCartController extends BaseController {
 	 */
 	@RequestMapping(value = "/shopping/buyerCart", method = RequestMethod.GET)
 	@ResponseBody
-	public BaseResult<?> buyerCart(@ModelAttribute(Constants.USER)User user, Long skuId, Long ruleId, Integer amount, HttpServletRequest request, HttpServletResponse response){
+	public BaseResult<?> buyerCart(@ModelAttribute(Constants.USER)User user, @RequestParam(required = true) Long skuId, @RequestParam(required = true) Long ruleId, @RequestParam(required = true) Integer amount, HttpServletRequest request, HttpServletResponse response){
 		try {
-			ObjectMapper om = new ObjectMapper();
-			om.setSerializationInclusion(Include.NON_NULL);
+//			ObjectMapper om = new ObjectMapper();
+//			om.setSerializationInclusion(Include.NON_NULL);
 			
-			BuyerCart buyerCart = null;
+			BuyerCart buyerCart = new BuyerCart();
 			//1.获取Cookie中的购物车
-			Cookie[] cookies = request.getCookies();
-			if (null != cookies && cookies.length > 0) {
-				for (Cookie cookie : cookies) {
-					if (Constants.BUYER_CART.equals(cookie.getName())) {
-						buyerCart = om.readValue(cookie.getValue(), BuyerCart.class);
-						break;
-					}
-				}
-			}
+//			Cookie[] cookies = request.getCookies();
+//			if (null != cookies && cookies.length > 0) {
+//				for (Cookie cookie : cookies) {
+//					if (Constants.BUYER_CART.equals(cookie.getName())) {
+//						buyerCart = om.readValue(cookie.getValue(), BuyerCart.class);
+//						break;
+//					}
+//				}
+//			}
 			//2.Cookie中没有购物车, 创建购物车对象
-			if (null == buyerCart) {
-				buyerCart = new BuyerCart();
-			}
+//			if (null == buyerCart) {
+//				buyerCart = new BuyerCart();
+//			}
 
 			//3.将当前款商品追加到购物车
-			if (null != skuId && null != ruleId && null != amount) {
-				Product sku = new Product();
-				sku.setId(skuId);
-				BuyerItem buyerItem = new BuyerItem();
-				buyerItem.setSku(sku);
-				//设置数量
-				buyerItem.setAmount(amount);
-				//设置规则ID
-				buyerItem.setRuleId(ruleId);
-				//添加购物项到购物车
-				buyerCart.addItem(buyerItem);
-			} else {
-				return BaseResult.fail("参数不合法");
-			}
+			Product sku = new Product();
+			sku.setId(skuId);
+			BuyerItem buyerItem = new BuyerItem();
+			buyerItem.setSku(sku);
+			//设置数量
+			buyerItem.setAmount(amount);
+			//设置规则ID
+			buyerItem.setRuleId(ruleId);
+			//添加购物项到购物车
+			buyerCart.addItem(buyerItem);
 			
 			//排序  倒序
 			List<BuyerItem> items = buyerCart.getItems();
@@ -115,10 +105,10 @@ public class BuyerCartController extends BaseController {
 			//4.将购物车追加到Redis中
 			insertBuyerCartToRedis(buyerCart, user.getId());
 			//5, 清空Cookie 设置存活时间为0, 立马销毁
-			Cookie cookie = new Cookie(Constants.BUYER_CART, null);
-			cookie.setPath("/");
-			cookie.setMaxAge(-0);
-			response.addCookie(cookie);
+//			Cookie cookie = new Cookie(Constants.BUYER_CART, null);
+//			cookie.setPath("/");
+//			cookie.setMaxAge(-0);
+//			response.addCookie(cookie);
 		} catch(Exception e) {
 			return BaseResult.fail(e.getMessage());
 		}
@@ -132,29 +122,8 @@ public class BuyerCartController extends BaseController {
 	public BaseResult<List<BuyerCart>> toCart(@ModelAttribute(Constants.USER)User user, HttpServletRequest request, HttpServletResponse response) {
 		List<BuyerCart> list = new ArrayList<BuyerCart>();
 		try {
-			ObjectMapper om = new ObjectMapper();
-			om.setSerializationInclusion(Include.NON_NULL);
 			BuyerCart buyerCart = null;
 			
-			//1,获取Cookie中的购物车
-			Cookie[] cookies = request.getCookies();
-			if (null != cookies && cookies.length > 0) {
-				for (Cookie cookie : cookies) {
-					if (Constants.BUYER_CART.equals(cookie.getName())) {
-						buyerCart = om.readValue(cookie.getValue(), BuyerCart.class);
-						break;
-					}
-				}
-			}
-			
-			if (null != buyerCart) {
-				insertBuyerCartToRedis(buyerCart, user.getId());
-				//清空Cookie 设置存活时间为0, 立马销毁
-				Cookie cookie = new Cookie(Constants.BUYER_CART, null);
-				cookie.setPath("/");
-				cookie.setMaxAge(-0);
-				response.addCookie(cookie);
-			}
 			//3, 取出Redis中的购物车
 			Map mapCart = redisRepository.getBuyerCart(user.getId());
 			
@@ -222,7 +191,7 @@ public class BuyerCartController extends BaseController {
 	 */
 	@RequestMapping(value="/buyer/trueBuy", method = RequestMethod.GET)
 	@ResponseBody
-	public BaseResult<List<BuyerCart>> trueBuy(@ModelAttribute(Constants.USER)User user, String skuIds) {
+	public BaseResult<List<BuyerCart>> trueBuy(@ModelAttribute(Constants.USER)User user, @RequestParam(required = true) String skuIds) {
 		List<BuyerCart> list = new ArrayList<BuyerCart>();
 		try {
 			String[] skuIdArr = skuIds.split(",");
@@ -321,12 +290,26 @@ public class BuyerCartController extends BaseController {
 			Map<String, String> hash = new HashMap<String, String>();
 			for (BuyerItem item : items) {
 				//判断是否已经存在
-				Object o = redisRepository.getBuyerCartByKey(userId, String.valueOf(item.getSku().getId()) + "-" + String.valueOf(item.getRuleId()));
+				String key = String.valueOf(item.getSku().getId()) + "-" + String.valueOf(item.getRuleId());
+				Object o = redisRepository.getBuyerCartByKey(userId, key);
 				if (o!= null) {
-					//存在就累加
-					redisRepository.incrementBuyerCart(userId, String.valueOf(item.getSku().getId()) + "-" + String.valueOf(item.getRuleId()), item.getAmount());
+					//数量为0就删除
+					if (item.getAmount() ==0) {
+						redisRepository.deleteBuyerCart(userId, key);
+					} else {
+						//存在就累加,因为数量存在负的情况，所以这里要判断已存的数量与当前传递的数量之间是否大于0
+						int s = Integer.parseInt(o.toString()) + item.getAmount();
+						if (s >0) {
+							redisRepository.incrementBuyerCart(userId, key, item.getAmount());
+						} else {
+							redisRepository.deleteBuyerCart(userId, key);
+						}
+					}
 				} else {
-					hash.put(String.valueOf(item.getSku().getId()) + "-" + String.valueOf(item.getRuleId()), String.valueOf(item.getAmount()));
+					//添加到购物车时，不允许数量为负
+					if (item.getAmount() >0) {
+						hash.put(String.valueOf(item.getSku().getId()) + "-" + String.valueOf(item.getRuleId()), String.valueOf(item.getAmount()));
+					}
 				}
 			}
 			
@@ -334,33 +317,5 @@ public class BuyerCartController extends BaseController {
 				redisRepository.setBuyerCart(userId, hash);
 			}
 		}
-	}
-	
-	/**
-	 * 通过一堆skuid获取redis的商品
-	 * @param skuIdStr
-	 * @param userId
-	 * @return
-	 */
-	public BuyerCart selectBuyerCartFromRedisBySkuIds(String skuIdStr, Long userId) {
-		String [] skuIds = skuIdStr.split(",");
-		BuyerCart buyerCart = new BuyerCart();
-		Map mapCart = redisRepository.getBuyerCart(userId);
-		if (null != mapCart && mapCart.size() > 0) {
-			Set<Entry<String, String>> entrySet = mapCart.entrySet();
-			for (Entry<String, String> entry : entrySet) {
-				for (String skuId : skuIds) {
-					if (skuId.equals(entry.getKey())) {
-						Product product = new Product();
-						product.setId(Long.parseLong(entry.getKey()));
-						BuyerItem buyerItem = new BuyerItem();
-						buyerItem.setSku(product);
-						buyerItem.setAmount(Integer.parseInt(entry.getValue()));
-						buyerCart.addItem(buyerItem);
-					}
-				}
-			}
-		}
-		return buyerCart;
 	}
 }
