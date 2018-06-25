@@ -19,6 +19,7 @@ import com.yumu.hexie.model.commonsupport.info.Product;
 public class SalePlan extends BaseModel {
 	private static final long serialVersionUID = 3468345175276564755L;
 	private long productId;
+	private long productItemId = 0;
 	
 	private String ruleNo;//规则编号
 	private String name;//规则名称
@@ -40,6 +41,7 @@ public class SalePlan extends BaseModel {
 	private String descriptionMore;
 
 	private String productName;
+	private String productItemName;
 	
 	@Column(nullable=true)
 	private long timeoutForPay;
@@ -235,5 +237,19 @@ public class SalePlan extends BaseModel {
 	public void setTagUrl(String tagUrl) {
 		this.tagUrl = tagUrl;
 	}
+	public long getProductItemId() {
+		return productItemId;
+	}
+	public void setProductItemId(long productItemId) {
+		this.productItemId = productItemId;
+	}
+	public String getProductItemName() {
+		return productItemName;
+	}
+	public void setProductItemName(String productItemName) {
+		this.productItemName = productItemName;
+	}
+	
+	
 
 }

@@ -1,10 +1,14 @@
 package com.yumu.hexie.service.sales.impl;
 
+import java.util.List;
+
 import javax.inject.Inject;
 
 import org.springframework.stereotype.Service;
 
 import com.yumu.hexie.model.ModelConstant;
+import com.yumu.hexie.model.commonsupport.info.ProductItem;
+import com.yumu.hexie.model.commonsupport.info.ProductItemRepository;
 import com.yumu.hexie.model.market.OrderItem;
 import com.yumu.hexie.model.market.ServiceOrder;
 import com.yumu.hexie.model.market.saleplan.OnSaleRule;
@@ -12,6 +16,7 @@ import com.yumu.hexie.model.market.saleplan.OnSaleRuleRepository;
 import com.yumu.hexie.model.market.saleplan.SalePlan;
 import com.yumu.hexie.model.payment.PaymentOrder;
 import com.yumu.hexie.model.user.Address;
+import com.yumu.hexie.model.user.User;
 import com.yumu.hexie.service.common.DistributionService;
 import com.yumu.hexie.service.exception.BizValidateException;
 import com.yumu.hexie.service.sales.ProductService;
@@ -24,6 +29,8 @@ public class CustomOnSaleServiceImpl extends CustomOrderServiceImpl {
     private DistributionService distributionService;
     @Inject
     private ProductService         productService;
+    @Inject
+    private ProductItemRepository productItemRepository;
 
 	@Override
 	public void validateRule(ServiceOrder order,SalePlan rule, OrderItem item, Address address) {
@@ -61,5 +68,22 @@ public class CustomOnSaleServiceImpl extends CustomOrderServiceImpl {
     @Override
     public void postOrderCancel(ServiceOrder order) {
     }
+
+	@Override
+	public List<ProductItem> findProductItem(User user, int productType, int page) {
+
+		return productItemRepository.queryProductItemsByType(productType, ModelConstant.PRODUCT_ONSALE,
+				user.getProvinceId(), user.getCityId(), user.getCountyId(), user.getXiaoquId(), 
+				System.currentTimeMillis(), page);
+	}
+
+	@Override
+	public List<ProductItem> findHotProductItem(User user, int productType,
+			int page) {
+		return productItemRepository.queryProductItemsByType(productType, ModelConstant.PRODUCT_ONSALE, 
+				user.getProvinceId(), user.getCityId(), user.getCountyId(), user.getXiaoquId(), 
+				System.currentTimeMillis(), page);
+	}
+
 
 }

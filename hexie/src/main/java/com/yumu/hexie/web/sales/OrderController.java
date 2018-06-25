@@ -81,6 +81,14 @@ public class OrderController extends BaseController{
 	public BaseResult<Product> getProduct(@PathVariable long productId) throws Exception {
 		return new BaseResult<Product>().success(productService.getProduct(productId));
     }
+	
+	@RequestMapping(value = "/getProductByItem/{productItemId}", method = RequestMethod.GET)
+	@ResponseBody
+	public BaseResult<List<Product>> getProductByItem(@PathVariable long productItemId) throws Exception {
+		List<Product> productList = productService.getProductsByItem(productItemId);
+		return new BaseResult<List<Product>>().success(productList);
+    } 
+	
     
 	@RequestMapping(value = "/orders/status/{statusType}", method = RequestMethod.GET)
 	@ResponseBody

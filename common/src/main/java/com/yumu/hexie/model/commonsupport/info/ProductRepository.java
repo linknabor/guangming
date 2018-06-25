@@ -16,4 +16,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 	
 	@Query("from Product where name like %?1% and status = 1 and endDate > NOW() AND startDate < NOW() AND totalCount > 0 ")
 	List<Product> getByNameProduct(String name);
+
+	List<Product> findByProductItemAndStatus(ProductItem productItem, int status);
+
 }

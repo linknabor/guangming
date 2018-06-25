@@ -7,6 +7,7 @@ import javax.inject.Inject;
 import org.springframework.stereotype.Service;
 
 import com.yumu.hexie.model.ModelConstant;
+import com.yumu.hexie.model.commonsupport.info.ProductItem;
 import com.yumu.hexie.model.localservice.oldversion.YuyueOrder;
 import com.yumu.hexie.model.localservice.oldversion.YuyueOrderRepository;
 import com.yumu.hexie.model.localservice.oldversion.thirdpartyorder.FlowerPlusOrder;
@@ -24,6 +25,7 @@ import com.yumu.hexie.model.payment.PaymentOrder;
 import com.yumu.hexie.model.tohome.AixiangbanOrder;
 import com.yumu.hexie.model.tohome.AixiangbanOrderRepository;
 import com.yumu.hexie.model.user.Address;
+import com.yumu.hexie.model.user.User;
 import com.yumu.hexie.service.common.DistributionService;
 import com.yumu.hexie.service.exception.BizValidateException;
 import com.yumu.hexie.service.user.UserNoticeService;
@@ -147,8 +149,20 @@ public class CustomYuyueServiceImpl extends CustomOrderServiceImpl {
 	public SalePlan findSalePlan(long ruleId) {
 		return yuyueRuleRepository.findOne(ruleId);
 	}
+	@Override
+	public List<ProductItem> findProductItem(User user, int productType, int page) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+	@Override
+	public List<ProductItem> findHotProductItem(User user, int productType,
+			int page) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
-
+	
+	
 }
 
 

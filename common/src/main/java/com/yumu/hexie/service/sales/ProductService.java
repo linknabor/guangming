@@ -8,6 +8,7 @@ import com.yumu.hexie.model.commonsupport.info.Product;
 public interface ProductService {
 	
 	public Product getProduct(long productId);
+	public List<Product> getProductsByItem(long productItem);
 	
 	public List<Product> getAllProduct();
 	

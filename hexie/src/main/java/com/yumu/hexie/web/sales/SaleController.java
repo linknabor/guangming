@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.yumu.hexie.common.Constants;
+import com.yumu.hexie.model.commonsupport.info.ProductItem;
 import com.yumu.hexie.model.distribution.OnSaleAreaItem;
 import com.yumu.hexie.model.market.saleplan.SalePlan;
 import com.yumu.hexie.model.user.User;
@@ -39,4 +40,23 @@ public class SaleController extends BaseController{
 	public BaseResult<SalePlan> getRgroupRule(@PathVariable long ruleId) throws Exception {
 		return new BaseResult<SalePlan>().success(customOnSaleService.findSalePlan(ruleId));
     }
+	
+	@RequestMapping(value = "/getOnSaleItems/{productType}/{page}", method = RequestMethod.GET)
+	@ResponseBody
+	public BaseResult<List<ProductItem>> getProductItem(@ModelAttribute(Constants.USER)User user, 
+			@PathVariable int productType, @PathVariable int page) throws Exception {
+		
+		return new BaseResult<List<ProductItem>>().success(customOnSaleService.findProductItem(user, productType, page));
+    }
+	
+	@RequestMapping(value = "/getHotSaleItems/{productType}/{page}", method = RequestMethod.GET)
+	@ResponseBody
+	public BaseResult<List<ProductItem>> getHotProductItem(@ModelAttribute(Constants.USER)User user, 
+			@PathVariable int productType, @PathVariable int page) throws Exception {
+		
+		return new BaseResult<List<ProductItem>>().success(customOnSaleService.findProductItem(user, productType, page));
+    }
+	
+	
+	
 }

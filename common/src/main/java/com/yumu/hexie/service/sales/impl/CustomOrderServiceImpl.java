@@ -8,6 +8,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import com.yumu.hexie.model.commonsupport.info.ProductItem;
 import com.yumu.hexie.model.market.OrderItem;
 import com.yumu.hexie.model.market.OrderItemRepository;
 import com.yumu.hexie.model.market.ServiceOrder;
@@ -15,6 +16,7 @@ import com.yumu.hexie.model.market.ServiceOrderRepository;
 import com.yumu.hexie.model.market.saleplan.SalePlan;
 import com.yumu.hexie.model.payment.PaymentOrder;
 import com.yumu.hexie.model.user.Address;
+import com.yumu.hexie.model.user.User;
 import com.yumu.hexie.service.sales.CustomOrderService;
 import com.yumu.hexie.service.sales.ProductService;
 
@@ -36,6 +38,8 @@ public abstract class CustomOrderServiceImpl implements CustomOrderService {
     protected ServiceOrderRepository serviceOrderRepository;
     @Override
     public abstract SalePlan findSalePlan(long ruleId);
+    @Override
+	public abstract List<ProductItem> findProductItem(User user, int productType, int page);
 
     /** 
      * @param po
@@ -71,5 +75,7 @@ public abstract class CustomOrderServiceImpl implements CustomOrderService {
      */
     @Override
     public abstract void validateRule(ServiceOrder order, SalePlan rule, OrderItem item, Address address);
+
+    
 
 }

@@ -22,6 +22,10 @@ public class ServiceAreaItem extends BaseModel {
 	private boolean hot = false;
 	private long productId;
 	private String productName;
+	
+	private long productItemId;
+	private String productItemName;
+	
 	private int productType;
 	private long regionId;
 	private String regionName;
@@ -110,18 +114,29 @@ public class ServiceAreaItem extends BaseModel {
 	public void setTagUrl(String tagUrl) {
 		this.tagUrl = tagUrl;
 	}
+	public long getProductItemId() {
+		return productItemId;
+	}
+	public void setProductItemId(long productItemId) {
+		this.productItemId = productItemId;
+	}
+	public String getProductItemName() {
+		return productItemName;
+	}
+	public void setProductItemName(String productItemName) {
+		this.productItemName = productItemName;
+	}
 	@Override
 	public String toString() {
 		return "ServiceAreaItem [hot=" + hot + ", productId=" + productId
-				+ ", productName=" + productName + ", productType="
-				+ productType + ", regionId=" + regionId + ", regionName="
-				+ regionName + ", regionType=" + regionType + ", regionIds="
-				+ regionIds + ", regionNames=" + regionNames + ", sort=" + sort
-				+ ", status=" + status + ", productPic=" + productPic
-				+ ", tagUrl=" + tagUrl + "]";
+				+ ", productName=" + productName + ", productItemId="
+				+ productItemId + ", productItemName=" + productItemName
+				+ ", productType=" + productType + ", regionId=" + regionId
+				+ ", regionName=" + regionName + ", regionType=" + regionType
+				+ ", regionIds=" + regionIds + ", regionNames=" + regionNames
+				+ ", sort=" + sort + ", status=" + status + ", productPic="
+				+ productPic + ", tagUrl=" + tagUrl + "]";
 	}
 	
-	
-
 	
 }

@@ -2,11 +2,16 @@ package com.yumu.hexie.model.commonsupport.info;
 
 import java.util.Date;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
 
 import org.springframework.util.StringUtils;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.yumu.hexie.common.util.DateUtil;
 import com.yumu.hexie.common.util.StringUtil;
 import com.yumu.hexie.model.BaseModel;
@@ -55,7 +60,6 @@ public class Product extends BaseModel {
 	private String showTemplate = "goodDetail";//暂时没用
 	private String orderTemplate = "orderDetail";//暂时没用
 	
-
 	private Date updateDate;
 	private String updateUser;
 	private int provenance;//1 进口 2 国产
@@ -67,6 +71,14 @@ public class Product extends BaseModel {
 	private String secondType = "00";//二级类目
 	private float postageFee = 0;//快递费
 	
+	//商品规格
+	private String spec;	//商品规格
+	private String specVal;	//规格值
+	
+	@JsonIgnore
+	@ManyToOne(fetch = FetchType.LAZY,cascade = {CascadeType.REFRESH }, optional = true)
+    @JoinColumn(name = "productItemId")
+	private ProductItem productItem;
 	
 	public long getMerchantId() {
 		return merchantId;
@@ -161,9 +173,6 @@ public class Product extends BaseModel {
 		return endDate;
 	}
 	
-	/*public void setEndDate(Date endDate) {
-		this.endDate = endDate;
-	}*/
 	public void setEndDate(String endDate) {
 		this.endDate =DateUtil.getSqlDateFromString(endDate);
 	}
@@ -317,4 +326,25 @@ public class Product extends BaseModel {
 	public void setPostageFee(float postageFee) {
 		this.postageFee = postageFee;
 	}
+	
+	public String getSpec() {
+		return spec;
+	}
+	public void setSpec(String spec) {
+		this.spec = spec;
+	}
+	public String getSpecVal() {
+		return specVal;
+	}
+	public void setSpecVal(String specVal) {
+		this.specVal = specVal;
+	}
+	public ProductItem getProductItem() {
+		return productItem;
+	}
+	public void setProductItem(ProductItem productItem) {
+		this.productItem = productItem;
+	}
+	
+	
 }
