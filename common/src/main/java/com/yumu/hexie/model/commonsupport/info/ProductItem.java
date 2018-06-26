@@ -3,7 +3,6 @@
  */
 package com.yumu.hexie.model.commonsupport.info;
 
-import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -11,7 +10,6 @@ import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
-import javax.persistence.Transient;
 
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
@@ -52,12 +50,6 @@ public class ProductItem extends BaseModel{
     @Fetch(FetchMode.SUBSELECT)
 	private List<Product> products;
 	
-	@Transient
-	private List<String> specs;
-	
-	@Transient
-	private List<String> specVals;
-
 	public String getFirstType() {
 		return firstType;
 	}
@@ -154,32 +146,6 @@ public class ProductItem extends BaseModel{
 		this.specValList = specValList;
 	}
 
-	public List<String> getSpecs() {
-		List<String> list = new ArrayList<String>();
-		String[]specarr = specList.split(",");
-		for (int i = 0; i < specarr.length; i++) {
-			list.add(specarr[i]);
-		}
-		return list;
-	}
-
-	public void setSpecs(List<String> specs) {
-		this.specs = specs;
-	}
-
-	public List<String> getSpecVals() {
-		List<String> list = new ArrayList<String>();
-		String[]specvalarr = specValList.split(",");
-		for (int i = 0; i < specvalarr.length; i++) {
-			list.add(specvalarr[i]);
-		}
-		return list;
-	}
-
-	public void setSpecVals(List<String> specVals) {
-		this.specVals = specVals;
-	}
-
 	public String getShortName() {
 		return shortName;
 	}
@@ -204,5 +170,5 @@ public class ProductItem extends BaseModel{
 		this.miniPrice = miniPrice;
 	}
 
-	
+
 }
