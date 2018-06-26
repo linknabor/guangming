@@ -372,6 +372,27 @@ public class Product extends BaseModel {
 	public void setProductItem(ProductItem productItem) {
 		this.productItem = productItem;
 	}
+
+	@Transient
+	public String getSpecVals(){
+		
+		String values = "";
+		if (!StringUtils.isEmpty(spec1) && !StringUtils.isEmpty(spec1val)) {
+			values += spec1val+",";
+		}
+		if (!StringUtils.isEmpty(spec2) && !StringUtils.isEmpty(spec2val)) {
+			values += spec2val+",";
+		}
+		if (!StringUtils.isEmpty(spec3) && !StringUtils.isEmpty(spec3val)) {
+			values += spec3val+",";
+		}
+		
+		if (!StringUtils.isEmpty(values)) {
+			values = values.substring(0, values.length()-1);
+		}
+		return values;
+		
+	}
 	
 	
 }
