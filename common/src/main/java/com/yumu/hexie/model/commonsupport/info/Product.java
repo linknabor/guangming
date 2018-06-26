@@ -78,6 +78,8 @@ public class Product extends BaseModel {
 	private String spec2val;	//规格2值
 	private String spec3;	//商品规格3
 	private String spec3val;	//规格3值
+	private int productclassificationid;
+	
 	
 	@JsonIgnore
 	@ManyToOne(fetch = FetchType.LAZY,cascade = {CascadeType.REFRESH }, optional = true)
@@ -371,6 +373,12 @@ public class Product extends BaseModel {
 	}
 	public void setProductItem(ProductItem productItem) {
 		this.productItem = productItem;
+	}
+	public int getProductclassificationid() {
+		return productclassificationid;
+	}
+	public void setProductclassificationid(int productclassificationid) {
+		this.productclassificationid = productclassificationid;
 	}
 	
 	
