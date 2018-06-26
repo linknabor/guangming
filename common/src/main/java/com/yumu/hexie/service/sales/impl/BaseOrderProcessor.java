@@ -63,19 +63,25 @@ public abstract class BaseOrderProcessor {
 			price += shipfee;
 
 			closeTime = c.getTimeoutForPay() + System.currentTimeMillis();
-		} else if (order.getItems().size() == 1) {
-			// 2.单个商品
-			OrderItem item = order.getItems().get(0);
-			SalePlan plan = findSalePlan(order.getOrderType(), item.getRuleId());
-
-			totalAmount = item.getAmount();
-			price = totalAmount;
-			if (item.getCount() < plan.getFreeShippingNum()) {
-				shipfee = plan.getPostageFee();
+		} else if (order.getItems().size() >= 1) {
+			for (int i = 0; i < order.getItems().size(); i++) {
+				OrderItem item = order.getItems().get(i);
+				
+				SalePlan plan = findSalePlan(order.getOrderType(), item.getRuleId());
+				
+				totalAmount = item.getAmount();
+				price = totalAmount;
+				if (item.getCount() < plan.getFreeShippingNum()) {
+					shipfee = plan.getPostageFee();
+				}
+				count += item.getCount();
+				price += shipfee;
+				closeTime = plan.getTimeoutForPay() + System.currentTimeMillis();
 			}
-			count += item.getCount();
-			price += shipfee;
-			closeTime = plan.getTimeoutForPay() + System.currentTimeMillis();
+			// 2.单个商品
+			
+
+			
 		} else {
 			throw new BizValidateException("下单失败，请重试！");
 		}

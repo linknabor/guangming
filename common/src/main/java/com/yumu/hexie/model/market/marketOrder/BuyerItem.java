@@ -1,4 +1,4 @@
-package com.yumu.hexie.model.market;
+package com.yumu.hexie.model.market.marketOrder;
 
 import java.io.Serializable;
 

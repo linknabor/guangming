@@ -1,5 +1,6 @@
 package com.yumu.hexie.service.sales.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -14,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.yumu.hexie.common.util.ConfigUtil;
+import com.yumu.hexie.common.util.OrderNoUtil;
 import com.yumu.hexie.common.util.StringUtil;
 import com.yumu.hexie.integration.wechat.entity.common.JsSign;
 import com.yumu.hexie.integration.wechat.entity.common.WxRefundOrder;
@@ -28,10 +30,13 @@ import com.yumu.hexie.model.market.OrderItem;
 import com.yumu.hexie.model.market.OrderItemRepository;
 import com.yumu.hexie.model.market.ServiceOrder;
 import com.yumu.hexie.model.market.ServiceOrderRepository;
+import com.yumu.hexie.model.market.marketOrder.req.BuyerOrderReq;
+import com.yumu.hexie.model.market.marketOrder.req.CartItemOrderReq;
 import com.yumu.hexie.model.market.saleplan.SalePlan;
 import com.yumu.hexie.model.payment.PaymentConstant;
 import com.yumu.hexie.model.payment.PaymentOrder;
 import com.yumu.hexie.model.promotion.coupon.CouponSeed;
+import com.yumu.hexie.model.redis.RedisRepository;
 import com.yumu.hexie.model.user.Address;
 import com.yumu.hexie.model.user.User;
 import com.yumu.hexie.service.comment.CommentService;
@@ -82,6 +87,9 @@ public class BaseOrderServiceImpl extends BaseOrderProcessor implements BaseOrde
 	@Inject
 	private CarService carService;
 
+	@Inject
+	private RedisRepository redisRepository;
+	
     @Value(value = "${testMode}")
     private boolean testMode;
 	private void preOrderCreate(ServiceOrder order, Address address){
@@ -398,6 +406,129 @@ public class BaseOrderServiceImpl extends BaseOrderProcessor implements BaseOrde
 		
 		
 		
+	}
+
+	
+	
+	
+	@Override
+	@Transactional
+	public List<ServiceOrder> createOrder(BuyerOrderReq buyerOrderReq, long userId, String openId) {
+		
+		List<ServiceOrder> list = new ArrayList<ServiceOrder>();
+		//1. 填充地址信息
+		
+		List<CartItemOrderReq> cartItem = buyerOrderReq.getBuyerOrderReq();
+		for (int i = 0; i < cartItem.size(); i++) {
+			
+			ServiceOrder serviceOrder = new ServiceOrder();
+			serviceOrder.setOrderType(ModelConstant.ORDER_TYPE_ONSALE);
+			serviceOrder.setServiceAddressId(buyerOrderReq.getServiceAddressId());
+			Address address = fillAddressInfo(serviceOrder);
+			
+			CartItemOrderReq item = cartItem.get(i);
+			long couponId = 0; //优惠券ID
+			if(item.getCouponId() != null ) {
+				couponId = item.getCouponId(); 
+			}
+
+			String memo = item.getMemo(); //
+			String skuIds = item.getSkuIds(); //商品ID
+			String ruleIds = item.getRuleIds(); //规则ID
+			
+			String[] sukArr = skuIds.split(",");
+			String[] ruleArr = ruleIds.split(",");
+			if (sukArr.length != ruleArr.length) {
+				throw new BizValidateException("勾选的商品与支付商品不一致").setError();
+			}
+			
+			List<OrderItem> items = new ArrayList<OrderItem>();
+			
+			
+			for (int j = 0; j < sukArr.length; j++) {
+				long sukId = Long.parseLong(sukArr[j]);
+				long ruleId = Long.parseLong(ruleArr[j]);
+				
+				//获取商品购买数量
+				Object o = redisRepository.getBuyerCartByKey(userId, String.valueOf(sukId) +"-"+ String.valueOf(ruleId));
+				if (o == null) {
+					throw new BizValidateException("购物车不存在商品").setError();
+				}
+				
+				//获取商品信息
+				Product product = productService.getProduct(sukId);
+				
+				SalePlan salePlan = salePlanService.getService(serviceOrder.getOrderType()).findSalePlan(ruleId);
+				
+				OrderItem orderItem = new OrderItem();
+				orderItem.setCount(Integer.parseInt(o.toString()));
+				orderItem.fillDetail(salePlan, product);
+				orderItem.setUserId(userId);
+				orderItem.setRuleId(ruleId);
+				
+				items.add(orderItem);
+			}
+			serviceOrder.setUserId(userId);
+			serviceOrder.setItems(items);
+			serviceOrder.setCouponId(couponId);
+			serviceOrder.setMemo(memo);
+			
+			//2. 填充订单信息并校验规则,设置价格信息
+			preOrderCreate(serviceOrder, address);
+			computeCoupon(serviceOrder);
+			
+			//3. 订单创建
+			serviceOrder.setOrderNo(OrderNoUtil.generateServiceOrderNo());
+
+			serviceOrder = serviceOrderRepository.save(serviceOrder);
+			for(OrderItem newItem : serviceOrder.getItems()) {
+				newItem.setServiceOrder(serviceOrder);
+				newItem.setUserId(serviceOrder.getUserId());
+				orderItemRepository.save(newItem);
+			}
+			log.warn("[Create]订单创建OrderNo:" + serviceOrder.getOrderNo());
+			
+			//4. 订单后处理
+			commonPostProcess(ModelConstant.ORDER_OP_CREATE, serviceOrder);
+			
+			list.add(serviceOrder);
+		}
+		
+		return list;
+	}
+
+	@Override
+	public JsSign requestPays(List<ServiceOrder> orders, String return_url) {
+		
+		String paymentNo = OrderNoUtil.generatePaymentOrderNo();
+		
+		List<PaymentOrder> payments = new ArrayList<PaymentOrder>();
+		for (int i = 0; i < orders.size(); i++) {
+			ServiceOrder order = orders.get(i);
+			log.warn("[requestPay] OrderNo:" + order.getOrderNo());
+			
+			//校验订单状态
+			if(!order.payable()){
+	            throw new BizValidateException(order.getId(),"订单状态不可支付，请重新查询确认订单状态！").setError();
+	        }
+			
+			//获取支付单
+			PaymentOrder pay = paymentService.fetchPaymentOrderHaveId(order, paymentNo);
+			
+			payments.add(pay);
+	        log.warn("[requestPay] PaymentId:" + pay.getId());
+			
+		}
+		
+		//发起支付
+		JsSign sign = paymentService.requestPays(payments, return_url);
+        log.warn("[requestPay]NonceStr:" + sign.getNonceStr());
+		//操作记录
+        for (int i = 0; i < orders.size(); i++) {
+        	ServiceOrder order = orders.get(i);
+        	commonPostProcess(ModelConstant.ORDER_OP_REQPAY, order);
+		}
+		return sign;
 	}
 	
 	
