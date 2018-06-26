@@ -23,6 +23,7 @@ import com.yumu.hexie.integration.wechat.entity.common.JsSign;
 import com.yumu.hexie.model.ModelConstant;
 import com.yumu.hexie.model.commonsupport.comment.Comment;
 import com.yumu.hexie.model.commonsupport.info.Product;
+import com.yumu.hexie.model.commonsupport.info.ProductItem;
 import com.yumu.hexie.model.localservice.HomeServiceConstant;
 import com.yumu.hexie.model.localservice.ServiceOperator;
 import com.yumu.hexie.model.localservice.ServiceOperatorRepository;
@@ -48,6 +49,7 @@ import com.yumu.hexie.vo.SingleItemOrder;
 import com.yumu.hexie.web.BaseController;
 import com.yumu.hexie.web.BaseResult;
 import com.yumu.hexie.web.sales.resp.BuyInfoVO;
+import com.yumu.hexie.web.sales.resp.ProductItemVO;
 
 @Controller(value = "orderController")
 public class OrderController extends BaseController{
@@ -84,9 +86,13 @@ public class OrderController extends BaseController{
 	
 	@RequestMapping(value = "/getProductByItem/{productItemId}", method = RequestMethod.GET)
 	@ResponseBody
-	public BaseResult<List<Product>> getProductByItem(@PathVariable long productItemId) throws Exception {
+	public BaseResult<ProductItemVO> getProductByItem(@PathVariable long productItemId) throws Exception {
 		List<Product> productList = productService.getProductsByItem(productItemId);
-		return new BaseResult<List<Product>>().success(productList);
+		ProductItem productItem = productService.getProdcutItemById(productItemId);
+		ProductItemVO vo = new ProductItemVO();
+		vo.setProductList(productList);
+		vo.setProductItem(productItem);
+		return new BaseResult<ProductItemVO>().success(vo);
     } 
 	
     

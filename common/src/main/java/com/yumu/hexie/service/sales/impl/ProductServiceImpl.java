@@ -78,4 +78,10 @@ public class ProductServiceImpl implements ProductService {
 		ProductItem productItem = productItemRepository.findOne(productItemId); 
 		return productRepository.findByProductItemAndStatus(productItem, ModelConstant.PRODUCT_ONSALE);
 	}
+
+	@Override
+	public ProductItem getProdcutItemById(long productItemId) {
+
+		return productItemRepository.findOne(productItemId);
+	}
 }

@@ -23,7 +23,7 @@ public class ServiceAreaItem extends BaseModel {
 	private long productId;
 	private String productName;
 	
-	private long productItemId;
+	private long productItemId = 0;
 	private String productItemName;
 	
 	private int productType;

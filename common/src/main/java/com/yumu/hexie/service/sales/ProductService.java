@@ -3,12 +3,14 @@ package com.yumu.hexie.service.sales;
 import java.util.List;
 
 import com.yumu.hexie.model.commonsupport.info.Product;
+import com.yumu.hexie.model.commonsupport.info.ProductItem;
 
 
 public interface ProductService {
 	
 	public Product getProduct(long productId);
 	public List<Product> getProductsByItem(long productItem);
+	public ProductItem getProdcutItemById(long productItem);
 	
 	public List<Product> getAllProduct();
 	
