@@ -60,7 +60,7 @@ public class CustomOnSaleServiceImpl extends CustomOrderServiceImpl {
 	@Override
 	public SalePlan findSalePlan(long ruleId) {
 		return onSaleRuleRepository.findOne(ruleId);
-	}
+	}	
 
 
     /** 
@@ -114,6 +114,12 @@ public class CustomOnSaleServiceImpl extends CustomOrderServiceImpl {
 	    int s = random.nextInt(max) % (max - min + 1) + min;
 	    return s;
 
+	}
+
+	@Override
+	public List<SalePlan> findSalePlanByProductItem(long productItemId) {
+
+		return onSaleRuleRepository.findByProductItemIdAndStatus(productItemId, ModelConstant.RULE_STATUS_ON);
 	}
 
 

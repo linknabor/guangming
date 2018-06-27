@@ -15,6 +15,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.yumu.hexie.common.util.DateUtil;
 import com.yumu.hexie.common.util.StringUtil;
 import com.yumu.hexie.model.BaseModel;
+import com.yumu.hexie.model.market.saleplan.SalePlan;
 
 @Entity
 //商品
@@ -393,6 +394,80 @@ public class Product extends BaseModel {
 		return values;
 		
 	}
+
+	/**
+	 * 设置rule
+	 * @param rule
+	 */
+	public void initRule(SalePlan rule){
+		
+		this.setRuleId(rule.getId());
+		this.setRuleName(rule.getName());
+		this.setRulePrice(rule.getPrice());
+		this.setRuleDiscount(rule.getDiscount());
+		this.setRulePostageFee(rule.getPostageFee());
+		this.setRuleFreeShippingNum(rule.getFreeShippingNum());
+		this.setRuleProductType(rule.getSalePlanType());
+	}
+	
+	@Transient
+	private long ruleId;
+	@Transient
+	private String ruleName;
+	@Transient
+	private float rulePrice;
+	@Transient
+	private String ruleDiscount;
+	@Transient
+	private float rulePostageFee;
+	@Transient
+	private int ruleFreeShippingNum;
+	@Transient
+	private int ruleProductType;
+
+	public long getRuleId() {
+		return ruleId;
+	}
+	public void setRuleId(long ruleId) {
+		this.ruleId = ruleId;
+	}
+	public String getRuleName() {
+		return ruleName;
+	}
+	public void setRuleName(String ruleName) {
+		this.ruleName = ruleName;
+	}
+	public float getRulePrice() {
+		return rulePrice;
+	}
+	public void setRulePrice(float rulePrice) {
+		this.rulePrice = rulePrice;
+	}
+	public String getRuleDiscount() {
+		return ruleDiscount;
+	}
+	public void setRuleDiscount(String ruleDiscount) {
+		this.ruleDiscount = ruleDiscount;
+	}
+	public float getRulePostageFee() {
+		return rulePostageFee;
+	}
+	public void setRulePostageFee(float rulePostageFee) {
+		this.rulePostageFee = rulePostageFee;
+	}
+	public int getRuleFreeShippingNum() {
+		return ruleFreeShippingNum;
+	}
+	public void setRuleFreeShippingNum(int ruleFreeShippingNum) {
+		this.ruleFreeShippingNum = ruleFreeShippingNum;
+	}
+	public int getRuleProductType() {
+		return ruleProductType;
+	}
+	public void setRuleProductType(int ruleProductType) {
+		this.ruleProductType = ruleProductType;
+	}
+	
 	
 	
 }

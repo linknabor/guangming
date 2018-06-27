@@ -108,6 +108,12 @@ public class CustomRepairServiceImpl extends CustomOrderServiceImpl {
 		return null;
 	}
 
+	@Override
+	public List<SalePlan> findSalePlanByProductItem(long productItemId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
     
     
     

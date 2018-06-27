@@ -160,6 +160,11 @@ public class CustomYuyueServiceImpl extends CustomOrderServiceImpl {
 		// TODO Auto-generated method stub
 		return null;
 	}
+	@Override
+	public List<SalePlan> findSalePlanByProductItem(long productItemId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
 
 	
 	

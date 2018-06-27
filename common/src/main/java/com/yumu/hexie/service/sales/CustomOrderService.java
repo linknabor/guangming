@@ -30,5 +30,6 @@ public interface CustomOrderService {
     public void validateRule(ServiceOrder order,SalePlan rule, OrderItem item, Address address);
     public List<ProductItem> findProductItem(User user, int productType, int page);
     public List<ProductItem> findHotProductItem(User user, int productType, int page);
+    public List<SalePlan> findSalePlanByProductItem(long productItemId);
 
 }

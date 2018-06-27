@@ -11,7 +11,7 @@ public interface ProductItemRepository extends JpaRepository<ProductItem, Long> 
 
 	public List<ProductItem> findByStatus(int status);
 	
-	@Query(value = "select distinct pi.* from ProductItem pi join OnSaleRule rule on pi.id = rule.productItemId "
+	@Query(value = "select distinct pi.*, rule.* from ProductItem pi join OnSaleRule rule on pi.id = rule.productItemId "
 			+ "join OnSaleAreaItem m on m.productItemId = pi.id and m.productItemId = rule.productItemId "
 			+ "where rule.productType = ?1 and pi.status = ?2 " 
 			+ "and m.status=" + ModelConstant.DISTRIBUTION_STATUS_ON  
@@ -51,7 +51,7 @@ public interface ProductItemRepository extends JpaRepository<ProductItem, Long> 
 	 * @param page
 	 * @return
 	 */
-	@Query(value = "select distinct pi.* from ProductItem pi join OnSaleRule rule on pi.id = rule.productItemId "
+	@Query(value = "select distinct pi.*, rule.* from ProductItem pi join OnSaleRule rule on pi.id = rule.productItemId "
 			+ "join OnSaleAreaItem m on m.productItemId = pi.id and m.productItemId = rule.productItemId "
 			+ "where pi.status = ?1 " 
 			+ "and m.status=" + ModelConstant.DISTRIBUTION_STATUS_ON  
