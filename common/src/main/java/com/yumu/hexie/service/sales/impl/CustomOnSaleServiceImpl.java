@@ -1,6 +1,8 @@
 package com.yumu.hexie.service.sales.impl;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 import javax.inject.Inject;
 
@@ -80,9 +82,38 @@ public class CustomOnSaleServiceImpl extends CustomOrderServiceImpl {
 	@Override
 	public List<ProductItem> findHotProductItem(User user, int productType,
 			int page) {
-		return productItemRepository.queryProductItemsByType(productType, ModelConstant.PRODUCT_ONSALE, 
+		/*选取销量前100的商品，随机取6条返回到前端展示*/
+		List<ProductItem> list =  productItemRepository.queryHotProductItems(ModelConstant.PRODUCT_ONSALE, 
 				user.getProvinceId(), user.getCityId(), user.getCountyId(), user.getXiaoquId(), 
 				System.currentTimeMillis(), page);
+		
+		List<ProductItem> showList = new ArrayList<ProductItem>();
+		
+		Integer[]randomList = new Integer[6];	//一次展示6个商品
+		for (int i = 0; i < randomList.length; i++) {
+			randomList[i] = getRandom(0, 100);
+		}
+		
+		for (int i = 0; i < randomList.length; i++) {
+			
+			showList.add(list.get(randomList[i]));
+		}		
+		
+		return showList;
+	}
+	
+	/**
+	 * 获取指定范围内的随机数
+	 * @param min
+	 * @param max
+	 * @return
+	 */
+	private int getRandom(int min, int max){
+		
+	    Random random = new Random();
+	    int s = random.nextInt(max) % (max - min + 1) + min;
+	    return s;
+
 	}
 
 

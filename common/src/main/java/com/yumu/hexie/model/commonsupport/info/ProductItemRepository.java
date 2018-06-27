@@ -39,22 +39,34 @@ public interface ProductItemRepository extends JpaRepository<ProductItem, Long> 
 	public List<ProductItem> queryProductItemsByType(int productType, int status,
 			long provinceId, long cityId, long countyId, long xiaoquId, long current, int page);
 	
-	
+	/**
+	 * 获取销量前100的商品
+	 * @param productType
+	 * @param status
+	 * @param provinceId
+	 * @param cityId
+	 * @param countyId
+	 * @param xiaoquId
+	 * @param current
+	 * @param page
+	 * @return
+	 */
 	@Query(value = "select distinct pi.* from ProductItem pi join OnSaleRule rule on pi.id = rule.productItemId "
 			+ "join OnSaleAreaItem m on m.productItemId = pi.id and m.productItemId = rule.productItemId "
-			+ "where rule.productType = ?1 and pi.status = ?2 " 
+			+ "where pi.status = ?1 " 
 			+ "and m.status=" + ModelConstant.DISTRIBUTION_STATUS_ON  
 			+ " and ((m.regionType=0) "
-			+ "or (m.regionType=1 and m.regionId=?3) "
-			+ "or (m.regionType=2 and m.regionId=?4) "
-			+ "or (m.regionType=3 and m.regionId=?5) "
-			+ "or (m.regionType=4 and m.regionId=?6)) "
-			+ "and m.ruleCloseTime > ?7 "
+			+ "or (m.regionType=1 and m.regionId=?2) "
+			+ "or (m.regionType=2 and m.regionId=?3) "
+			+ "or (m.regionType=3 and m.regionId=?4) "
+			+ "or (m.regionType=4 and m.regionId=?5)) "
+			+ "and m.ruleCloseTime > ?6 "
 			+ "and m.productItemId > 0 "
 			+ "order by saledNum desc limit ?8, 100 ", 
 			nativeQuery = true)
-	public List<ProductItem> queryHotProductItems(int productType, int status, 
+	public List<ProductItem> queryHotProductItems(int status, 
 			long provinceId, long cityId, long countyId, long xiaoquId, long current, int page);
+	
 	
 	
 }

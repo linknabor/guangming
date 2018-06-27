@@ -41,6 +41,14 @@ public class SaleController extends BaseController{
 		return new BaseResult<SalePlan>().success(customOnSaleService.findSalePlan(ruleId));
     }
 	
+	/**
+	 * 获取某一类型的商品大类
+	 * @param user
+	 * @param productType
+	 * @param page
+	 * @return
+	 * @throws Exception
+	 */
 	@RequestMapping(value = "/getOnSaleItems/{productType}/{page}", method = RequestMethod.GET)
 	@ResponseBody
 	public BaseResult<List<ProductItem>> getProductItem(@ModelAttribute(Constants.USER)User user, 
@@ -49,6 +57,14 @@ public class SaleController extends BaseController{
 		return new BaseResult<List<ProductItem>>().success(customOnSaleService.findProductItem(user, productType, page));
     }
 	
+	/**
+	 * 获取热卖商品的商品大类
+	 * @param user
+	 * @param productType
+	 * @param page
+	 * @return
+	 * @throws Exception
+	 */
 	@RequestMapping(value = "/getHotSaleItems/{productType}/{page}", method = RequestMethod.GET)
 	@ResponseBody
 	public BaseResult<List<ProductItem>> getHotProductItem(@ModelAttribute(Constants.USER)User user, 
