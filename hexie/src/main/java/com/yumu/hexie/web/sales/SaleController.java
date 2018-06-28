@@ -70,7 +70,8 @@ public class SaleController extends BaseController{
 	public BaseResult<List<ProductItem>> getHotProductItem(@ModelAttribute(Constants.USER)User user, 
 			@PathVariable int productType, @PathVariable int page) throws Exception {
 		
-		return new BaseResult<List<ProductItem>>().success(customOnSaleService.findProductItem(user, productType, page));
+		List<ProductItem> itemList = customOnSaleService.findHotProductItem(user, productType, page);
+		return new BaseResult<List<ProductItem>>().success(itemList);
     }
 	
 	

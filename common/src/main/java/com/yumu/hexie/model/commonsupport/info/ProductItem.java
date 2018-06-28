@@ -10,6 +10,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.OneToMany;
+import javax.persistence.Transient;
 
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
@@ -39,7 +40,7 @@ public class ProductItem extends BaseModel{
 	private Date startDate;//生效开始时间
 	private Date endDate;	//生效结束时间
 	private String mainPicture;	//封面图片
-	private String miniPrice;	//单独显示的价格
+	private String oriPrice;	//最低价，原价
 	private String displayPrice;	//页面显示价格，可能是个区间
 	
 	private String specList;	//产品规格名称列表，逗号分隔
@@ -49,6 +50,9 @@ public class ProductItem extends BaseModel{
     @OneToMany(targetEntity = Product.class, fetch = FetchType.LAZY, cascade = {CascadeType.REFRESH}, mappedBy = "productItem")
     @Fetch(FetchMode.SUBSELECT)
 	private List<Product> products;
+
+	@Transient
+	private int totalSale;
 	
 	public String getFirstType() {
 		return firstType;
@@ -162,13 +166,21 @@ public class ProductItem extends BaseModel{
 		this.titleName = titleName;
 	}
 
-	public String getMiniPrice() {
-		return miniPrice;
+	public String getOriPrice() {
+		return oriPrice;
 	}
 
-	public void setMiniPrice(String miniPrice) {
-		this.miniPrice = miniPrice;
+	public void setOriPrice(String oriPrice) {
+		this.oriPrice = oriPrice;
 	}
 
+	public int getTotalSale() {
+		return totalSale;
+	}
 
+	public void setTotalSale(int totalSale) {
+		this.totalSale = totalSale;
+	}
+
+	
 }

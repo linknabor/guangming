@@ -9,8 +9,10 @@ import javax.inject.Inject;
 import org.springframework.stereotype.Service;
 
 import com.yumu.hexie.model.ModelConstant;
+import com.yumu.hexie.model.commonsupport.info.Product;
 import com.yumu.hexie.model.commonsupport.info.ProductItem;
 import com.yumu.hexie.model.commonsupport.info.ProductItemRepository;
+import com.yumu.hexie.model.commonsupport.info.ProductRepository;
 import com.yumu.hexie.model.market.OrderItem;
 import com.yumu.hexie.model.market.ServiceOrder;
 import com.yumu.hexie.model.market.saleplan.OnSaleRule;
@@ -33,6 +35,8 @@ public class CustomOnSaleServiceImpl extends CustomOrderServiceImpl {
     private ProductService         productService;
     @Inject
     private ProductItemRepository productItemRepository;
+    @Inject
+    private ProductRepository productRepository;
 
 	@Override
 	public void validateRule(ServiceOrder order,SalePlan rule, OrderItem item, Address address) {
@@ -89,14 +93,32 @@ public class CustomOnSaleServiceImpl extends CustomOrderServiceImpl {
 		
 		List<ProductItem> showList = new ArrayList<ProductItem>();
 		
-		Integer[]randomList = new Integer[6];	//一次展示6个商品
-		for (int i = 0; i < randomList.length; i++) {
-			randomList[i] = getRandom(0, 100);
+		List<Integer> rList = new ArrayList<Integer>();
+		
+		int loopNum = list.size()<6?list.size():6;
+		
+		while (true) {
+
+			Integer iRandom = getRandom(0, list.size());
+			if (!rList.contains(iRandom)) {
+				rList.add(iRandom);
+			}
+			if (rList.size()>loopNum||rList.size()==list.size()) {
+				break;
+			}
 		}
 		
-		for (int i = 0; i < randomList.length; i++) {
+		for (int i = 0; i < rList.size(); i++) {
 			
-			showList.add(list.get(randomList[i]));
+			ProductItem randomItem = list.get(rList.get(i));
+			List<Product> proList = productRepository.findByProductItemAndStatus(randomItem, ModelConstant.PRODUCT_ONSALE);
+			int totalSale = 0;
+			for (int j = 0; j < proList.size(); j++) {
+				totalSale += proList.get(j).getSaledNum();
+			}
+			randomItem.setTotalSale(totalSale);
+			showList.add(randomItem);
+			
 		}		
 		
 		return showList;
