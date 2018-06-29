@@ -17,8 +17,6 @@ import org.springframework.stereotype.Service;
 import com.yumu.hexie.integration.wechat.entity.common.CloseOrderResp;
 import com.yumu.hexie.integration.wechat.entity.common.JsSign;
 import com.yumu.hexie.integration.wechat.entity.common.PaymentOrderResult;
-import com.yumu.hexie.integration.wechat.entity.common.PrePaymentOrder;
-import com.yumu.hexie.integration.wechat.entity.common.WxRefundOrder;
 import com.yumu.hexie.model.localservice.basemodel.BaseO2OService;
 import com.yumu.hexie.model.market.ServiceOrder;
 import com.yumu.hexie.model.payment.PaymentConstant;
@@ -301,4 +299,52 @@ public class PaymentServiceImpl implements PaymentService {
         return paymentOrderRepository.save(pay);
     }
 
+	@Override
+	public PaymentOrder fetchPaymentOrderHaveId(ServiceOrder order, String paymentNo) {
+		List<PaymentOrder> pos = paymentOrderRepository.findByOrderTypeAndOrderId(PaymentConstant.TYPE_MARKET_ORDER,order.getId());
+        if(pos != null && pos.size()>0) {
+            return pos.get(0);
+        } else {
+            return new PaymentOrder(order, paymentNo);
+        }
+	}
+
+	@Override
+	public JsSign requestPays(List<PaymentOrder> payments, String return_url) {
+		float amount = 0;
+		PaymentOrder p = new PaymentOrder();
+		for (int i = 0; i < payments.size(); i++) {
+			PaymentOrder pay = payments.get(i);
+			validatePayRequest(pay);
+			
+			log.warn("[Payment-req]["+pay.getPaymentNo()+"]["+pay.getOrderId()+"]["+pay.getOrderType()+"]");
+			
+			amount += pay.getPrice();
+			p = pay;
+		}
+		
+		//因为是多订单一起支付，所有在paymentorder里面paymentNo是相同的
+        
+        //支付然后没继续的情景=----校验所需时间较长，是否需要如此操作
+        if(checkPaySuccess(p.getPaymentNo())){
+            throw new BizValidateException(Long.parseLong(p.getPaymentNo()), "订单已支付成功，勿重复提交！").setError();
+        }
+        //获取预支付ID
+        //因为存在多个订单，所有这个把订单的金额累计
+        p.setPrice(amount);
+        String prepay_id = wechatCoreService.createOrder(p, return_url);
+        
+        for (int i = 0; i < payments.size(); i++) {
+			PaymentOrder pay = payments.get(i);
+			pay.setPrepayId(prepay_id);
+	        paymentOrderRepository.save(pay);
+	        
+	        log.warn("[Payment-req]Saved["+pay.getPaymentNo()+"]["+pay.getOrderId()+"]["+pay.getOrderType()+"]");
+		}
+        
+        //3. 从微信获取签名
+        JsSign sign = wechatCoreService.getPrepareSign(prepay_id);
+        log.warn("[Payment-req]sign["+sign.getSignature()+"]");
+        return sign;
+	}
 }

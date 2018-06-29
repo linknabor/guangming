@@ -88,6 +88,21 @@ public class PaymentOrder  extends BaseModel {
         setSettleId(order.getId());
         setSettleType(SettleConstant.TYPE_MARKET);
     }
+    
+    public PaymentOrder(ServiceOrder order, String paymentNo) {
+        this.paymentNo = paymentNo;
+        setProductName(order.getProductName());
+        setOrderId(order.getId());
+        setUserId(order.getUserId());
+        setOpenId(order.getOpenId());
+        setMerchantId(order.getMerchantId());
+        setPrice(order.getPrice());
+        setStatus(PaymentConstant.PAYMENT_STATUS_INIT);
+        setOrderType(PaymentConstant.TYPE_MARKET_ORDER);
+        setSettleId(order.getId());
+        setSettleType(SettleConstant.TYPE_MARKET);
+    }
+    
     public PaymentOrder(BaseO2OService order,String openId) {
         paymentNo = OrderNoUtil.generatePaymentOrderNo();
         setProductName(order.getProjectName());

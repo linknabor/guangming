@@ -1,5 +1,7 @@
 package com.yumu.hexie.service.sales.impl;
 
+import java.util.List;
+
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
@@ -7,6 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import com.yumu.hexie.model.ModelConstant;
+import com.yumu.hexie.model.commonsupport.info.ProductItem;
 import com.yumu.hexie.model.market.OrderItem;
 import com.yumu.hexie.model.market.ServiceOrder;
 import com.yumu.hexie.model.market.rgroup.RgroupUser;
@@ -115,6 +118,26 @@ public class CustomRgroupServiceImpl  extends CustomOrderServiceImpl {
     @Override
     public void postOrderCancel(ServiceOrder order) {
     }
+
+	@Override
+	public List<ProductItem> findProductItem(User user, int productType, int page) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<ProductItem> findHotProductItem(User user, int productType,
+			int page) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<SalePlan> findSalePlanByProductItem(long productItemId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
 
 
 }

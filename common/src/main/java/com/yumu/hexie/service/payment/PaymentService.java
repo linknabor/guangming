@@ -1,5 +1,7 @@
 package com.yumu.hexie.service.payment;
 
+import java.util.List;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -25,6 +27,8 @@ public interface PaymentService {
     public PaymentOrder findByPaymentNo(String paymentNo);
     //创建支付单
     public PaymentOrder fetchPaymentOrder(ServiceOrder order);
+    //创建支付单(多订单支付时调用)
+    public PaymentOrder fetchPaymentOrderHaveId(ServiceOrder order, String paymentNo);
     //创建支付单
     public PaymentOrder fetchPaymentOrder(BaseO2OService order,String openId);
     //创建订单
@@ -33,6 +37,8 @@ public interface PaymentService {
     public void payOffline(BaseO2OService order);
     //发起支付
     public JsSign requestPay(PaymentOrder payment, String return_url);
+    //发起支付(多订单支付时调用)
+    public JsSign requestPays(List<PaymentOrder> payments, String return_url);
     //取消支付
     public PaymentOrder cancelPayment(int orderType,long orderId);
     //全额退款申请

@@ -12,11 +12,12 @@ public class Distribution extends BaseModel{
 
     private String productName;//商品名称
     private String productPic;//商品图片
-    
 	private int status;//RULE_STATUS_ON
-
 	private String tagUrl;//右上角标签URL
 
+	private long productItemId = 0;	//商品大类ID
+	private String productItemName;	//商品大类名称
+	
 	public long getRegionId() {
 		return regionId;
 	}
@@ -72,5 +73,22 @@ public class Distribution extends BaseModel{
 	public void setTagUrl(String tagUrl) {
 		this.tagUrl = tagUrl;
 	}
+
+	public long getProductItemId() {
+		return productItemId;
+	}
+
+	public void setProductItemId(long productItemId) {
+		this.productItemId = productItemId;
+	}
+
+	public String getProductItemName() {
+		return productItemName;
+	}
+
+	public void setProductItemName(String productItemName) {
+		this.productItemName = productItemName;
+	}
+	
 	
 }

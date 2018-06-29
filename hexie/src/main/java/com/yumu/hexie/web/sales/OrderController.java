@@ -23,6 +23,7 @@ import com.yumu.hexie.integration.wechat.entity.common.JsSign;
 import com.yumu.hexie.model.ModelConstant;
 import com.yumu.hexie.model.commonsupport.comment.Comment;
 import com.yumu.hexie.model.commonsupport.info.Product;
+import com.yumu.hexie.model.commonsupport.info.ProductItem;
 import com.yumu.hexie.model.localservice.HomeServiceConstant;
 import com.yumu.hexie.model.localservice.ServiceOperator;
 import com.yumu.hexie.model.localservice.ServiceOperatorRepository;
@@ -38,6 +39,7 @@ import com.yumu.hexie.model.redis.RedisRepository;
 import com.yumu.hexie.model.user.User;
 import com.yumu.hexie.service.o2o.SendGoodsService;
 import com.yumu.hexie.service.sales.BaseOrderService;
+import com.yumu.hexie.service.sales.CustomOrderService;
 import com.yumu.hexie.service.sales.ProductService;
 import com.yumu.hexie.service.sales.RgroupService;
 import com.yumu.hexie.service.sales.SalePlanService;
@@ -48,6 +50,7 @@ import com.yumu.hexie.vo.SingleItemOrder;
 import com.yumu.hexie.web.BaseController;
 import com.yumu.hexie.web.BaseResult;
 import com.yumu.hexie.web.sales.resp.BuyInfoVO;
+import com.yumu.hexie.web.sales.resp.ProductItemVO;
 
 @Controller(value = "orderController")
 public class OrderController extends BaseController{
@@ -75,12 +78,39 @@ public class OrderController extends BaseController{
 	private SendGoodsService sendGoodsService;
 	@Inject
 	private ServiceOperatorRepository serviceOperatorRepository;
+	@Inject
+    private CustomOrderService customOnSaleService;
 	
 	@RequestMapping(value = "/getProduct/{productId}", method = RequestMethod.GET)
 	@ResponseBody
 	public BaseResult<Product> getProduct(@PathVariable long productId) throws Exception {
 		return new BaseResult<Product>().success(productService.getProduct(productId));
     }
+	
+	@RequestMapping(value = "/getProductByItem/{productItemId}", method = RequestMethod.GET)
+	@ResponseBody
+	public BaseResult<ProductItemVO> getProductByItem(@PathVariable long productItemId) throws Exception {
+		List<Product> productList = productService.getProductsByItem(productItemId);
+		ProductItem productItem = productService.getProdcutItemById(productItemId);
+		List<SalePlan> ruleList = customOnSaleService.findSalePlanByProductItem(productItemId);
+		
+		for (int i = 0; i < productList.size(); i++) {
+			Product product = productList.get(i);
+			for (int j = 0; j < ruleList.size(); j++) {
+				SalePlan salePlan = ruleList.get(j);
+				if (salePlan.getProductId() == product.getId()) {
+					product.initRule(salePlan);
+				}
+					
+			}
+		}
+		
+		ProductItemVO vo = new ProductItemVO();
+		vo.setProductList(productList);
+		vo.setProductItem(productItem);
+		return new BaseResult<ProductItemVO>().success(vo);
+    } 
+	
     
 	@RequestMapping(value = "/orders/status/{statusType}", method = RequestMethod.GET)
 	@ResponseBody

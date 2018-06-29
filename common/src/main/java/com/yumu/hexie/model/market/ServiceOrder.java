@@ -178,6 +178,7 @@ public class ServiceOrder  extends BaseModel {
 		this.openId = openId;
 		this.items = cart.getItems();
 	}
+	
 	@JsonIgnore
 	@Transient
 	public long getCollocationId(){

@@ -2,14 +2,20 @@ package com.yumu.hexie.model.commonsupport.info;
 
 import java.util.Date;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.Transient;
 
 import org.springframework.util.StringUtils;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.yumu.hexie.common.util.DateUtil;
 import com.yumu.hexie.common.util.StringUtil;
 import com.yumu.hexie.model.BaseModel;
+import com.yumu.hexie.model.market.saleplan.SalePlan;
 
 @Entity
 //商品
@@ -55,7 +61,6 @@ public class Product extends BaseModel {
 	private String showTemplate = "goodDetail";//暂时没用
 	private String orderTemplate = "orderDetail";//暂时没用
 	
-
 	private Date updateDate;
 	private String updateUser;
 	private int provenance;//1 进口 2 国产
@@ -67,6 +72,18 @@ public class Product extends BaseModel {
 	private String secondType = "00";//二级类目
 	private float postageFee = 0;//快递费
 	
+	//商品规格
+	private String spec1;	//商品规格1
+	private String spec1val;//规格1值
+	private String spec2;	//商品规格2
+	private String spec2val;	//规格2值
+	private String spec3;	//商品规格3
+	private String spec3val;	//规格3值
+	
+	@JsonIgnore
+	@ManyToOne(fetch = FetchType.LAZY,cascade = {CascadeType.REFRESH }, optional = true)
+    @JoinColumn(name = "productItemId")
+	private ProductItem productItem;
 	
 	public long getMerchantId() {
 		return merchantId;
@@ -161,9 +178,6 @@ public class Product extends BaseModel {
 		return endDate;
 	}
 	
-	/*public void setEndDate(Date endDate) {
-		this.endDate = endDate;
-	}*/
 	public void setEndDate(String endDate) {
 		this.endDate =DateUtil.getSqlDateFromString(endDate);
 	}
@@ -317,4 +331,143 @@ public class Product extends BaseModel {
 	public void setPostageFee(float postageFee) {
 		this.postageFee = postageFee;
 	}
+	public String getSpec1() {
+		return spec1;
+	}
+	public void setSpec1(String spec1) {
+		this.spec1 = spec1;
+	}
+	public String getSpec1val() {
+		return spec1val;
+	}
+	public void setSpec1val(String spec1val) {
+		this.spec1val = spec1val;
+	}
+	public String getSpec2() {
+		return spec2;
+	}
+	public void setSpec2(String spec2) {
+		this.spec2 = spec2;
+	}
+	public String getSpec2val() {
+		return spec2val;
+	}
+	public void setSpec2val(String spec2val) {
+		this.spec2val = spec2val;
+	}
+	public String getSpec3() {
+		return spec3;
+	}
+	public void setSpec3(String spec3) {
+		this.spec3 = spec3;
+	}
+	public String getSpec3val() {
+		return spec3val;
+	}
+	public void setSpec3val(String spec3val) {
+		this.spec3val = spec3val;
+	}
+	public ProductItem getProductItem() {
+		return productItem;
+	}
+	public void setProductItem(ProductItem productItem) {
+		this.productItem = productItem;
+	}
+
+	@Transient
+	public String getSpecVals(){
+		
+		String values = "";
+		if (!StringUtils.isEmpty(spec1) && !StringUtils.isEmpty(spec1val)) {
+			values += spec1val+",";
+		}
+		if (!StringUtils.isEmpty(spec2) && !StringUtils.isEmpty(spec2val)) {
+			values += spec2val+",";
+		}
+		if (!StringUtils.isEmpty(spec3) && !StringUtils.isEmpty(spec3val)) {
+			values += spec3val+",";
+		}
+		
+		if (!StringUtils.isEmpty(values)) {
+			values = values.substring(0, values.length()-1);
+		}
+		return values;
+		
+	}
+
+	/**
+	 * 设置rule
+	 * @param rule
+	 */
+	public void initRule(SalePlan rule){
+		
+		this.setRuleId(rule.getId());
+		this.setRuleName(rule.getName());
+		this.setRulePrice(rule.getPrice());
+		this.setRuleDiscount(rule.getDiscount());
+		this.setRulePostageFee(rule.getPostageFee());
+		this.setRuleFreeShippingNum(rule.getFreeShippingNum());
+		this.setRuleProductType(rule.getSalePlanType());
+	}
+	
+	@Transient
+	private long ruleId;
+	@Transient
+	private String ruleName;
+	@Transient
+	private float rulePrice;
+	@Transient
+	private String ruleDiscount;
+	@Transient
+	private float rulePostageFee;
+	@Transient
+	private int ruleFreeShippingNum;
+	@Transient
+	private int ruleProductType;
+
+	public long getRuleId() {
+		return ruleId;
+	}
+	public void setRuleId(long ruleId) {
+		this.ruleId = ruleId;
+	}
+	public String getRuleName() {
+		return ruleName;
+	}
+	public void setRuleName(String ruleName) {
+		this.ruleName = ruleName;
+	}
+	public float getRulePrice() {
+		return rulePrice;
+	}
+	public void setRulePrice(float rulePrice) {
+		this.rulePrice = rulePrice;
+	}
+	public String getRuleDiscount() {
+		return ruleDiscount;
+	}
+	public void setRuleDiscount(String ruleDiscount) {
+		this.ruleDiscount = ruleDiscount;
+	}
+	public float getRulePostageFee() {
+		return rulePostageFee;
+	}
+	public void setRulePostageFee(float rulePostageFee) {
+		this.rulePostageFee = rulePostageFee;
+	}
+	public int getRuleFreeShippingNum() {
+		return ruleFreeShippingNum;
+	}
+	public void setRuleFreeShippingNum(int ruleFreeShippingNum) {
+		this.ruleFreeShippingNum = ruleFreeShippingNum;
+	}
+	public int getRuleProductType() {
+		return ruleProductType;
+	}
+	public void setRuleProductType(int ruleProductType) {
+		this.ruleProductType = ruleProductType;
+	}
+	
+	
+	
 }

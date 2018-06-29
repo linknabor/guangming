@@ -1,11 +1,15 @@
 package com.yumu.hexie.service.sales.impl;
 
+import java.util.List;
+
 import javax.inject.Inject;
 
 import org.springframework.stereotype.Service;
 
 import com.yumu.hexie.model.ModelConstant;
 import com.yumu.hexie.model.commonsupport.info.Product;
+import com.yumu.hexie.model.commonsupport.info.ProductItem;
+import com.yumu.hexie.model.commonsupport.info.ProductItemRepository;
 import com.yumu.hexie.model.commonsupport.info.ProductRepository;
 import com.yumu.hexie.service.exception.BizValidateException;
 import com.yumu.hexie.service.sales.ProductService;
@@ -15,12 +19,24 @@ public class ProductServiceImpl implements ProductService {
 
 	@Inject
 	private ProductRepository productRepository;
+	@Inject
+	private ProductItemRepository productItemRepository;
 
 	@Override
 	public Product getProduct(long productId) {
 		return productRepository.findOne(productId);
 	}
 
+	@Override
+	public List<Product> getAllProduct() {
+		return productRepository.findAll();
+	}
+
+	@Override
+	public List<Product> getByNameProduct(String name) {
+		return productRepository.getByNameProduct(name);
+	}
+	
 	@Override
 	public void checkSalable(Product product, int count) {
 		if(product.getStatus() != ModelConstant.PRODUCT_ONSALE){
@@ -38,6 +54,7 @@ public class ProductServiceImpl implements ProductService {
 	public void freezeCount(Product product, int count) {
 		product.setFreezeNum(product.getFreezeNum() +count);
 		productRepository.save(product);
+		
 	}
 
 	@Override
@@ -53,5 +70,18 @@ public class ProductServiceImpl implements ProductService {
 		Product product = productRepository.findOne(productId);
 		product.setFreezeNum(product.getFreezeNum()-count);
 		productRepository.save(product);
+	}
+
+	@Override
+	public List<Product> getProductsByItem(long productItemId) {
+		
+		ProductItem productItem = productItemRepository.findOne(productItemId); 
+		return productRepository.findByProductItemAndStatus(productItem, ModelConstant.PRODUCT_ONSALE);
+	}
+
+	@Override
+	public ProductItem getProdcutItemById(long productItemId) {
+
+		return productItemRepository.findOne(productItemId);
 	}
 }

@@ -4,11 +4,15 @@
  */
 package com.yumu.hexie.service.sales;
 
+import java.util.List;
+
+import com.yumu.hexie.model.commonsupport.info.ProductItem;
 import com.yumu.hexie.model.market.OrderItem;
 import com.yumu.hexie.model.market.ServiceOrder;
 import com.yumu.hexie.model.market.saleplan.SalePlan;
 import com.yumu.hexie.model.payment.PaymentOrder;
 import com.yumu.hexie.model.user.Address;
+import com.yumu.hexie.model.user.User;
 
 /**
  * <pre>
@@ -24,5 +28,8 @@ public interface CustomOrderService {
     public void postOrderCancel(ServiceOrder order);
     public void postOrderConfirm(ServiceOrder order) ;
     public void validateRule(ServiceOrder order,SalePlan rule, OrderItem item, Address address);
-    
+    public List<ProductItem> findProductItem(User user, int productType, int page);
+    public List<ProductItem> findHotProductItem(User user, int productType, int page);
+    public List<SalePlan> findSalePlanByProductItem(long productItemId);
+
 }

@@ -1,5 +1,6 @@
 package com.yumu.hexie.model.redis;
 
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
 import javax.inject.Inject;
@@ -116,6 +117,30 @@ public class RedisRepository {
     	stringRedisTemplate.delete(Keys.pushOrderRequestKey(key));
     }
 
+    /* 新版购物车 */
+    
+    public Object getBuyerCartByKey(long userId, String valueKey) {
+    	return stringRedisTemplate.opsForHash().get(Keys.uidCardKey(userId), valueKey);
+    	
+    }
+    
+    public void setBuyerCart(long userId, Map<String, String> map) {
+    	stringRedisTemplate.opsForHash().putAll(Keys.uidCardKey(userId), map);
+    }
+    
+    public void incrementBuyerCart(long userId, String hashKey, long acount) {
+    	stringRedisTemplate.opsForHash().increment(Keys.uidCardKey(userId), hashKey, acount);
+    }
+    
+    public void deleteBuyerCart(long userId, String hashKey) {
+    	stringRedisTemplate.opsForHash().delete(Keys.uidCardKey(userId), hashKey);
+    }
+    
+    public Map<?, ?> getBuyerCart(long userId) {
+    	return stringRedisTemplate.opsForHash().entries(Keys.uidCardKey(userId));
+    }
+    
+    
 //    
 //    public void put(String key, String value, Long expireDate) {
 //        stringRedisTemplate.opsForValue().set(key, value, expireDate, TimeUnit.MINUTES);

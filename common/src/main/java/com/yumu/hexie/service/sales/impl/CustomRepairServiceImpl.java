@@ -10,6 +10,7 @@ import javax.inject.Inject;
 
 import org.springframework.stereotype.Service;
 
+import com.yumu.hexie.model.commonsupport.info.ProductItem;
 import com.yumu.hexie.model.localservice.repair.RepairOrder;
 import com.yumu.hexie.model.localservice.repair.RepairOrderRepository;
 import com.yumu.hexie.model.market.OrderItem;
@@ -18,6 +19,7 @@ import com.yumu.hexie.model.market.saleplan.RepairSaleRule;
 import com.yumu.hexie.model.market.saleplan.SalePlan;
 import com.yumu.hexie.model.payment.PaymentOrder;
 import com.yumu.hexie.model.user.Address;
+import com.yumu.hexie.model.user.User;
 
 /**
  * <pre>
@@ -93,5 +95,27 @@ public class CustomRepairServiceImpl extends CustomOrderServiceImpl {
     public void postOrderCancel(ServiceOrder order) {
     }
 
+	@Override
+	public List<ProductItem> findProductItem(User user, int productType, int page) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<ProductItem> findHotProductItem(User user, int productType,
+			int page) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public List<SalePlan> findSalePlanByProductItem(long productItemId) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+    
+    
+    
     
 }
