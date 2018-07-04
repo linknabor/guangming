@@ -34,18 +34,22 @@ import com.yumu.hexie.model.distribution.region.MerchantRepository;
 import com.yumu.hexie.model.market.ServiceOrder;
 import com.yumu.hexie.model.market.marketOrder.BuyerCart;
 import com.yumu.hexie.model.market.marketOrder.BuyerItem;
+import com.yumu.hexie.model.market.marketOrder.BuyerList;
 import com.yumu.hexie.model.market.marketOrder.req.BuyerOrderReq;
 import com.yumu.hexie.model.market.marketOrder.req.CartItemOrderReq;
 import com.yumu.hexie.model.market.saleplan.OnSaleRule;
 import com.yumu.hexie.model.market.saleplan.OnSaleRuleRepository;
 import com.yumu.hexie.model.redis.Keys;
 import com.yumu.hexie.model.redis.RedisRepository;
+import com.yumu.hexie.model.user.Address;
 import com.yumu.hexie.model.user.User;
 import com.yumu.hexie.model.user.UserRepository;
 import com.yumu.hexie.service.sales.BaseOrderService;
 import com.yumu.hexie.service.sales.ProductService;
+import com.yumu.hexie.service.user.AddressService;
 import com.yumu.hexie.web.BaseController;
 import com.yumu.hexie.web.BaseResult;
+import com.yumu.hexie.web.user.AddressController;
 
 @Controller(value = "buyerCartController")
 public class BuyerCartController extends BaseController {
@@ -69,6 +73,10 @@ public class BuyerCartController extends BaseController {
 	@Inject
     protected UserRepository userRepository;
 	
+	@Inject
+    private AddressService addressService;
+	
+	
 	/**
 	 * 添加购物车
 	 * @param user
@@ -82,24 +90,9 @@ public class BuyerCartController extends BaseController {
 	@ResponseBody
 	public BaseResult<?> buyerCart(@ModelAttribute(Constants.USER)User user, @RequestParam(required = true) Long skuId, @RequestParam(required = true) Long ruleId, @RequestParam(required = true) Integer amount, HttpServletRequest request, HttpServletResponse response){
 		try {
-//			ObjectMapper om = new ObjectMapper();
-//			om.setSerializationInclusion(Include.NON_NULL);
 			
 			BuyerCart buyerCart = new BuyerCart();
 			//1.获取Cookie中的购物车
-//			Cookie[] cookies = request.getCookies();
-//			if (null != cookies && cookies.length > 0) {
-//				for (Cookie cookie : cookies) {
-//					if (Constants.BUYER_CART.equals(cookie.getName())) {
-//						buyerCart = om.readValue(cookie.getValue(), BuyerCart.class);
-//						break;
-//					}
-//				}
-//			}
-			//2.Cookie中没有购物车, 创建购物车对象
-//			if (null == buyerCart) {
-//				buyerCart = new BuyerCart();
-//			}
 
 			//3.将当前款商品追加到购物车
 			Product sku = new Product();
@@ -124,11 +117,6 @@ public class BuyerCartController extends BaseController {
 			
 			//4.将购物车追加到Redis中
 			insertBuyerCartToRedis(buyerCart, user.getId());
-			//5, 清空Cookie 设置存活时间为0, 立马销毁
-//			Cookie cookie = new Cookie(Constants.BUYER_CART, null);
-//			cookie.setPath("/");
-//			cookie.setMaxAge(-0);
-//			response.addCookie(cookie);
 		} catch(Exception e) {
 			return BaseResult.fail(e.getMessage());
 		}
@@ -212,6 +200,8 @@ public class BuyerCartController extends BaseController {
 	@RequestMapping(value="/buyer/trueBuy", method = RequestMethod.POST)
 	@ResponseBody
 	public BaseResult<List<BuyerCart>> trueBuy(@ModelAttribute(Constants.USER)User user, @RequestBody(required = true) CartItemOrderReq req) {
+		
+		BuyerList buyerLists = new BuyerList();
 		List<BuyerCart> list = new ArrayList<BuyerCart>();
 		try {
 			
@@ -293,6 +283,13 @@ public class BuyerCartController extends BaseController {
 				for (String key : map.keySet()) {
 					list.add(map.get(key));
 				}
+				
+				//获取默认地址
+				Address addr = addressService.queryDefaultAddress(user);
+				
+				buyerLists.setBuyerCart(list);
+				buyerLists.setAddr(addr);
+				
 			} else {
 				return new BaseResult().failMsg("购买商品不存在，请确认后下单!");
 			}
@@ -301,7 +298,7 @@ public class BuyerCartController extends BaseController {
 			return new BaseResult().failMsg(e.getMessage());
 		}
 		
-		return new BaseResult().success(list);
+		return new BaseResult().success(buyerLists);
 	}
 	
 	/**
