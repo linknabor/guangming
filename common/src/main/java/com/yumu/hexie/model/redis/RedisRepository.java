@@ -136,7 +136,7 @@ public class RedisRepository {
     	stringRedisTemplate.opsForHash().delete(Keys.uidCardKey(userId), hashKey);
     }
     
-    public Map<?, ?> getBuyerCart(long userId) {
+    public Map<Object, Object> getBuyerCart(long userId) {
     	return stringRedisTemplate.opsForHash().entries(Keys.uidCardKey(userId));
     }
     

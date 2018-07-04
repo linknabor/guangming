@@ -416,11 +416,11 @@ public class BaseOrderServiceImpl extends BaseOrderProcessor implements BaseOrde
 	public List<ServiceOrder> createOrder(BuyerOrderReq buyerOrderReq, long userId, String openId) {
 		
 		List<ServiceOrder> list = new ArrayList<ServiceOrder>();
-		//1. 填充地址信息
 		
 		List<CartItemOrderReq> cartItem = buyerOrderReq.getBuyerOrderReq();
 		for (int i = 0; i < cartItem.size(); i++) {
 			
+			//1. 填充地址信息
 			ServiceOrder serviceOrder = new ServiceOrder();
 			serviceOrder.setOrderType(ModelConstant.ORDER_TYPE_ONSALE);
 			serviceOrder.setServiceAddressId(buyerOrderReq.getServiceAddressId());
@@ -444,7 +444,6 @@ public class BaseOrderServiceImpl extends BaseOrderProcessor implements BaseOrde
 			
 			List<OrderItem> items = new ArrayList<OrderItem>();
 			
-			
 			for (int j = 0; j < sukArr.length; j++) {
 				long sukId = Long.parseLong(sukArr[j]);
 				long ruleId = Long.parseLong(ruleArr[j]);
@@ -458,6 +457,13 @@ public class BaseOrderServiceImpl extends BaseOrderProcessor implements BaseOrde
 				//获取商品信息
 				Product product = productService.getProduct(sukId);
 				
+				//当前库存
+				int stock = product.getTotalCount() - product.getSaledNum();
+				
+				if (stock < Integer.parseInt(o.toString())) {
+					throw new BizValidateException("商品库存不足").setError();
+				}
+				
 				SalePlan salePlan = salePlanService.getService(serviceOrder.getOrderType()).findSalePlan(ruleId);
 				
 				OrderItem orderItem = new OrderItem();
@@ -467,6 +473,10 @@ public class BaseOrderServiceImpl extends BaseOrderProcessor implements BaseOrde
 				orderItem.setRuleId(ruleId);
 				
 				items.add(orderItem);
+				
+				//5.修改库存
+				productService.saledCount(sukId, orderItem.getCount());
+				
 			}
 			serviceOrder.setUserId(userId);
 			serviceOrder.setItems(items);
@@ -505,7 +515,7 @@ public class BaseOrderServiceImpl extends BaseOrderProcessor implements BaseOrde
 		List<PaymentOrder> payments = new ArrayList<PaymentOrder>();
 		for (int i = 0; i < orders.size(); i++) {
 			ServiceOrder order = orders.get(i);
-			log.warn("[requestPay] OrderNo:" + order.getOrderNo());
+			log.warn("[requestPays] OrderNo:" + order.getOrderNo());
 			
 			//校验订单状态
 			if(!order.payable()){
@@ -516,13 +526,14 @@ public class BaseOrderServiceImpl extends BaseOrderProcessor implements BaseOrde
 			PaymentOrder pay = paymentService.fetchPaymentOrderHaveId(order, paymentNo);
 			
 			payments.add(pay);
-	        log.warn("[requestPay] PaymentId:" + pay.getId());
+			
+	        log.warn("[requestPays] PaymentId:" + pay.getId());
 			
 		}
 		
 		//发起支付
 		JsSign sign = paymentService.requestPays(payments, return_url);
-        log.warn("[requestPay]NonceStr:" + sign.getNonceStr());
+        log.warn("[requestPays]NonceStr:" + sign.getNonceStr());
 		//操作记录
         for (int i = 0; i < orders.size(); i++) {
         	ServiceOrder order = orders.get(i);

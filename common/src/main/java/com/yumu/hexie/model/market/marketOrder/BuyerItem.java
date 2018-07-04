@@ -14,6 +14,8 @@ public class BuyerItem implements Serializable{
 	private Long ruleId; //规则ID
 	private float postageFee; //邮费
 	private boolean skuSelected = false; //商品是否选中，默认false
+	private boolean inStock = true; //是否有货,默认有货
+	private Integer currStock = 0; //当前库存，默认是0
 	
 	
 	public Product getSku() {
@@ -45,6 +47,18 @@ public class BuyerItem implements Serializable{
 	}
 	public void setSkuSelected(boolean skuSelected) {
 		this.skuSelected = skuSelected;
+	}
+	public boolean isInStock() {
+		return inStock;
+	}
+	public void setInStock(boolean inStock) {
+		this.inStock = inStock;
+	}
+	public Integer getCurrStock() {
+		return currStock;
+	}
+	public void setCurrStock(Integer currStock) {
+		this.currStock = currStock;
 	}
 	
 }
