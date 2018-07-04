@@ -38,4 +38,9 @@ public class ProductController extends BaseController{
 		return list;
 	}
 	
+	@RequestMapping(value = "/getByproductCfi", method = RequestMethod.GET)
+	@ResponseBody
+	public List<Product> getByproductCfi(int productcfiid){
+		return product.getByProductCfiId(productcfiid);
+	}
 }

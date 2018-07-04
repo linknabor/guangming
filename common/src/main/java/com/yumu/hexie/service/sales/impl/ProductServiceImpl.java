@@ -11,6 +11,8 @@ import com.yumu.hexie.model.commonsupport.info.Product;
 import com.yumu.hexie.model.commonsupport.info.ProductItem;
 import com.yumu.hexie.model.commonsupport.info.ProductItemRepository;
 import com.yumu.hexie.model.commonsupport.info.ProductRepository;
+import com.yumu.hexie.model.commonsupport.info.Productclassification;
+import com.yumu.hexie.model.commonsupport.info.ProductclassificationRepository;
 import com.yumu.hexie.service.exception.BizValidateException;
 import com.yumu.hexie.service.sales.ProductService;
 
@@ -21,7 +23,9 @@ public class ProductServiceImpl implements ProductService {
 	private ProductRepository productRepository;
 	@Inject
 	private ProductItemRepository productItemRepository;
-
+	@Inject
+	private ProductclassificationRepository productclassificationRepository;
+	
 	@Override
 	public Product getProduct(long productId) {
 		return productRepository.findOne(productId);
@@ -83,5 +87,23 @@ public class ProductServiceImpl implements ProductService {
 	public ProductItem getProdcutItemById(long productItemId) {
 
 		return productItemRepository.findOne(productItemId);
+	}
+
+	@Override
+	public List<Productclassification> getParentProductCfi() {
+		// TODO Auto-generated method stub
+		return productclassificationRepository.getParentProductCfi();
+	}
+
+	@Override
+	public List<Productclassification> getByParentIDProductCfi(int parentid) {
+		// TODO Auto-generated method stub
+		return productclassificationRepository.getByParentIDProductCfi(parentid);
+	}
+
+	@Override
+	public List<Product> getByProductCfiId(int productcfiid) {
+		// TODO Auto-generated method stub
+		return productRepository.getByProductCfiId(productcfiid);
 	}
 }
