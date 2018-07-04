@@ -23,6 +23,7 @@ public interface BaseOrderService {
 	public ServiceOrder createOrder(SingleItemOrder order);
 	//创建订单
 	public ServiceOrder createOrder(CreateOrderReq req,Cart cart,long userId,String openId);
+	//创建订单（多商户）
 	public List<ServiceOrder> createOrder(BuyerOrderReq buyerOrderReq, long userId, String openId);
 	//发起支付
 	public JsSign requestPay(ServiceOrder order, String return_url);
