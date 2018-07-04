@@ -39,6 +39,7 @@ import com.yumu.hexie.model.redis.RedisRepository;
 import com.yumu.hexie.model.user.User;
 import com.yumu.hexie.service.o2o.SendGoodsService;
 import com.yumu.hexie.service.sales.BaseOrderService;
+import com.yumu.hexie.service.sales.CustomOrderService;
 import com.yumu.hexie.service.sales.ProductService;
 import com.yumu.hexie.service.sales.RgroupService;
 import com.yumu.hexie.service.sales.SalePlanService;
@@ -77,6 +78,8 @@ public class OrderController extends BaseController{
 	private SendGoodsService sendGoodsService;
 	@Inject
 	private ServiceOperatorRepository serviceOperatorRepository;
+	@Inject
+    private CustomOrderService customOnSaleService;
 	
 	@RequestMapping(value = "/getProduct/{productId}", method = RequestMethod.GET)
 	@ResponseBody
@@ -89,6 +92,19 @@ public class OrderController extends BaseController{
 	public BaseResult<ProductItemVO> getProductByItem(@PathVariable long productItemId) throws Exception {
 		List<Product> productList = productService.getProductsByItem(productItemId);
 		ProductItem productItem = productService.getProdcutItemById(productItemId);
+		List<SalePlan> ruleList = customOnSaleService.findSalePlanByProductItem(productItemId);
+		
+		for (int i = 0; i < productList.size(); i++) {
+			Product product = productList.get(i);
+			for (int j = 0; j < ruleList.size(); j++) {
+				SalePlan salePlan = ruleList.get(j);
+				if (salePlan.getProductId() == product.getId()) {
+					product.initRule(salePlan);
+				}
+					
+			}
+		}
+		
 		ProductItemVO vo = new ProductItemVO();
 		vo.setProductList(productList);
 		vo.setProductItem(productItem);

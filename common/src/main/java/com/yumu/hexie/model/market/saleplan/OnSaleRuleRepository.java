@@ -5,5 +5,8 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface OnSaleRuleRepository extends JpaRepository<OnSaleRule, Long> {
+	
 	List<OnSaleRule> findAllByProductId(long productId);
+	
+	<T> List<T> findByProductItemIdAndStatus(long productItemId, int status);
 }

@@ -4,7 +4,6 @@
  */
 package com.yumu.hexie.service.payment.impl;
 
-import java.math.BigDecimal;
 import java.util.List;
 
 import javax.inject.Inject;
@@ -15,13 +14,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import sun.nio.cs.ext.Big5;
-
 import com.yumu.hexie.integration.wechat.entity.common.CloseOrderResp;
 import com.yumu.hexie.integration.wechat.entity.common.JsSign;
 import com.yumu.hexie.integration.wechat.entity.common.PaymentOrderResult;
-import com.yumu.hexie.integration.wechat.entity.common.PrePaymentOrder;
-import com.yumu.hexie.integration.wechat.entity.common.WxRefundOrder;
 import com.yumu.hexie.model.localservice.basemodel.BaseO2OService;
 import com.yumu.hexie.model.market.ServiceOrder;
 import com.yumu.hexie.model.payment.PaymentConstant;
@@ -338,5 +333,4 @@ public class PaymentServiceImpl implements PaymentService {
         log.warn("[Payment-req]sign["+sign.getSignature()+"]");
         return sign;
 	}
-
 }
