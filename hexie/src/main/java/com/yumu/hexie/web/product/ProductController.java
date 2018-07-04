@@ -8,6 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.yumu.hexie.model.commonsupport.info.Product;
@@ -28,12 +29,18 @@ public class ProductController extends BaseController{
 	 * @param name
 	 * @return
 	 */
-	@RequestMapping("/search")
+	@RequestMapping(value = "/search", method = RequestMethod.GET)
 	@ResponseBody
-	public List<Product> search(String name) {
+	public List<Product> search(String name)  throws Exception{
 		
 		List<Product> list = product.getByNameProduct(name);
 		
 		return list;
+	}
+	
+	@RequestMapping(value = "/getByproductCfi", method = RequestMethod.GET)
+	@ResponseBody
+	public List<Product> getByproductCfi(int productcfiid){
+		return product.getByProductCfiId(productcfiid);
 	}
 }

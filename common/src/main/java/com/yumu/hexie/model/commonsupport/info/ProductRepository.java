@@ -18,5 +18,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 	List<Product> getByNameProduct(String name);
 
 	List<Product> findByProductItemAndStatus(ProductItem productItem, int status);
+	
+	@Query("from Product where productclassificationid = ?1 and status = 1 AND endDate > NOW() AND startDate < NOW() AND totalCount > 0")
+	List<Product> getByProductCfiId(int productcfiid);
 
 }

@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.yumu.hexie.model.commonsupport.info.Product;
 import com.yumu.hexie.model.commonsupport.info.ProductItem;
+import com.yumu.hexie.model.commonsupport.info.Productclassification;
 
 
 public interface ProductService {
@@ -21,4 +22,10 @@ public interface ProductService {
 	public void freezeCount(Product product,int count);
 	public void unfreezeCount(long productId,int count);
 	public void saledCount(long productId,int count);
+	
+	
+	public List<Productclassification> getParentProductCfi();
+	public List<Productclassification> getByParentIDProductCfi(int parentid);
+	
+	public List<Product> getByProductCfiId(int productcfiid);
 }
