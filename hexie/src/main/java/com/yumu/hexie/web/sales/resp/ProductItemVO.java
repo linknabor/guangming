@@ -75,57 +75,57 @@ public class ProductItemVO implements Serializable {
 
 	private void initSpecs(){
 		
-		String[]specArr = productItem.getSpecList().split(",");
-		String[]specValArr = productItem.getSpecValList().split(",");
-
-		for (int i = 0; i < specArr.length; i++) {
+//		String[]specArr = productItem.getSpecList().split(",");
+//		String[]specValArr = productItem.getSpecValList().split(",");
+//
+//		for (int i = 0; i < specArr.length; i++) {
+//			
+//			if (!StringUtil.isEmpty(specArr[i]) && !StringUtil.isEmpty(specValArr[i])) {
+//				
+//				String[]valArr = this.split(specValArr[i], "|");
+//				List<String> valList = new ArrayList<String>();
+//				for (int j = 0; j < valArr.length; j++) {
+//					if (!StringUtil.isEmpty(valArr[j])) {
+//						valList.add(valArr[j]);
+//					}
+//					
+//				}
+//				
+//				Specification specification = new Specification(specArr[i], valList);
+//				specs.add(specification);
+//
+//			}
+//			
+//		}
+		
+		Map<String, List<String>> map = new HashMap<String, List<String>>();
+		
+		for (int i = 0; i < productList.size(); i++) {
 			
-			if (!StringUtil.isEmpty(specArr[i]) && !StringUtil.isEmpty(specValArr[i])) {
-				
-				String[]valArr = this.split(specValArr[i], "|");
-				List<String> valList = new ArrayList<String>();
-				for (int j = 0; j < valArr.length; j++) {
-					if (!StringUtil.isEmpty(valArr[j])) {
-						valList.add(valArr[j]);
-					}
-					
-				}
-				
-				Specification specification = new Specification(specArr[i], valList);
-				specs.add(specification);
-
-			}
+			Product product = productList.get(i);
+			String spec1 = product.getSpec1();
+			String spec2 = product.getSpec2();
+			String spec3 = product.getSpec3();
+			String spec1val = product.getSpec1val();
+			String spec2val = product.getSpec2val();
+			String spec3val = product.getSpec3val();
+			
+			setSpecs(map, spec1, spec1val);
+			setSpecs(map, spec2, spec2val);
+			setSpecs(map, spec3, spec3val);
+			
 			
 		}
-		
-//		Map<String, List<String>> map = new HashMap<String, List<String>>();
-//		
-//		for (int i = 0; i < productList.size(); i++) {
-//			
-//			Product product = productList.get(i);
-//			String spec1 = product.getSpec1();
-//			String spec2 = product.getSpec2();
-//			String spec3 = product.getSpec3();
-//			String spec1val = product.getSpec1val();
-//			String spec2val = product.getSpec2val();
-//			String spec3val = product.getSpec3val();
-//			
-//			setSpecs(map, spec1, spec1val);
-//			setSpecs(map, spec2, spec2val);
-//			setSpecs(map, spec3, spec3val);
-//			
-//			
-//		}
-//
-//		Iterator<Map.Entry<String, List<String>>> it = map.entrySet().iterator();
-//		while(it.hasNext()){
-//			Map.Entry<String, List<String>> entry = it.next();
-//			String key = entry.getKey();
-//			List<String> valList = entry.getValue();
-//			
-//			Specification specification = new Specification(key, valList);
-//			specs.add(specification);
-//		}
+
+		Iterator<Map.Entry<String, List<String>>> it = map.entrySet().iterator();
+		while(it.hasNext()){
+			Map.Entry<String, List<String>> entry = it.next();
+			String key = entry.getKey();
+			List<String> valList = entry.getValue();
+			
+			Specification specification = new Specification(key, valList);
+			specs.add(specification);
+		}
 		
 		
 	}
