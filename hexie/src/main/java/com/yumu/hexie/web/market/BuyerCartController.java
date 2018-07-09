@@ -185,7 +185,6 @@ public class BuyerCartController extends BaseController {
 			//获取默认地址
 			Address addr = addressService.queryDefaultAddress(user);
 			
-			logger.error("addr is toString : "+ addr.toString());
 			buyerLists.setBuyerCart(list);
 			buyerLists.setAddr(addr);
 			
