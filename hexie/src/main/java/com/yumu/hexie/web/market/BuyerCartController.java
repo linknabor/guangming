@@ -157,7 +157,7 @@ public class BuyerCartController extends BaseController {
 	@RequestMapping(value="/buyer/trueBuy", method = RequestMethod.POST)
 	@ResponseBody
 	public BaseResult<BuyerList> trueBuy(@ModelAttribute(Constants.USER)User user, @RequestBody(required = true) CartItemOrderReq req) {
-		
+		logger.error("user is toString ：" + user.toString());
 		BuyerList buyerLists = new BuyerList();
 		List<BuyerCart> list = new ArrayList<BuyerCart>();
 		try {
@@ -185,6 +185,7 @@ public class BuyerCartController extends BaseController {
 			//获取默认地址
 			Address addr = addressService.queryDefaultAddress(user);
 			
+			logger.error("addr is toString : "+ addr.toString());
 			buyerLists.setBuyerCart(list);
 			buyerLists.setAddr(addr);
 			
