@@ -153,9 +153,7 @@ public class BuyerCartController extends BaseController {
 			}
 			
 			list = getCartItem(user, listSku, false);
-			if (list.size() ==0) {
-				return new BaseResult<List<BuyerCart>>().failMsg("购物车商品异常，请刷新后重试");
-			}
+			
 		} catch(Exception e) {
 			logger.error("/shopping/toCart error : ", e);
 			return new BaseResult<List<BuyerCart>>().failMsg(e.getMessage());
