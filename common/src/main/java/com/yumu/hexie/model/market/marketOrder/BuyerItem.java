@@ -1,9 +1,7 @@
 package com.yumu.hexie.model.market.marketOrder;
 
 import java.io.Serializable;
-
 import com.yumu.hexie.model.commonsupport.info.Product;
-import com.yumu.hexie.model.market.OrderItem;
 
 public class BuyerItem implements Serializable{
 
@@ -14,7 +12,7 @@ public class BuyerItem implements Serializable{
 	private Long ruleId; //规则ID
 	private float postageFee; //邮费
 	private boolean skuSelected = false; //商品是否选中，默认false
-	private boolean inStock = true; //是否有货,默认有货
+	private String inStock; //是否有错，正常是为空，不正常是 会填写相应原因，可能是没库存或已下架或规则到期或商品过期等
 	private Integer currStock = 0; //当前库存，默认是0
 	
 	
@@ -48,10 +46,10 @@ public class BuyerItem implements Serializable{
 	public void setSkuSelected(boolean skuSelected) {
 		this.skuSelected = skuSelected;
 	}
-	public boolean isInStock() {
+	public String isInStock() {
 		return inStock;
 	}
-	public void setInStock(boolean inStock) {
+	public void setInStock(String inStock) {
 		this.inStock = inStock;
 	}
 	public Integer getCurrStock() {
