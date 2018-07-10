@@ -15,7 +15,6 @@ public class BuyerItem implements Serializable{
 	private String inStock; //是否有错，正常是为空，不正常是 会填写相应原因，可能是没库存或已下架或规则到期或商品过期等
 	private Integer currStock = 0; //当前库存，默认是0
 	
-	
 	public Product getSku() {
 		return sku;
 	}
@@ -46,7 +45,7 @@ public class BuyerItem implements Serializable{
 	public void setSkuSelected(boolean skuSelected) {
 		this.skuSelected = skuSelected;
 	}
-	public String isInStock() {
+	public String getInStock() {
 		return inStock;
 	}
 	public void setInStock(String inStock) {

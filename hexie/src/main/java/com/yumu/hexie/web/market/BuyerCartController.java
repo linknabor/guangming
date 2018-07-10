@@ -198,7 +198,6 @@ public class BuyerCartController extends BaseController {
 				return new BaseResult<BuyerList>().failMsg("购物车商品异常，请刷新后重试");
 			}
 			
-			logger.error("111111111111111111:" + list);
 			//获取默认地址
 			Address addr = addressService.queryDefaultAddress(user);
 			

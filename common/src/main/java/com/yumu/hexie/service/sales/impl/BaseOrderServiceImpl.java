@@ -482,6 +482,7 @@ public class BaseOrderServiceImpl extends BaseOrderProcessor implements BaseOrde
 			serviceOrder.setItems(items);
 			serviceOrder.setCouponId(couponId);
 			serviceOrder.setMemo(memo);
+			serviceOrder.setOpenId(openId);
 			
 			//2. 填充订单信息并校验规则,设置价格信息
 			preOrderCreate(serviceOrder, address);
