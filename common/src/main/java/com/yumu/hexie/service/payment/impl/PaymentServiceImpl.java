@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import com.yumu.hexie.integration.wechat.entity.common.CloseOrderResp;
 import com.yumu.hexie.integration.wechat.entity.common.JsSign;
-import com.yumu.hexie.integration.wechat.entity.common.PaymentOrderResult;
 import com.yumu.hexie.model.localservice.basemodel.BaseO2OService;
 import com.yumu.hexie.model.market.ServiceOrder;
 import com.yumu.hexie.model.payment.PaymentConstant;
@@ -107,6 +106,7 @@ public class PaymentServiceImpl implements PaymentService {
     /** 
      * @param payment
      * @return
+     * @throws JSONException 
      * @see com.yumu.hexie.service.payment.PaymentService#requestPay(com.yumu.hexie.model.payment.PaymentOrder)
      */
     @Override
@@ -114,16 +114,21 @@ public class PaymentServiceImpl implements PaymentService {
         validatePayRequest(pay);
         log.warn("[Payment-req]["+pay.getPaymentNo()+"]["+pay.getOrderId()+"]["+pay.getOrderType()+"]");
         //支付然后没继续的情景=----校验所需时间较长，是否需要如此操作
-        if(checkPaySuccess(pay.getPaymentNo())){
-            throw new BizValidateException(pay.getId(),"订单已支付成功，勿重复提交！").setError();
-        }
-        String prepay_id = wechatCoreService.createOrder(pay, return_url);
-        pay.setPrepayId(prepay_id);
+        try {
+			if(checkPaySuccess(pay.getPaymentNo())){
+			    throw new BizValidateException(pay.getId(),"订单已支付成功，勿重复提交！").setError();
+			}
+		} catch (JSONException e) {
+			throw new BizValidateException(pay.getId(),"订单已支付成功，勿重复提交！").setError();
+		}
+        JsSign sign = wechatCoreService.createOrder(pay, return_url);
+        
+        pay.setPrepayId(sign.getPkgStr());
         paymentOrderRepository.save(pay);
         log.warn("[Payment-req]Saved["+pay.getPaymentNo()+"]["+pay.getOrderId()+"]["+pay.getOrderType()+"]");
-        //3. 从微信获取签名
-        JsSign sign = wechatCoreService.getPrepareSign(prepay_id);
-        log.warn("[Payment-req]sign["+sign.getSignature()+"]");
+//        //3. 从微信获取签名
+//        JsSign sign = wechatCoreService.getPrepareSign(prepay_id);
+//        log.warn("[Payment-req]sign["+sign.getSignature()+"]");
         return sign;
     }
     
@@ -139,10 +144,17 @@ public class PaymentServiceImpl implements PaymentService {
         }
     }
 
-    private boolean checkPaySuccess(String paymentNo){
+    private boolean checkPaySuccess(String paymentNo) throws JSONException{
         log.warn("[Payment-check]begin["+paymentNo+"]");
-        PaymentOrderResult poResult = wechatCoreService.queryOrder(paymentNo);
-        return poResult.isSuccess()&&poResult.isPaySuccess();
+        JSONObject poResult = wechatCoreService.queryOrder(paymentNo);
+        log.error("poResult is :" + poResult);
+        if (poResult!=null) {
+        	PaymentOrder order = new PaymentOrder();
+            return order.isSuccess(poResult.getString("pay_status"));
+		} else {
+			return false;
+		}
+        
     }
     /** 
      * @param payment
@@ -151,7 +163,7 @@ public class PaymentServiceImpl implements PaymentService {
      */
     @Override
     public PaymentOrder refreshStatus(PaymentOrder payment, String pay_status, String other_payId) {
-        log.warn("[Payment-refreshStatus]begin["+payment.getOrderType()+"]["+payment.getOrderId()+"]");
+        log.warn("[Payment-refreshStatus]begin["+payment.getOrderType()+"]["+payment.getOrderId()+"]["+pay_status+"]");
         if(payment.getStatus() != PaymentConstant.PAYMENT_STATUS_INIT){
             return payment;
         }
@@ -216,7 +228,8 @@ public class PaymentServiceImpl implements PaymentService {
         }
         validateRefundPayment(po);
         try{
-            if(!wechatCoreService.queryOrder(po.getPaymentNo()).isPaySuccess()){
+        	PaymentOrder order = new PaymentOrder();
+            if(!order.isSuccess(wechatCoreService.queryOrder(po.getPaymentNo()).getString("pay_status"))){
                 log.warn("[Payment-refundApply]notsuccess["+po.getOrderType()+"]["+po.getId()+"]");
                 po.setStatus(PaymentConstant.PAYMENT_STATUS_CANCEL);
                 po.setUpdateDate(System.currentTimeMillis());
@@ -312,24 +325,29 @@ public class PaymentServiceImpl implements PaymentService {
 		//因为是多订单一起支付，所有在paymentorder里面paymentNo是相同的
         
         //支付然后没继续的情景=----校验所需时间较长，是否需要如此操作
-        if(checkPaySuccess(p.getPaymentNo())){
-            throw new BizValidateException(Long.parseLong(p.getPaymentNo()), "订单已支付成功，勿重复提交！").setError();
-        }
+		try {
+			if(checkPaySuccess(p.getPaymentNo())){
+			    throw new BizValidateException(p.getId(),"订单已支付成功，勿重复提交！").setError();
+			}
+		} catch (JSONException e) {
+			throw new BizValidateException(p.getId(),"订单已支付成功，勿重复提交！").setError();
+		}
+        JsSign sign = wechatCoreService.createOrder(p, return_url);
+        
         //获取预支付ID
+        p.setPrepayId(sign.getPkgStr());
         //因为存在多个订单，所有这个把订单的金额累计
         p.setPrice(amount);
-        String prepay_id = wechatCoreService.createOrder(p, return_url);
         
         for (int i = 0; i < payments.size(); i++) {
 			PaymentOrder pay = payments.get(i);
-			pay.setPrepayId(prepay_id);
+			pay.setPrepayId(p.getPrepayId());
 	        paymentOrderRepository.save(pay);
 	        
 	        log.warn("[Payment-req]Saved["+pay.getPaymentNo()+"]["+pay.getOrderId()+"]["+pay.getOrderType()+"]");
 		}
         
         //3. 从微信获取签名
-        JsSign sign = wechatCoreService.getPrepareSign(prepay_id);
         log.warn("[Payment-req]sign["+sign.getSignature()+"]");
         return sign;
 	}

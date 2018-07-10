@@ -26,9 +26,9 @@ public interface WechatCoreService {
     public List<UserWeiXin> getUserList();
 	
 
-	public String createOrder(PaymentOrder payOrder, String return_url);
+	public JsSign createOrder(PaymentOrder payOrder, String return_url);
 	public CloseOrderResp closeOrder(PaymentOrder payOrder);
-	public PaymentOrderResult queryOrder(String out_trade_no);
+	public JSONObject queryOrder(String out_trade_no);
 	public JsSign getPrepareSign(String prepay_id) ;
 	
 	public JSONObject requestRefund(RefundOrder refund);

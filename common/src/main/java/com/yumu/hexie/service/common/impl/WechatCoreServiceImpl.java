@@ -218,7 +218,7 @@ public class WechatCoreServiceImpl implements WechatCoreService {
 	}
 
 	@Override
-	public String createOrder(PaymentOrder payOrder, String return_url) {
+	public JsSign createOrder(PaymentOrder payOrder, String return_url) {
 		try {
 			return FundService.createOrder(payOrder, return_url);
 		} catch (Exception e) {
@@ -238,7 +238,7 @@ public class WechatCoreServiceImpl implements WechatCoreService {
 	
 
 	@Override
-	public PaymentOrderResult queryOrder(String out_trade_no) {
+	public JSONObject queryOrder(String out_trade_no) {
 		try {
 			return FundService.queryOrder(out_trade_no);
 		} catch (Exception e) {

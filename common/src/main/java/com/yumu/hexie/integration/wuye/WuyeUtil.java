@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.databind.JavaType;
 import com.yumu.hexie.common.util.JacksonJsonUtil;
 import com.yumu.hexie.common.util.MyHttpClient;
+import com.yumu.hexie.integration.wechat.entity.common.JsSign;
 import com.yumu.hexie.integration.wuye.resp.BaseResult;
 import com.yumu.hexie.integration.wuye.resp.BillListVO;
 import com.yumu.hexie.integration.wuye.resp.CellListVO;
@@ -186,9 +187,9 @@ public class WuyeUtil {
 	}
 	
 	//16.商品支付
-	public static BaseResult<String> getOrderPay(String trade_no, String openId, String return_url, String price) {
+	public static BaseResult<JsSign> getOrderPay(String trade_no, String openId, String return_url, String price) {
 		String url = REQUEST_ADDRESS + String.format(ORDER_PAY_URL, trade_no, CSPID, openId, return_url, price);
-		return (BaseResult<String>)httpGet(url, String.class);
+		return (BaseResult<JsSign>)httpGet(url, JsSign.class);
 	}
 	
 	//17.商品支付通知查询
