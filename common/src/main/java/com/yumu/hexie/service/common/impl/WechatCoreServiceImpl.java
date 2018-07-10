@@ -224,7 +224,7 @@ public class WechatCoreServiceImpl implements WechatCoreService {
 		} catch (Exception e) {
 			processError(e);
 		}
-		return null;
+		return new JsSign();
 	}
 	@Override
 	public CloseOrderResp closeOrder( PaymentOrder payOrder) {

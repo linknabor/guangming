@@ -198,6 +198,7 @@ public class BuyerCartController extends BaseController {
 				return new BaseResult<BuyerList>().failMsg("购物车商品异常，请刷新后重试");
 			}
 			
+			logger.error("111111111111111111:" + list);
 			//获取默认地址
 			Address addr = addressService.queryDefaultAddress(user);
 			
@@ -393,7 +394,7 @@ public class BuyerCartController extends BaseController {
 				error = e.getMessage();
 				logger.error("检验商品报错 :", e);
 			}
-			buyerItem.setInStock(error);
+			
 			
 			//收费计算运费
 			if (isPostageFee) {
@@ -411,6 +412,7 @@ public class BuyerCartController extends BaseController {
 			buyerItem.setRuleId(Long.parseLong(ruleId));
 			buyerItem.setAmount(Integer.parseInt(sku_num));
 			buyerItem.setCurrStock(product.getCanSaleNum());
+			buyerItem.setInStock(error);
 			
 			items.add(buyerItem);
 			buyerCart.setItems(items);
