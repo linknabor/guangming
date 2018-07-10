@@ -1,4 +1,6 @@
-package com.yumu.hexie.model.jingdong;
+package com.yumu.hexie.model.jingdong.getskuid;
+
+import com.yumu.hexie.model.jingdong.JDParent;
 
 public class JDSkuID extends JDParent{
 

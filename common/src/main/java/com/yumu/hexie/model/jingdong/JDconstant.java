@@ -29,4 +29,24 @@ public class JDconstant {
 	 * 获取商品上下架状态接口
 	 */
 	public static final String SKUSTATE = "skuState";
+	
+	/**
+	 * 获取所有图片信息
+	 */
+	public static final String SKUIMAGE = "skuImage";
+	
+	/**
+	 * 获取下级地址列表
+	 */
+	public static final String GETADRESS = "GetAdress";
+	
+	/**
+	 * 批量获取库存接口
+	 */
+	public static final String GETNEWSTOCKBYID = "getNewStockById";
+	
+	/**
+	 * 商品购买区域限制查询
+	 */
+	public static final String CHECKAREALIMIT = "checkAreaLimit";
 }

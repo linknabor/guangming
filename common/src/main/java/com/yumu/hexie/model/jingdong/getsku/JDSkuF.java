@@ -1,6 +1,6 @@
-package com.yumu.hexie.model.jingdong;
+package com.yumu.hexie.model.jingdong.getsku;
 
-import java.util.List;
+import com.yumu.hexie.model.jingdong.JDGetParent;
 
 public class JDSkuF extends JDGetParent{
 

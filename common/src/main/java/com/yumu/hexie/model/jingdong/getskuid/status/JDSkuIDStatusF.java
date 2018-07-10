@@ -1,6 +1,8 @@
-package com.yumu.hexie.model.jingdong;
+package com.yumu.hexie.model.jingdong.getskuid.status;
 
 import java.util.List;
+
+import com.yumu.hexie.model.jingdong.JDGetParent;
 
 public class JDSkuIDStatusF extends JDGetParent{
 

@@ -1,4 +1,6 @@
-package com.yumu.hexie.model.jingdong;
+package com.yumu.hexie.model.jingdong.token;
+
+import com.yumu.hexie.model.jingdong.JDGetParent;
 
 public class JDTokenF extends JDGetParent{
 

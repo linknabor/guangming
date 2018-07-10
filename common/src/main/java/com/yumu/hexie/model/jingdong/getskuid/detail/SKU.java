@@ -1,4 +1,4 @@
-package com.yumu.hexie.model.jingdong;
+package com.yumu.hexie.model.jingdong.getskuid.detail;
 
 public class SKU {
 	private String sku;//商品编号

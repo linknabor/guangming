@@ -1,5 +1,6 @@
-package com.yumu.hexie.model.jingdong;
+package com.yumu.hexie.model.jingdong.getSecurity;
 
+import com.yumu.hexie.model.jingdong.JDParent;
 
 public class JDLoad extends JDParent{
 
