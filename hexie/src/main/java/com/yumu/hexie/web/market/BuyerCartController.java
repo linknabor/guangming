@@ -252,9 +252,9 @@ public class BuyerCartController extends BaseController {
 	 * @param user
 	 * @param orderId
 	 */
-	@RequestMapping(value="/buyer/requestPay", method = RequestMethod.POST)
+	@RequestMapping(value="/buyer/requestPay", method = RequestMethod.GET)
 	@ResponseBody
-	public BaseResult<JsSign> requestPay(@ModelAttribute(Constants.USER)User user, @RequestBody(required = true) String orderIds) {
+	public BaseResult<JsSign> requestPay(@ModelAttribute(Constants.USER)User user, @RequestParam(required = true) String orderIds) {
 		Properties props = new Properties();
         try {
 			props.load(Thread.currentThread().getContextClassLoader()
@@ -379,10 +379,10 @@ public class BuyerCartController extends BaseController {
 			
 			//获取商品规则信息
 			OnSaleRule saleRule = onSaleRuleRepository.findOne(Long.parseLong(ruleId));
-			
+			String error = "";
 			//校验规则
 			if(!saleRule.valid(Integer.parseInt(o.toString()))){
-				buyerItem.setInStock("商品信息已过期，请重新下单！");
+				error = "商品信息已过期，请重新下单！";
 				logger.error(ModelConstant.EXCEPTION_BIZ_TYPE_ONSALE+" ruleId:" + saleRule.getId()+" 商品信息已过期，请重新下单！");
 	        }
 			
@@ -390,10 +390,10 @@ public class BuyerCartController extends BaseController {
 				//校验商品（库存）
 				productService.checkSalable(product, Integer.parseInt(o.toString()));
 			}catch (Exception e) {
-				buyerItem.setInStock(e.getMessage());
+				error = e.getMessage();
 				logger.error("检验商品报错 :", e);
 			}
-			
+			buyerItem.setInStock(error);
 			
 			//收费计算运费
 			if (isPostageFee) {
