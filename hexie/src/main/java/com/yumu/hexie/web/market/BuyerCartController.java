@@ -254,7 +254,7 @@ public class BuyerCartController extends BaseController {
 	 */
 	@RequestMapping(value="/buyer/requestPay", method = RequestMethod.POST)
 	@ResponseBody
-	public BaseResult<JsSign> requestPay(@ModelAttribute(Constants.USER)User user, @RequestParam(required = true) String orderIds) {
+	public BaseResult<JsSign> requestPay(@ModelAttribute(Constants.USER)User user, @RequestBody(required = true) String orderIds) {
 		Properties props = new Properties();
         try {
 			props.load(Thread.currentThread().getContextClassLoader()
