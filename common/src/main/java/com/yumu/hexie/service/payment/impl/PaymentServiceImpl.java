@@ -122,13 +122,13 @@ public class PaymentServiceImpl implements PaymentService {
 			throw new BizValidateException(pay.getId(),"订单已支付成功，勿重复提交！").setError();
 		}
         JsSign sign = wechatCoreService.createOrder(pay, return_url);
+        if (sign ==null) {
+        	throw new BizValidateException(pay.getId(),"订单支付异常，请刷新后重新提交！").setError();
+		}
         
         pay.setPrepayId(sign.getPkgStr());
         paymentOrderRepository.save(pay);
         log.warn("[Payment-req]Saved["+pay.getPaymentNo()+"]["+pay.getOrderId()+"]["+pay.getOrderType()+"]");
-//        //3. 从微信获取签名
-//        JsSign sign = wechatCoreService.getPrepareSign(prepay_id);
-//        log.warn("[Payment-req]sign["+sign.getSignature()+"]");
         return sign;
     }
     
@@ -311,40 +311,43 @@ public class PaymentServiceImpl implements PaymentService {
 	@Override
 	public JsSign requestPays(List<PaymentOrder> payments, String return_url) {
 		float amount = 0;
-		PaymentOrder p = new PaymentOrder();
+		PaymentOrder pay = new PaymentOrder();
 		for (int i = 0; i < payments.size(); i++) {
-			PaymentOrder pay = payments.get(i);
-			validatePayRequest(pay);
+			PaymentOrder p = payments.get(i);
+			validatePayRequest(p);
 			
-			log.warn("[Payment-req]["+pay.getPaymentNo()+"]["+pay.getOrderId()+"]["+pay.getOrderType()+"]");
+			log.warn("[Payment-req]["+p.getPaymentNo()+"]["+p.getOrderId()+"]["+p.getOrderType()+"]");
 			
-			amount += pay.getPrice();
-			p = pay;
+			amount += p.getPrice();
+			pay = p;
 		}
 		
 		//因为是多订单一起支付，所有在paymentorder里面paymentNo是相同的
         
         //支付然后没继续的情景=----校验所需时间较长，是否需要如此操作
 		try {
-			if(checkPaySuccess(p.getPaymentNo())){
-			    throw new BizValidateException(p.getId(),"订单已支付成功，勿重复提交！").setError();
+			if(checkPaySuccess(pay.getPaymentNo())){
+			    throw new BizValidateException(pay.getId(),"订单已支付成功，勿重复提交！").setError();
 			}
 		} catch (JSONException e) {
-			throw new BizValidateException(p.getId(),"订单已支付成功，勿重复提交！").setError();
+			throw new BizValidateException(pay.getId(),"订单已支付成功，勿重复提交！").setError();
 		}
-        JsSign sign = wechatCoreService.createOrder(p, return_url);
+        JsSign sign = wechatCoreService.createOrder(pay, return_url);
         
+        if (sign ==null) {
+        	throw new BizValidateException(pay.getId(),"订单支付异常，请刷新后重新提交！").setError();
+		}
         //获取预支付ID
-        p.setPrepayId(sign.getPkgStr());
+        pay.setPrepayId(sign.getPkgStr());
         //因为存在多个订单，所有这个把订单的金额累计
-        p.setPrice(amount);
+        pay.setPrice(amount);
         
         for (int i = 0; i < payments.size(); i++) {
-			PaymentOrder pay = payments.get(i);
-			pay.setPrepayId(p.getPrepayId());
-	        paymentOrderRepository.save(pay);
+			PaymentOrder p = payments.get(i);
+			pay.setPrepayId(pay.getPrepayId());
+	        paymentOrderRepository.save(p);
 	        
-	        log.warn("[Payment-req]Saved["+pay.getPaymentNo()+"]["+pay.getOrderId()+"]["+pay.getOrderType()+"]");
+	        log.warn("[Payment-req]Saved["+p.getPaymentNo()+"]["+p.getOrderId()+"]["+p.getOrderType()+"]");
 		}
         
         //3. 从微信获取签名
