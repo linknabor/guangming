@@ -5,6 +5,10 @@ public final class Keys {
     public static String uidCardKey(Long uid) {
         return String.format("uid:%d:cart", uid);
     }
+    public static String uidNewCardKey(Long uid) {
+        return String.format("guangming.uid:%d:cart", uid);
+    }
+    
     public static String uidHomeCardKey(Long uid) {
         return String.format("uid:%d:homeCart", uid);
     }
