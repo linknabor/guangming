@@ -185,24 +185,16 @@ public class WuyeUtil {
 	}
 	
 	//16.商品支付
-	public static BaseResult<JsSign> getOrderPay(String trade_no, String openId, String return_url, String price) throws ValidationException {
+	public static BaseResult<JsSign> getOrderPay(String trade_no, String openId, String return_url, String price) {
 		String url = REQUEST_ADDRESS + String.format(ORDER_PAY_URL, trade_no, CSPID, openId, return_url, price);
 		BaseResult<JsSign> result = (BaseResult<JsSign>)httpGet(url, JsSign.class);
-		
-		if (!result.isSuccess()) {
-			throw new ValidationException(result.getData().toString());
-		}
 		return result;
 	}
 	
 	//17.商品支付通知查询
-	public static BaseResult<JSONObject> notifyPayed(String trade_no) throws ValidationException {
+	public static BaseResult<JSONObject> notifyPayed(String trade_no){
 		String url = REQUEST_ADDRESS + String.format(ORDER_NOTIFY_URL, trade_no, CSPID);
 		BaseResult<JSONObject> result = (BaseResult<JSONObject>)httpGet(url, String.class);
-		
-		if (!result.isSuccess() && !StringUtil.isEmpty(result.getData())) {
-			throw new ValidationException(result.getData().toString());
-		}
 		return result;
 	}
 	
