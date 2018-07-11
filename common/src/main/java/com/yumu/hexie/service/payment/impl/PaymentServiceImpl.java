@@ -16,7 +16,6 @@ import org.springframework.stereotype.Service;
 
 import com.yumu.hexie.integration.wechat.entity.common.CloseOrderResp;
 import com.yumu.hexie.integration.wechat.entity.common.JsSign;
-import com.yumu.hexie.integration.wechat.entity.common.PaymentOrderResult;
 import com.yumu.hexie.model.localservice.basemodel.BaseO2OService;
 import com.yumu.hexie.model.market.ServiceOrder;
 import com.yumu.hexie.model.payment.PaymentConstant;

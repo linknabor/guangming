@@ -186,5 +186,14 @@ public class Address  extends BaseModel{
     public void setXiaoquAddr(String xiaoquAddr) {
         this.xiaoquAddr = xiaoquAddr;
     }
+	@Override
+	public String toString() {
+		return "Address [amapId=" + amapId + ", amapDetailAddr=" + amapDetailAddr + ", provinceId=" + provinceId
+				+ ", province=" + province + ", cityId=" + cityId + ", city=" + city + ", countyId=" + countyId
+				+ ", county=" + county + ", xiaoquId=" + xiaoquId + ", xiaoquName=" + xiaoquName + ", longitude="
+				+ longitude + ", latitude=" + latitude + ", userId=" + userId + ", userName=" + userName
+				+ ", receiveName=" + receiveName + ", detailAddress=" + detailAddress + ", tel=" + tel + ", main="
+				+ main + ", xiaoquEntId=" + xiaoquEntId + ", xiaoquAddr=" + xiaoquAddr + "]";
+	}
 	
 }
