@@ -49,4 +49,9 @@ public class JDconstant {
 	 * 商品购买区域限制查询
 	 */
 	public static final String CHECKAREALIMIT = "checkAreaLimit";
+	
+	/**
+	 *  批量查询协议价价格
+	 */
+	public static final String GETPRICE = "getPrice";
 }

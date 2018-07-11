@@ -14,14 +14,24 @@ import com.yumu.hexie.integration.jingdong.JDOrderService;
 import com.yumu.hexie.integration.provider.ilohas.service.ProviderOrderService;
 import com.yumu.hexie.model.jingdong.JDconstant;
 import com.yumu.hexie.model.jingdong.getSecurity.JDLoad;
+import com.yumu.hexie.model.jingdong.getSecurity.JDSecurity;
 import com.yumu.hexie.model.jingdong.getaddress.JDAddress;
+import com.yumu.hexie.model.jingdong.getaddress.JDAddressF;
 import com.yumu.hexie.model.jingdong.getsku.JDSku;
+import com.yumu.hexie.model.jingdong.getsku.JDSkuF;
 import com.yumu.hexie.model.jingdong.getskuid.JDSkuID;
+import com.yumu.hexie.model.jingdong.getskuid.detail.JDSkuIDF;
+import com.yumu.hexie.model.jingdong.getskuid.image.JDSkuIdImageF;
+import com.yumu.hexie.model.jingdong.getskuid.price.PriceF;
+import com.yumu.hexie.model.jingdong.getskuid.status.JDSkuIDStatusF;
 import com.yumu.hexie.model.jingdong.getstock.SkuNums;
 import com.yumu.hexie.model.jingdong.getstock.Stock;
+import com.yumu.hexie.model.jingdong.getstock.StockF;
 import com.yumu.hexie.model.jingdong.gettype.Classification;
 import com.yumu.hexie.model.jingdong.limitregion.JDRegion;
+import com.yumu.hexie.model.jingdong.limitregion.JDRegionF;
 import com.yumu.hexie.model.jingdong.token.JDToken;
+import com.yumu.hexie.model.jingdong.token.JDTokenF;
 import com.yumu.hexie.service.jingdong.JDService;
 
 public class JDServiceImpl implements JDService{
@@ -32,183 +42,84 @@ public class JDServiceImpl implements JDService{
 	 * 获取安全码
 	 */
 	@Override
-	public String getTokenSafeCode() {
+	public JDSecurity getTokenSafeCode(JDLoad load) {
 		// TODO Auto-generated method stub
-		JDLoad load = new JDLoad();
-		load.setFunc(JDconstant.GETTOKENSAFECODE);
-		load.setUsername(JDconstant.USERNAME);
-		load.setPassword(JDconstant.PASSWORD);
-		load.setApi_name(JDconstant.API_NAME);
-		load.setApi_secret(JDconstant.API_SECRET);
-		
-		String json = "";
 		try {
-			json = JacksonJsonUtil.beanToJson(load);
+			return getAll(load,JDSecurity.class);
 		} catch (JSONException e) {
 			e.printStackTrace();
-		} 
-		String response = "";
-		Map<String, String> map = new HashMap<String, String>();
-		map.put("param", json);
-		try {
-//			response = HttpUtil.doPostJsonStr(JDOrderService.JD_URL, json, JDOrderService.DEFAULT_CHARACTER);
-			response = HttpUtil.doPostMap(JDOrderService.JD_URL, map, JDOrderService.DEFAULT_CHARACTER);
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
-		logger.info("response is : " + response);
-		return response;
+		return null;
 	}
 
 	/**
 	 * 获取token
 	 */
 	@Override
-	public String getApiToken(String safecode) {
+	public JDTokenF getApiToken(JDToken token) {
 		// TODO Auto-generated method stub
-		JDToken token = new JDToken();
-		token.setFunc(JDconstant.GETAPITOKEN);
-		token.setUsername(JDconstant.USERNAME);
-		token.setPassword(JDconstant.PASSWORD);
-		token.setApi_name(JDconstant.API_NAME);
-		token.setApi_secret(JDconstant.API_SECRET);
-		token.setSafecode(safecode);
-		
-		String json = "";
 		try {
-			json = JacksonJsonUtil.beanToJson(token);
+			return getAll(token,JDTokenF.class);
 		} catch (JSONException e) {
 			e.printStackTrace();
-		} 
-		String response = "";
-		Map<String, String> map = new HashMap<String, String>();
-		map.put("param", json);
-		try {
-			response = HttpUtil.doPostMap(JDOrderService.JD_URL, map, JDOrderService.DEFAULT_CHARACTER);
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
-		logger.info("response is : " + response);
-		return response;
+		return null;
 	}
 
 	/**
 	 * 获取所有sku
 	 */
 	@Override
-	public String getSku(String token, String page) {
+	public JDSkuF getSku(JDSku sku) {
 		// TODO Auto-generated method stub
-		JDSku sku = new JDSku();
-		sku.setFunc(JDconstant.GETSKU);
-		sku.setToken(token);
-		sku.setPage(page);
-		
-		String json = "";
 		try {
-			json = JacksonJsonUtil.beanToJson(sku);
+			return getAll(sku,JDSkuF.class);
 		} catch (JSONException e) {
 			e.printStackTrace();
-		} 
-		String response = "";
-		Map<String, String> map = new HashMap<String, String>();
-		map.put("param", json);
-		try {
-			response = HttpUtil.doPostMap(JDOrderService.JD_URL, map, JDOrderService.DEFAULT_CHARACTER);
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
-		logger.info("response is : " + response);
-		return response;
+		return null;
 	}
 
 	/**
 	 * 根据商品id获取详细信息
 	 */
 	@Override
-	public String skuDetail(String token, String sku) {
+	public JDSkuIDF skuDetail(JDSkuID skuid) {
 		// TODO Auto-generated method stub
-		JDSkuID skuid = new JDSkuID();
-		skuid.setFunc(JDconstant.SKUDETAIL);
-		skuid.setToken(token);
-		skuid.setSku(sku);
-		
-		
-		String json = "";
 		try {
-			json = JacksonJsonUtil.beanToJson(skuid);
+			return getAll(skuid,JDSkuIDF.class);
 		} catch (JSONException e) {
 			e.printStackTrace();
-		} 
-		String response = "";
-		Map<String, String> map = new HashMap<String, String>();
-		map.put("param", json);
-		try {
-			response = HttpUtil.doPostMap(JDOrderService.JD_URL, map, JDOrderService.DEFAULT_CHARACTER);
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
-		logger.info("response is : " + response);
-		return response;
+		return null;
 	}
 
 	/**
 	 * 获取商品上下架状态
 	 */
 	@Override
-	public String skuState(String token, String skus) {
+	public JDSkuIDStatusF skuState(JDSkuID skuid) {
 		// TODO Auto-generated method stub
-		JDSkuID skuid = new JDSkuID();
-		skuid.setFunc(JDconstant.SKUSTATE);
-		skuid.setToken(token);
-		skuid.setSku(skus);
-		
-		
-		String json = "";
 		try {
-			json = JacksonJsonUtil.beanToJson(skuid);
+			return getAll(skuid,JDSkuIDStatusF.class);
 		} catch (JSONException e) {
 			e.printStackTrace();
-		} 
-		String response = "";
-		Map<String, String> map = new HashMap<String, String>();
-		map.put("param", json);
-		try {
-			response = HttpUtil.doPostMap(JDOrderService.JD_URL, map, JDOrderService.DEFAULT_CHARACTER);
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
-		logger.info("response is : " + response);
-		return response;
+		return null;
 	}
 
 	/**
 	 * 获取所有图片信息 skus最多100个  用,隔开
 	 */
 	@Override
-	public String skuImage(String token, String skus) {
+	public JDSkuIdImageF skuImage(JDSkuID skuid) {
 		// TODO Auto-generated method stub
-		JDSkuID skuid = new JDSkuID();
-		skuid.setFunc(JDconstant.SKUIMAGE);
-		skuid.setToken(token);
-		skuid.setSku(skus);
-		
-		
-		String json = "";
 		try {
-			json = JacksonJsonUtil.beanToJson(skuid);
+			return getAll(skuid,JDSkuIdImageF.class);
 		} catch (JSONException e) {
 			e.printStackTrace();
-		} 
-		String response = "";
-		Map<String, String> map = new HashMap<String, String>();
-		map.put("param", json);
-		try {
-			response = HttpUtil.doPostMap(JDOrderService.JD_URL, map, JDOrderService.DEFAULT_CHARACTER);
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
-		logger.info("response is : " + response);
-		return response;
+		return null;
 	}
 	
 	/**
@@ -240,75 +151,63 @@ public class JDServiceImpl implements JDService{
 	 *  获取下级地址列表
 	 */
 	@Override
-	public String GetAdress(String token, String parentid) {
+	public JDAddressF GetAdress(JDAddress addre) {
 		// TODO Auto-generated method stub
-		// TODO Auto-generated method stub
-		JDAddress addre = new JDAddress();
-		addre.setFunc(JDconstant.GETADRESS);
-		addre.setToken(token);
-		addre.setParent_id(parentid);
-		
-		
-		String json = "";
 		try {
-			json = JacksonJsonUtil.beanToJson(addre);
+			return getAll(addre,JDAddressF.class);
 		} catch (JSONException e) {
 			e.printStackTrace();
-		} 
-		String response = "";
-		Map<String, String> map = new HashMap<String, String>();
-		map.put("param", json);
-		try {
-			response = HttpUtil.doPostMap(JDOrderService.JD_URL, map, JDOrderService.DEFAULT_CHARACTER);
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
-		logger.info("response is : " + response);
-		return response;
+		return null;
 	}
 
 	/**
 	 * 批量获取库存接口 
 	 */
 	@Override
-	public String GetNewStockById(String token,String area, List<SkuNums> skuNums) {
+	public StockF GetNewStockById(Stock sto) {
 		// TODO Auto-generated method stub
-		Stock sto = new Stock();
-		sto.setFunc(JDconstant.GETNEWSTOCKBYID);
-		sto.setToken(token);
-		sto.setArea(area);
-		sto.setSkuNums(skuNums);
-		
-		String json = "";
 		try {
-			json = JacksonJsonUtil.beanToJson(sto);
+			return getAll(sto,StockF.class);
 		} catch (JSONException e) {
 			e.printStackTrace();
-		} 
-		String response = "";
-		Map<String, String> map = new HashMap<String, String>();
-		map.put("param", json);
-		try {
-			response = HttpUtil.doPostMap(JDOrderService.JD_URL, map, JDOrderService.DEFAULT_CHARACTER);
-		} catch (Exception e) {
-			e.printStackTrace();
 		}
-		logger.info("response is : " + response);
-		return response;
+		return null;
 	}
 
+	/**
+	 * 商品购买区域限制查询
+	 */
 	@Override
-	public String CheckAreaLimit(String token, String area, String skuids) {
+	public JDRegionF CheckAreaLimit(JDRegion region) {
 		// TODO Auto-generated method stub
-		JDRegion region = new JDRegion();
-		region.setFunc(JDconstant.CHECKAREALIMIT);
-		region.setToken(token);
-		region.setArea(area);
-		region.setSkuIds(skuids);
-		
+		try {
+			return getAll(region,JDRegionF.class);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	/**
+	 * 批量获取协议价价格
+	 */
+	@Override
+	public PriceF getPrice(JDSkuID sku) {
+		// TODO Auto-generated method stub
+		try {
+			return getAll(sku,PriceF.class);
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	private <T> String currency(T t) {
+		// TODO Auto-generated method stub
 		String json = "";
 		try {
-			json = JacksonJsonUtil.beanToJson(region);
+			json = JacksonJsonUtil.beanToJson(t);
 		} catch (JSONException e) {
 			e.printStackTrace();
 		} 
@@ -323,5 +222,9 @@ public class JDServiceImpl implements JDService{
 		logger.info("response is : " + response);
 		return response;
 	}
-
+	
+	private <T,Y> T getAll(Y y,Class<T> t) throws JSONException{
+		T skudetailed = (T)JacksonJsonUtil.jsonToBean(currency(y),t);
+		return skudetailed;
+	}
 }
