@@ -4,16 +4,13 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Map;
 import java.util.Properties;
-
 import javax.xml.bind.ValidationException;
-
 import org.apache.http.client.methods.HttpGet;
 import org.hibernate.bytecode.buildtime.spi.ExecutionException;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.databind.JavaType;
 import com.yumu.hexie.common.util.JacksonJsonUtil;
 import com.yumu.hexie.common.util.MyHttpClient;
