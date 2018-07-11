@@ -48,10 +48,8 @@ public class WechatCoreServiceImpl implements WechatCoreService {
 	private SystemConfigService systemConfigService;
 	@Inject
 	private com.yumu.hexie.service.user.UserService userService;
-	
 	@Inject 
 	private CouponService couponService;
-
 
 	// FIXME 暂时没用
 	@Override
