@@ -33,7 +33,6 @@ public class FundService {
 	 * @return
 	 */
 	public static JsSign createOrder(PaymentOrder payOrder, String return_url){
-		
 		return WuyeUtil.getOrderPay(payOrder.getPaymentNo()+"", payOrder.getOpenId(), return_url, payOrder.getPrice()+"").getData();
 	}
 	
