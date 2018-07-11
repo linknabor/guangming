@@ -118,9 +118,8 @@ public class RedisRepository {
     }
 
     /* 新版购物车 */
-    
     public Object getBuyerCartByKey(long userId, String valueKey) {
-    	return stringRedisTemplate.opsForHash().get(Keys.uidCardKey(userId), valueKey);
+    	return stringRedisTemplate.opsForHash().get(Keys.uidNewCardKey(userId), valueKey);
     	
     }
     
