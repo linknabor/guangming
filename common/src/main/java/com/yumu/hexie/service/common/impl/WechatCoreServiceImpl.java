@@ -17,10 +17,6 @@ import com.yumu.hexie.integration.wechat.entity.AccessToken;
 import com.yumu.hexie.integration.wechat.entity.AccessTokenOAuth;
 import com.yumu.hexie.integration.wechat.entity.common.CloseOrderResp;
 import com.yumu.hexie.integration.wechat.entity.common.JsSign;
-import com.yumu.hexie.integration.wechat.entity.common.PaymentOrderResult;
-import com.yumu.hexie.integration.wechat.entity.common.PrePaymentOrder;
-import com.yumu.hexie.integration.wechat.entity.common.WxRefundOrder;
-import com.yumu.hexie.integration.wechat.entity.common.WxRefundResp;
 import com.yumu.hexie.integration.wechat.entity.customer.Text;
 import com.yumu.hexie.integration.wechat.entity.message.req.CommonMessage;
 import com.yumu.hexie.integration.wechat.entity.message.resp.TextMessage;
@@ -219,12 +215,7 @@ public class WechatCoreServiceImpl implements WechatCoreService {
 
 	@Override
 	public JsSign createOrder(PaymentOrder payOrder, String return_url) {
-		try {
-			return FundService.createOrder(payOrder, return_url);
-		} catch (Exception e) {
-			processError(e);
-		}
-		return new JsSign();
+		return FundService.createOrder(payOrder, return_url);
 	}
 	@Override
 	public CloseOrderResp closeOrder( PaymentOrder payOrder) {
