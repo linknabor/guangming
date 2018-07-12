@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import com.yumu.hexie.common.Constants;
 import com.yumu.hexie.integration.wechat.entity.common.JsSign;
+import com.yumu.hexie.model.ModelConstant;
 import com.yumu.hexie.model.commonsupport.info.Product;
 import com.yumu.hexie.model.distribution.region.Merchant;
 import com.yumu.hexie.model.distribution.region.MerchantRepository;
@@ -39,6 +40,7 @@ import com.yumu.hexie.model.market.saleplan.OnSaleRuleRepository;
 import com.yumu.hexie.model.redis.RedisRepository;
 import com.yumu.hexie.model.user.Address;
 import com.yumu.hexie.model.user.User;
+import com.yumu.hexie.service.exception.BizValidateException;
 import com.yumu.hexie.service.sales.BaseOrderService;
 import com.yumu.hexie.service.sales.ProductService;
 import com.yumu.hexie.service.user.AddressService;
@@ -61,7 +63,8 @@ public class BuyerCartController extends BaseController {
     private BaseOrderService baseOrderService;
 	@Inject
     private AddressService addressService;
-	
+	@Inject
+	protected ProductService productService;
 	
 	/**
 	 * 添加购物车
@@ -79,11 +82,24 @@ public class BuyerCartController extends BaseController {
 			//1.加入购物车前判断是否有库存
 			Product product = productservice.getProduct(skuId);
 			
-			//2.校验是否有库存
-			boolean flag = getCartProductAmount(user, product, ruleId, amount);
-			if (!flag) {
-				return BaseResult.fail("No goods");
+			String newKey = String.valueOf(skuId) + "-" + String.valueOf(ruleId);
+					
+			Object o = redisRepository.getBuyerCartByKey(user.getId(), newKey);
+			if (o ==null) {
+				o = "0";
 			}
+			
+			//2.校验
+			//获取商品规则信息
+			OnSaleRule saleRule = onSaleRuleRepository.findOne(ruleId);
+			
+			//校验规则
+			if(!saleRule.valid(Integer.parseInt(o.toString())+amount)){
+				throw new BizValidateException(ModelConstant.EXCEPTION_BIZ_TYPE_ONSALE, saleRule.getId(), "商品信息已过期，请重新下单！").setError();
+	        }
+			
+			//校验商品（库存）
+			productService.checkSalable(product, Integer.parseInt(o.toString()));
 			
 			//3.将当前款商品追加到购物车
 			BuyerCart buyerCart = new BuyerCart();
@@ -137,9 +153,7 @@ public class BuyerCartController extends BaseController {
 			}
 			
 			list = getCartItem(user, listSku, false);
-			if (list.size() ==0) {
-				return new BaseResult<List<BuyerCart>>().failMsg("购物车商品异常，请刷新后重试");
-			}
+			
 		} catch(Exception e) {
 			logger.error("/shopping/toCart error : ", e);
 			return new BaseResult<List<BuyerCart>>().failMsg(e.getMessage());
@@ -157,7 +171,7 @@ public class BuyerCartController extends BaseController {
 	@RequestMapping(value="/buyer/trueBuy", method = RequestMethod.POST)
 	@ResponseBody
 	public BaseResult<BuyerList> trueBuy(@ModelAttribute(Constants.USER)User user, @RequestBody(required = true) CartItemOrderReq req) {
-		
+		logger.error("user is toString ：" + user.toString());
 		BuyerList buyerLists = new BuyerList();
 		List<BuyerCart> list = new ArrayList<BuyerCart>();
 		try {
@@ -204,7 +218,7 @@ public class BuyerCartController extends BaseController {
 	public BaseResult<List<ServiceOrder>> createOrderBuyer(@ModelAttribute(Constants.USER)User user, @RequestBody BuyerOrderReq req) {
 		List<ServiceOrder> o = new ArrayList<ServiceOrder>();
 		try {
-			o = baseOrderService.createOrder(req, user.getId(), user.getOpenid());
+			o = baseOrderService.createOrder(req, user.getId(), user.getBindOpenId());
 			if(o.size()<=0) {
 				return new BaseResult<List<ServiceOrder>>().failMsg("订单提交失败，请稍后重试！");
 			} else {
@@ -311,34 +325,6 @@ public class BuyerCartController extends BaseController {
 	}
 	
 	/**
-	 * 校验商品库存
-	 * @param user 用户
-	 * @param skuId 商品ID
-	 * @param ruleId 规则ID
-	 * @param amount 本次添加数量
-	 * @return
-	 */
-	public boolean getCartProductAmount(User user, Product product, Long ruleId, Integer amount) {
-		
-		//1.计算当前库存
-		int stock = product.getTotalCount() - product.getSaledNum();
-		
-		//2.获取当前商品购物车的购买数量
-		String key = String.valueOf(product.getId()) + "-" + String.valueOf(ruleId);
-		Object o = redisRepository.getBuyerCartByKey(user.getId(), key);
-		int cartNum = 0;
-		if (o!=null) {
-			cartNum =Integer.parseInt(o.toString());
-		}
-		
-		//3.校验是否超过库存 （校验库存需要把已经加入购物车的数量和本次添加的数量总和去检验）
-		if (stock >= cartNum + amount) {
-			return true;
-		}
-		return false;
-	}
-	
-	/**
 	 * 组装购物车的商品信息
 	 * @param user 用户信息
 	 * @param listSku 商品列表
@@ -375,14 +361,6 @@ public class BuyerCartController extends BaseController {
 			//查询商品对应商户信息及商品详细信息
 			Product product = productservice.getProduct(Long.parseLong(sku_id));
 			
-			//当前库存
-			int stock = product.getTotalCount() - product.getSaledNum();
-			
-			boolean flag = getCartProductAmount(user, product, Long.parseLong(ruleId), 0);
-			if (!flag) {
-				buyerItem.setInStock(false);
-			}
-			
 			Merchant merchant = merchantRepository.findOne(product.getMerchantId());
 			
 			//商户名称
@@ -397,10 +375,26 @@ public class BuyerCartController extends BaseController {
 				items = new ArrayList<BuyerItem>();
 			}
 			
+			//获取商品规则信息
+			OnSaleRule saleRule = onSaleRuleRepository.findOne(Long.parseLong(ruleId));
+			String error = "";
+			//校验规则
+			if(!saleRule.valid(Integer.parseInt(o.toString()))){
+				error = "商品信息已过期，请重新下单！";
+				logger.error(ModelConstant.EXCEPTION_BIZ_TYPE_ONSALE+" ruleId:" + saleRule.getId()+" 商品信息已过期，请重新下单！");
+	        }
+			
+			try {
+				//校验商品（库存）
+				productService.checkSalable(product, Integer.parseInt(o.toString()));
+			}catch (Exception e) {
+				error = e.getMessage();
+				logger.error("检验商品报错 :", e);
+			}
+			
+			
 			//收费计算运费
 			if (isPostageFee) {
-				//获取商品规则信息
-				OnSaleRule saleRule = onSaleRuleRepository.findOne(Long.parseLong(ruleId));
 				float postageFee = saleRule.getPostageFee(); //邮费
 				int freeNum = saleRule.getFreeShippingNum(); //包邮件数
 				
@@ -414,7 +408,8 @@ public class BuyerCartController extends BaseController {
 			buyerItem.setSku(product);
 			buyerItem.setRuleId(Long.parseLong(ruleId));
 			buyerItem.setAmount(Integer.parseInt(sku_num));
-			buyerItem.setCurrStock(stock);
+			buyerItem.setCurrStock(product.getCanSaleNum());
+			buyerItem.setInStock(error);
 			
 			items.add(buyerItem);
 			buyerCart.setItems(items);
