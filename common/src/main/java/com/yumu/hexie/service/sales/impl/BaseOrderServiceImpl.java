@@ -273,16 +273,25 @@ public class BaseOrderServiceImpl extends BaseOrderProcessor implements BaseOrde
 	}
 
 	@Override
-	public PaymentOrder notifyPayed(long orderId, String pay_status, String other_payId) {
-        log.warn("[notifyPayed]orderId:"+orderId);
-		ServiceOrder so = serviceOrderRepository.findOne(orderId);
-		if(so == null || so.getStatus() == ModelConstant.ORDER_STATUS_PAYED) {
-		    return null;
-		}
-        PaymentOrder payment = paymentService.fetchPaymentOrder(so);
-        payment = paymentService.refreshStatus(payment, pay_status, other_payId);
-        update4Payment(payment);
-        return payment;
+	@Transactional
+	public List<PaymentOrder> notifyPayed(long paymentNo, String pay_status, String other_payId) {
+        log.warn("[notifyPayed] paymentNo:"+paymentNo);
+        
+        List<PaymentOrder> paymentSum = paymentService.findByPaymentNo(paymentNo+"");
+        
+        for(int i=0; i<paymentSum.size(); i++) {
+        	PaymentOrder payment = paymentSum.get(i);
+        	long orderId = payment.getOrderId();
+        	
+        	ServiceOrder so = serviceOrderRepository.findOne(orderId);
+    		if(so == null || so.getStatus() == ModelConstant.ORDER_STATUS_PAYED) {
+    		    return null;
+    		}
+    		
+    		payment = paymentService.refreshStatus(payment, pay_status, other_payId);
+            update4Payment(payment);
+        }
+        return paymentSum;
 	}
 
 	@Override

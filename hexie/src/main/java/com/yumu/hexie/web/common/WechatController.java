@@ -1,5 +1,7 @@
 package com.yumu.hexie.web.common;
 
+import java.util.List;
+
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -81,15 +83,18 @@ public class WechatController extends BaseController{
     public String orderNotify(PaymentOrderResult paymentOrderResult) throws Exception {
     	LOGGER.error("orderNotify:（"+paymentOrderResult.isSuccess()+"）" + JacksonJsonUtil.beanToJson(paymentOrderResult));
     	if(paymentOrderResult.isSuccess()) {
-			PaymentOrder payment = paymentService.findByPaymentNo(paymentOrderResult.getOut_trade_no());
-			payment = paymentService.refreshStatus(payment, "", "");
-			if(payment.getOrderType() == PaymentConstant.TYPE_MARKET_ORDER){
-	            baseOrderService.update4Payment(payment);
-			} else if(payment.getOrderType() == PaymentConstant.TYPE_XIYI_ORDER) {
-                xiyiService.update4Payment(payment);
-            } else if(payment.getOrderType() == PaymentConstant.TYPE_BAOJIE_ORDER) {
-                baojieService.update4Payment(payment);
-            }
+			List<PaymentOrder> paymentSum = paymentService.findByPaymentNo(paymentOrderResult.getOut_trade_no());
+			for(int i=0; i<paymentSum.size();i++) {
+				PaymentOrder payment = paymentSum.get(i);
+				payment = paymentService.refreshStatus(payment, "", "");
+				if(payment.getOrderType() == PaymentConstant.TYPE_MARKET_ORDER){
+		            baseOrderService.update4Payment(payment);
+				} else if(payment.getOrderType() == PaymentConstant.TYPE_XIYI_ORDER) {
+	                xiyiService.update4Payment(payment);
+	            } else if(payment.getOrderType() == PaymentConstant.TYPE_BAOJIE_ORDER) {
+	                baojieService.update4Payment(payment);
+	            }
+			}
     	}
     	return "<xml><return_code><![CDATA[SUCCESS]]></return_code><return_msg><![CDATA[OK]]></return_msg></xml>";
     }
