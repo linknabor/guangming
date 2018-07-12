@@ -51,7 +51,7 @@ public class ProductController extends BaseController{
 	 */
 	@RequestMapping(value = "/search", method = RequestMethod.GET)
 	@ResponseBody
-	public List<ProductItem> search(String name,@ModelAttribute(Constants.USER)User user,@RequestParam(required=false,defaultValue="1")int pageNow)  throws Exception{
+	public List<ProductItem> search(String name,@ModelAttribute(Constants.USER)User user,@RequestParam(required=false,defaultValue="0")int pageNow)  throws Exception{
 		
 		List<ProductItem> list = product.getByNameProduct(name,user,pageNow);
 
@@ -60,7 +60,7 @@ public class ProductController extends BaseController{
 	
 	@RequestMapping(value = "/getByproductCfi", method = RequestMethod.GET)
 	@ResponseBody
-	public List<ProductItem> getByproductCfi(int productcfiid,@ModelAttribute(Constants.USER)User user,@RequestParam(required=false,defaultValue="1") int pageNow){
+	public List<ProductItem> getByproductCfi(int productcfiid,@ModelAttribute(Constants.USER)User user,@RequestParam(required=false,defaultValue="0") int pageNow){
 		return product.getByProductCfiId(productcfiid,user, pageNow);
 	}
 	
