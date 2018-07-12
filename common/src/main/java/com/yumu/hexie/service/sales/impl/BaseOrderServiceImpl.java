@@ -437,7 +437,7 @@ public class BaseOrderServiceImpl extends BaseOrderProcessor implements BaseOrde
 			CartItemOrderReq item = cartItem.get(i);
 			long couponId = 0; //优惠券ID
 			if(item.getCouponId() != null ) {
-				couponId = item.getCouponId(); 
+				couponId = item.getCouponId();
 			}
 
 			String memo = item.getMemo(); //
@@ -464,14 +464,10 @@ public class BaseOrderServiceImpl extends BaseOrderProcessor implements BaseOrde
 				
 				//获取商品信息
 				Product product = productService.getProduct(sukId);
+				//检验库存
+				productService.checkSalable(product, Integer.parseInt(o.toString()));
 				
-				//当前库存
-				int stock = product.getTotalCount() - product.getSaledNum();
-				
-				if (stock < Integer.parseInt(o.toString())) {
-					throw new BizValidateException("商品库存不足").setError();
-				}
-				
+				//获取规则
 				SalePlan salePlan = salePlanService.getService(serviceOrder.getOrderType()).findSalePlan(ruleId);
 				
 				OrderItem orderItem = new OrderItem();

@@ -69,22 +69,25 @@ public abstract class BaseOrderProcessor {
 				
 				SalePlan plan = findSalePlan(order.getOrderType(), item.getRuleId());
 				
-				totalAmount = item.getAmount();
-				price = totalAmount;
-				if (item.getCount() < plan.getFreeShippingNum()) {
-					shipfee = plan.getPostageFee();
+				totalAmount += item.getAmount();
+				
+				float postageFee = plan.getPostageFee(); //邮费
+				int freeNum = plan.getFreeShippingNum(); //包邮件数
+				//如果当前商品购买数大于等于包邮件数，那么邮费为0，否则显示相应邮费
+				if (item.getCount() >= freeNum) {
+					postageFee = 0;
 				}
+				shipfee += postageFee;
+				
 				count += item.getCount();
-				price += shipfee;
 				closeTime = plan.getTimeoutForPay() + System.currentTimeMillis();
 			}
-			// 2.单个商品
-			
-
-			
+			price += totalAmount;
+			price += shipfee;
 		} else {
 			throw new BizValidateException("下单失败，请重试！");
 		}
+		
 		order.setTotalAmount(totalAmount);
 		order.setShipFee(shipfee);
 		order.setDiscountAmount(discount);
