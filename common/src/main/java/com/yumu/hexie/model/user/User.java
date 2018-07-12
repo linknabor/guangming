@@ -386,6 +386,20 @@ public class User extends BaseModel{
         this.bindAppId = bindAppId;
     }
 
+	@Override
+	public String toString() {
+		return "User [realName=" + realName + ", name=" + name + ", tel=" + tel + ", provinceId=" + provinceId
+				+ ", cityId=" + cityId + ", countyId=" + countyId + ", xiaoquId=" + xiaoquId + ", county=" + county
+				+ ", xiaoquName=" + xiaoquName + ", longitude=" + longitude + ", latitude=" + latitude
+				+ ", currentAddrId=" + currentAddrId + ", wuyeId=" + wuyeId + ", openid=" + openid + ", memo=" + memo
+				+ ", subscribe=" + subscribe + ", status=" + status + ", nickname=" + nickname + ", sex=" + sex
+				+ ", age=" + age + ", city=" + city + ", country=" + country + ", province=" + province + ", language="
+				+ language + ", headimgurl=" + headimgurl + ", subscribe_time=" + subscribe_time + ", registerDate="
+				+ registerDate + ", identityCard=" + identityCard + ", zhima=" + zhima + ", lvdou=" + lvdou
+				+ ", couponCount=" + couponCount + ", shareCode=" + shareCode + ", newRegiste=" + newRegiste
+				+ ", bindAppId=" + bindAppId + ", bindOpenId=" + bindOpenId + "]";
+	}
+
 	
 	
 }

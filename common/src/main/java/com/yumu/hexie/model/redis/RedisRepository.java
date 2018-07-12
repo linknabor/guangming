@@ -118,26 +118,26 @@ public class RedisRepository {
     }
 
     /* 新版购物车 */
-    
     public Object getBuyerCartByKey(long userId, String valueKey) {
-    	return stringRedisTemplate.opsForHash().get(Keys.uidCardKey(userId), valueKey);
+    	return stringRedisTemplate.opsForHash().get(Keys.uidNewCardKey(userId), valueKey);
     	
     }
     
     public void setBuyerCart(long userId, Map<String, String> map) {
-    	stringRedisTemplate.opsForHash().putAll(Keys.uidCardKey(userId), map);
+    	stringRedisTemplate.opsForHash().putAll(Keys.uidNewCardKey(userId), map);
+    	stringRedisTemplate.expire(Keys.uidNewCardKey(userId), 30, TimeUnit.DAYS);
     }
     
     public void incrementBuyerCart(long userId, String hashKey, long acount) {
-    	stringRedisTemplate.opsForHash().increment(Keys.uidCardKey(userId), hashKey, acount);
+    	stringRedisTemplate.opsForHash().increment(Keys.uidNewCardKey(userId), hashKey, acount);
     }
     
     public void deleteBuyerCart(long userId, String hashKey) {
-    	stringRedisTemplate.opsForHash().delete(Keys.uidCardKey(userId), hashKey);
+    	stringRedisTemplate.opsForHash().delete(Keys.uidNewCardKey(userId), hashKey);
     }
     
-    public Map<?, ?> getBuyerCart(long userId) {
-    	return stringRedisTemplate.opsForHash().entries(Keys.uidCardKey(userId));
+    public Map<Object, Object> getBuyerCart(long userId) {
+    	return stringRedisTemplate.opsForHash().entries(Keys.uidNewCardKey(userId));
     }
     
     
