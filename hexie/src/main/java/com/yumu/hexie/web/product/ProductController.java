@@ -9,9 +9,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.yumu.hexie.model.commonsupport.info.Product;
+import com.yumu.hexie.model.commonsupport.info.ProductItem;
 import com.yumu.hexie.service.sales.ProductService;
 import com.yumu.hexie.web.BaseController;
 
@@ -31,10 +33,10 @@ public class ProductController extends BaseController{
 	 */
 	@RequestMapping(value = "/search", method = RequestMethod.GET)
 	@ResponseBody
-	public List<Product> search(String name)  throws Exception{
+	public List<ProductItem> search(String name,String regionId,@RequestParam(required=false,defaultValue="0")int pageNow)  throws Exception{
 		
-		List<Product> list = product.getByNameProduct(name);
-		
+		List<ProductItem> list = product.getByNameProduct(name,regionId,pageNow);
+
 		return list;
 	}
 	
@@ -43,4 +45,5 @@ public class ProductController extends BaseController{
 	public List<Product> getByproductCfi(int productcfiid){
 		return product.getByProductCfiId(productcfiid);
 	}
+	
 }

@@ -15,7 +15,7 @@ public interface ProductService {
 	
 	public List<Product> getAllProduct();
 	
-	public List<Product> getByNameProduct(String name);
+	public List<ProductItem> getByNameProduct(String name,String regionId,int pageNow);
 	
 	public void checkSalable(Product product, int count) ;
 

@@ -39,7 +39,7 @@ public interface ProductItemRepository extends JpaRepository<ProductItem, Long> 
 	public List<ProductItem> queryProductItemsByType(int productType, int status,
 			long provinceId, long cityId, long countyId, long xiaoquId, long current, int page);
 	
-	/**
+	/*
 	 * 获取销量前100的商品
 	 * @param productType
 	 * @param status
@@ -67,6 +67,18 @@ public interface ProductItemRepository extends JpaRepository<ProductItem, Long> 
 			nativeQuery = true)
 	public List<ProductItem> queryHotProductItems(int status, 
 			long provinceId, long cityId, long countyId, long xiaoquId, long current, int page);
+	
+	@Query(value="SELECT pitem.* FROM productitem pitem "
+			+"INNER JOIN product p ON p.`productItemId` = pitem.`id` "
+			+"INNER JOIN onsaleareaitem areaitem ON p.`id` = areaitem.`productId` "
+			+"WHERE (p.`endDate` > NOW() AND p.`startDate` < NOW())	"
+			+"AND pitem.`status` = 1 "
+			+"AND p.`status` = 1 "
+			+"AND pitem.`name` LIKE %?1%  "
+			+"AND areaitem.`regionId` = ?2 "
+			+"GROUP BY pitem.`name` "
+			+"LIMIT ?3,2 ",nativeQuery = true)
+	List<ProductItem> getByNameProductItem(String name,String regionId,int pageNow);
 	
 	
 	
