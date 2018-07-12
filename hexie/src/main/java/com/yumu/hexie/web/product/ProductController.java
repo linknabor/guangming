@@ -31,18 +31,18 @@ public class ProductController extends BaseController{
 	private ProductService product;
 	
 //	模拟用户信息
-	@ModelAttribute
-    public void init01(Model model)
-    {
-		User user = new User();
-		user.setProvinceId(1);
-		user.setCityId(0);
-		user.setCountyId(0);
-		user.setXiaoquId(0);
-//		provinceId, long cityId, long countyId, long xiaoquId
-		model.addAttribute("sessionUser", user);
-        System.out.println("创建了一个sessionUser");
-    }
+//	@ModelAttribute
+//    public void init01(Model model)
+//    {
+//		User user = new User();
+//		user.setProvinceId(1);
+//		user.setCityId(0);
+//		user.setCountyId(0);
+//		user.setXiaoquId(0);
+////		provinceId, long cityId, long countyId, long xiaoquId
+//		model.addAttribute("sessionUser", user);
+//        System.out.println("创建了一个sessionUser");
+//    }
 	
 	/**
 	 * 模糊查询商品
@@ -51,7 +51,7 @@ public class ProductController extends BaseController{
 	 */
 	@RequestMapping(value = "/search", method = RequestMethod.GET)
 	@ResponseBody
-	public List<ProductItem> search(String name,@ModelAttribute(Constants.USER)User user,@RequestParam(required=false,defaultValue="1")int pageNow)  throws Exception{
+	public List<ProductItem> search(String name,@ModelAttribute(Constants.USER)User user,@RequestParam(required=false,defaultValue="0")int pageNow)  throws Exception{
 		
 		List<ProductItem> list = product.getByNameProduct(name,user,pageNow);
 
@@ -60,7 +60,7 @@ public class ProductController extends BaseController{
 	
 	@RequestMapping(value = "/getByproductCfi", method = RequestMethod.GET)
 	@ResponseBody
-	public List<ProductItem> getByproductCfi(int productcfiid,@ModelAttribute(Constants.USER)User user,@RequestParam(required=false,defaultValue="1") int pageNow){
+	public List<ProductItem> getByproductCfi(int productcfiid,@ModelAttribute(Constants.USER)User user,@RequestParam(required=false,defaultValue="0") int pageNow){
 		return product.getByProductCfiId(productcfiid,user, pageNow);
 	}
 	

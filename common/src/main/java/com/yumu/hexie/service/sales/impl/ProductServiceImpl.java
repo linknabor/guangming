@@ -39,8 +39,7 @@ public class ProductServiceImpl implements ProductService {
 
 	@Override
 	public List<ProductItem> getByNameProduct(String name,User user,int pageNow) {
-		pageNow = (pageNow -1) * 6;
-		return productRepository.getByNameProduct(user.getProvinceId(), user.getCityId(), user.getCountyId(), user.getXiaoquId(),name,pageNow);
+		return productItemRepository.getByNameProduct(user.getProvinceId(), user.getCityId(), user.getCountyId(), user.getXiaoquId(),name,pageNow);
 	}
 	
 	@Override
@@ -106,7 +105,6 @@ public class ProductServiceImpl implements ProductService {
 	@Override
 	public List<ProductItem> getByProductCfiId(int productcfiid,User user,int pageNow) {
 		// TODO Auto-generated method stub
-		pageNow = (pageNow -1) * 6;
-		return productRepository.getByProductCfiId( user.getProvinceId(), user.getCityId(), user.getCountyId(), user.getXiaoquId(),productcfiid, pageNow);
+		return productItemRepository.getByProductCfiId( user.getProvinceId(), user.getCityId(), user.getCountyId(), user.getXiaoquId(),productcfiid, pageNow);
 	}
 }
