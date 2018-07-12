@@ -17,6 +17,7 @@ import com.yumu.hexie.common.Constants;
 import com.yumu.hexie.common.util.StringUtil;
 import com.yumu.hexie.model.market.Cart;
 import com.yumu.hexie.model.market.Collocation;
+import com.yumu.hexie.model.market.ServiceOrder;
 import com.yumu.hexie.model.payment.PaymentConstant;
 import com.yumu.hexie.model.payment.PaymentOrder;
 import com.yumu.hexie.model.provider.CollocationCategory;
@@ -24,6 +25,7 @@ import com.yumu.hexie.model.redis.Keys;
 import com.yumu.hexie.model.redis.RedisRepository;
 import com.yumu.hexie.model.user.User;
 import com.yumu.hexie.service.exception.BizValidateException;
+import com.yumu.hexie.service.payment.PaymentService;
 import com.yumu.hexie.service.provider.ProviderService;
 import com.yumu.hexie.service.sales.BaseOrderService;
 import com.yumu.hexie.service.sales.CollocationService;
@@ -46,6 +48,8 @@ public class CollocationController extends BaseController{
     @SuppressWarnings("rawtypes")
 	@Inject
     private ProviderService providerService;
+    @Inject
+    private PaymentService paymentService;
    
     
 	@RequestMapping(value = "/collocation/{salePlanType}/{ruleId}", method = RequestMethod.GET)
@@ -126,11 +130,21 @@ public class CollocationController extends BaseController{
 	@ResponseBody
 	public BaseResult<String> notifyPayed(@PathVariable long orderId, @ModelAttribute(Constants.USER)User user) throws Exception{
 
-		PaymentOrder order = baseOrderService.notifyPayed(orderId, "", "");
-		//collocationService.AssginSupermarketOrder(orderId, user);
-		if (PaymentConstant.PAYMENT_STATUS_SUCCESS == order.getStatus()) {
-			providerService.notifyPay(orderId);
+		ServiceOrder order = baseOrderService.findOne(orderId);
+		PaymentOrder pay = paymentService.findByOrderId(orderId);
+		if(pay!=null) {
+			List<PaymentOrder> paymentSum = baseOrderService.notifyPayed(Long.parseLong(pay.getPaymentNo()), "", "");
+			
+			for(int i=0;i<paymentSum.size();i++) {
+				PaymentOrder pay1 = paymentSum.get(i);
+				long newOrderId = pay1.getOrderId();
+				
+				if (PaymentConstant.PAYMENT_STATUS_SUCCESS == order.getStatus()) {
+					providerService.notifyPay(newOrderId);
+				}
+			}
 		}
+		
 		return new BaseResult<String>().success("success");
 	}
 	
