@@ -31,6 +31,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 			+"WHERE (p.`endDate` > NOW() AND p.`startDate` < NOW())	"
 			+"AND pitem.`status` = 1 "
 			+"AND p.`status` = 1 "
+			+"AND (pitem.`endDate` > NOW() AND pitem.`startDate` < NOW()) "
 			+"AND pitem.`name` LIKE %?1%  "
 			+"AND areaitem.`regionId` = ?2 "
 			+"GROUP BY pitem.`name` "
@@ -39,7 +40,17 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
 	List<Product> findByProductItemAndStatus(ProductItem productItem, int status);
 	
-	@Query("from Product where productclassificationid = ?1 and status = 1 AND endDate > NOW() AND startDate < NOW() AND totalCount > 0")
-	List<Product> getByProductCfiId(int productcfiid);
+	@Query(value="SELECT pitem.* FROM productitem pitem "
+			 +"INNER JOIN product p ON p.`productItemId` = pitem.`id` "
+			 +"INNER JOIN onsaleareaitem areaitem ON p.`id` = areaitem.`productId` "
+			 +"WHERE (p.`endDate` > NOW() AND p.`startDate` < NOW()) "	
+			 +"AND p.`status` = 1 "
+			 +"AND (pitem.`endDate` > NOW() AND pitem.`startDate` < NOW())	"		 
+			 +"AND pitem.`status` = 1 "			 
+			 +"AND pitem.`productclassificationid` = ?1 "
+			 +"AND areaitem.`regionId` = ?2 "
+			 +"GROUP BY pitem.`name` "
+			 +"LIMIT ?3,2 ",nativeQuery = true)
+	List<ProductItem> getByProductCfiId(int productcfiid,int regionId,int pageNow);
 
 }

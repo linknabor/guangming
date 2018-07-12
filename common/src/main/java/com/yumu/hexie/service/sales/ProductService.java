@@ -27,5 +27,5 @@ public interface ProductService {
 	public List<Productclassification> getParentProductCfi();
 	public List<Productclassification> getByParentIDProductCfi(int parentid);
 	
-	public List<Product> getByProductCfiId(int productcfiid);
+	public List<ProductItem> getByProductCfiId(int productcfiid,int regionId,int pageNow);
 }

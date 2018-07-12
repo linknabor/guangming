@@ -102,8 +102,8 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	@Override
-	public List<Product> getByProductCfiId(int productcfiid) {
+	public List<ProductItem> getByProductCfiId(int productcfiid,int regionId,int pageNow) {
 		// TODO Auto-generated method stub
-		return productRepository.getByProductCfiId(productcfiid);
+		return productRepository.getByProductCfiId(productcfiid, regionId, pageNow);
 	}
 }
