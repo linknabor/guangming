@@ -13,6 +13,7 @@ import com.yumu.hexie.model.commonsupport.info.ProductItemRepository;
 import com.yumu.hexie.model.commonsupport.info.ProductRepository;
 import com.yumu.hexie.model.commonsupport.info.Productclassification;
 import com.yumu.hexie.model.commonsupport.info.ProductclassificationRepository;
+import com.yumu.hexie.model.user.User;
 import com.yumu.hexie.service.exception.BizValidateException;
 import com.yumu.hexie.service.sales.ProductService;
 
@@ -37,8 +38,9 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	@Override
-	public List<ProductItem> getByNameProduct(String name,String regionId,int pageNow) {
-		return productRepository.getByNameProduct(name,regionId,pageNow);
+	public List<ProductItem> getByNameProduct(String name,User user,int pageNow) {
+		pageNow = (pageNow -1) * 6;
+		return productRepository.getByNameProduct(user.getProvinceId(), user.getCityId(), user.getCountyId(), user.getXiaoquId(),name,pageNow);
 	}
 	
 	@Override
@@ -102,8 +104,9 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	@Override
-	public List<Product> getByProductCfiId(int productcfiid) {
+	public List<ProductItem> getByProductCfiId(int productcfiid,User user,int pageNow) {
 		// TODO Auto-generated method stub
-		return productRepository.getByProductCfiId(productcfiid);
+		pageNow = (pageNow -1) * 6;
+		return productRepository.getByProductCfiId( user.getProvinceId(), user.getCityId(), user.getCountyId(), user.getXiaoquId(),productcfiid, pageNow);
 	}
 }
