@@ -35,7 +35,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 			+"AND pitem.`name` LIKE %?1%  "
 			+"AND areaitem.`regionId` = ?2 "
 			+"GROUP BY pitem.`name` "
-			+"LIMIT ?3,2 ",nativeQuery = true)
+			+"LIMIT ?3,6 ",nativeQuery = true)
 	List<ProductItem> getByNameProduct(String name,String regionId,int pageNow);
 
 	List<Product> findByProductItemAndStatus(ProductItem productItem, int status);
@@ -50,7 +50,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 			 +"AND pitem.`productclassificationid` = ?1 "
 			 +"AND areaitem.`regionId` = ?2 "
 			 +"GROUP BY pitem.`name` "
-			 +"LIMIT ?3,2 ",nativeQuery = true)
+			 +"LIMIT ?3,6 ",nativeQuery = true)
 	List<ProductItem> getByProductCfiId(int productcfiid,int regionId,int pageNow);
 
 }
