@@ -43,6 +43,8 @@ public class ProductItem extends BaseModel{
 	private String miniPrice;	//最低价
 	private String oriPrice;	//原价
 	private String displayPrice;	//页面显示价格，可能是个区间
+	private long productclassificationid;//分类ID
+	
 	
 	private String specList;	//产品规格名称列表，逗号分隔
 	private String specValList;	//产品规格值 列表，逗号分隔
@@ -55,6 +57,16 @@ public class ProductItem extends BaseModel{
 	@Transient
 	private int totalSale;
 	
+	
+	
+	public long getProductclassificationid() {
+		return productclassificationid;
+	}
+
+	public void setProductclassificationid(long productclassificationid) {
+		this.productclassificationid = productclassificationid;
+	}
+
 	public String getFirstType() {
 		return firstType;
 	}
