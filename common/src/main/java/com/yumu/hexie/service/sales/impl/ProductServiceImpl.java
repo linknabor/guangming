@@ -37,8 +37,8 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	@Override
-	public List<Product> getByNameProduct(String name) {
-		return productRepository.getByNameProduct(name);
+	public List<ProductItem> getByNameProduct(String name,String regionId,int pageNow) {
+		return productRepository.getByNameProduct(name,regionId,pageNow);
 	}
 	
 	@Override
