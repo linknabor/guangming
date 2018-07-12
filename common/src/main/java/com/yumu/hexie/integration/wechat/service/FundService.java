@@ -1,7 +1,5 @@
 package com.yumu.hexie.integration.wechat.service;
 
-import java.net.InetAddress;
-import java.net.UnknownHostException;
 import java.text.DecimalFormat;
 import java.util.HashMap;
 import java.util.Map;
@@ -13,12 +11,8 @@ import com.yumu.hexie.common.util.JacksonJsonUtil;
 import com.yumu.hexie.integration.wechat.constant.ConstantWeChat;
 import com.yumu.hexie.integration.wechat.entity.common.CloseOrderResp;
 import com.yumu.hexie.integration.wechat.entity.common.JsSign;
-import com.yumu.hexie.integration.wechat.entity.common.PaymentOrderResult;
-import com.yumu.hexie.integration.wechat.entity.common.PrePaymentOrder;
-import com.yumu.hexie.integration.wechat.util.MessageUtil;
 import com.yumu.hexie.integration.wechat.util.WeixinUtil;
 import com.yumu.hexie.integration.wuye.WuyeUtil;
-import com.yumu.hexie.integration.wuye.resp.BaseResult;
 import com.yumu.hexie.model.payment.PaymentOrder;
 
 public class FundService {
@@ -39,7 +33,6 @@ public class FundService {
 	 * @return
 	 */
 	public static JsSign createOrder(PaymentOrder payOrder, String return_url){
-		
 		return WuyeUtil.getOrderPay(payOrder.getPaymentNo()+"", payOrder.getOpenId(), return_url, payOrder.getPrice()+"").getData();
 	}
 	

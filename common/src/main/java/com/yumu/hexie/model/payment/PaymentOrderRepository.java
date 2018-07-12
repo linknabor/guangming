@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.Query;
 public interface PaymentOrderRepository extends JpaRepository<PaymentOrder, Long> {
 	public List<PaymentOrder> findAllByPaymentNo(String paymentNo);
 
+	public PaymentOrder findByOrderId(long orderId);
+	
     public List<PaymentOrder> findByOrderTypeAndOrderId(int orderType, long orderId);
 
     public List<PaymentOrder> findByOrderTypeAndOrderIdAndOpenId(int orderType, long orderId,String openId);

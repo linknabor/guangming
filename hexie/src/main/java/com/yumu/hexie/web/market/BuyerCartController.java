@@ -218,7 +218,7 @@ public class BuyerCartController extends BaseController {
 	public BaseResult<List<ServiceOrder>> createOrderBuyer(@ModelAttribute(Constants.USER)User user, @RequestBody BuyerOrderReq req) {
 		List<ServiceOrder> o = new ArrayList<ServiceOrder>();
 		try {
-			o = baseOrderService.createOrder(req, user.getId(), user.getOpenid());
+			o = baseOrderService.createOrder(req, user.getId(), user.getBindOpenId());
 			if(o.size()<=0) {
 				return new BaseResult<List<ServiceOrder>>().failMsg("订单提交失败，请稍后重试！");
 			} else {
@@ -356,7 +356,7 @@ public class BuyerCartController extends BaseController {
 			if (o ==null) {
 				continue;
 			}
-			String sku_num = redisRepository.getBuyerCartByKey(user.getId(), newKey).toString(); //商品数量
+			String sku_num = o.toString(); //商品数量
 			
 			//查询商品对应商户信息及商品详细信息
 			Product product = productservice.getProduct(Long.parseLong(sku_id));

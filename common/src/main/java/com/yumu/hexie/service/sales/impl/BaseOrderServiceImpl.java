@@ -18,7 +18,6 @@ import com.yumu.hexie.common.util.ConfigUtil;
 import com.yumu.hexie.common.util.OrderNoUtil;
 import com.yumu.hexie.common.util.StringUtil;
 import com.yumu.hexie.integration.wechat.entity.common.JsSign;
-import com.yumu.hexie.integration.wechat.entity.common.WxRefundOrder;
 import com.yumu.hexie.integration.wechat.service.TemplateMsgService;
 import com.yumu.hexie.model.ModelConstant;
 import com.yumu.hexie.model.commonsupport.comment.Comment;
@@ -274,16 +273,25 @@ public class BaseOrderServiceImpl extends BaseOrderProcessor implements BaseOrde
 	}
 
 	@Override
-	public PaymentOrder notifyPayed(long orderId, String pay_status, String other_payId) {
-        log.warn("[notifyPayed]orderId:"+orderId);
-		ServiceOrder so = serviceOrderRepository.findOne(orderId);
-		if(so == null || so.getStatus() == ModelConstant.ORDER_STATUS_PAYED) {
-		    return null;
-		}
-        PaymentOrder payment = paymentService.fetchPaymentOrder(so);
-        payment = paymentService.refreshStatus(payment, pay_status, other_payId);
-        update4Payment(payment);
-        return payment;
+	@Transactional
+	public List<PaymentOrder> notifyPayed(long paymentNo, String pay_status, String other_payId) {
+        log.warn("[notifyPayed] paymentNo:"+paymentNo);
+        
+        List<PaymentOrder> paymentSum = paymentService.findByPaymentNo(paymentNo+"");
+        
+        for(int i=0; i<paymentSum.size(); i++) {
+        	PaymentOrder payment = paymentSum.get(i);
+        	long orderId = payment.getOrderId();
+        	
+        	ServiceOrder so = serviceOrderRepository.findOne(orderId);
+    		if(so == null || so.getStatus() == ModelConstant.ORDER_STATUS_PAYED) {
+    		    return null;
+    		}
+    		
+    		payment = paymentService.refreshStatus(payment, pay_status, other_payId);
+            update4Payment(payment);
+        }
+        return paymentSum;
 	}
 
 	@Override
@@ -429,7 +437,7 @@ public class BaseOrderServiceImpl extends BaseOrderProcessor implements BaseOrde
 			CartItemOrderReq item = cartItem.get(i);
 			long couponId = 0; //优惠券ID
 			if(item.getCouponId() != null ) {
-				couponId = item.getCouponId(); 
+				couponId = item.getCouponId();
 			}
 
 			String memo = item.getMemo(); //
@@ -456,14 +464,10 @@ public class BaseOrderServiceImpl extends BaseOrderProcessor implements BaseOrde
 				
 				//获取商品信息
 				Product product = productService.getProduct(sukId);
+				//检验库存
+				productService.checkSalable(product, Integer.parseInt(o.toString()));
 				
-				//当前库存
-				int stock = product.getTotalCount() - product.getSaledNum();
-				
-				if (stock < Integer.parseInt(o.toString())) {
-					throw new BizValidateException("商品库存不足").setError();
-				}
-				
+				//获取规则
 				SalePlan salePlan = salePlanService.getService(serviceOrder.getOrderType()).findSalePlan(ruleId);
 				
 				OrderItem orderItem = new OrderItem();
