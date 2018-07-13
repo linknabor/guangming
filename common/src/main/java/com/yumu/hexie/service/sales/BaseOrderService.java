@@ -33,7 +33,7 @@ public interface BaseOrderService {
 	//支付状态变更
 	public void update4Payment(PaymentOrder payment);
 	//通知支付成功
-	public PaymentOrder notifyPayed(long orderId, String pay_status, String other_payId);
+	public List<PaymentOrder> notifyPayed(long paymentNo, String pay_status, String other_payId);
 	//取消订单
 	public ServiceOrder cancelOrder(ServiceOrder order);
 	//确认订单

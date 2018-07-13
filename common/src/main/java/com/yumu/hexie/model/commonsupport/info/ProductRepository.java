@@ -14,12 +14,21 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 	
 	Product findByMerchanProductNo(String merchantProductNo);
 	
-	@Query("from Product where name like %?1% and status = 1 and endDate > NOW() AND startDate < NOW() AND totalCount > 0 ")
-	List<Product> getByNameProduct(String name);
+//	@Query("from Product where name like %?1% and status = 1 and endDate > NOW() AND startDate < NOW() AND totalCount > 0 ")
+//	@Query(value="SELECT * FROM product p "
+//			+"INNER JOIN productitem pitem ON p.`productItemId` = pitem.`id` "
+//			+"INNER JOIN onsalerule rule ON p.`id` = rule.`productId` "
+//			+"INNER JOIN onsaleareaitem areaitem ON p.`id` = areaitem.`productId` "
+//			+"WHERE p.`totalCount` > 0 "
+//			+"AND p.`name` LIKE %?1% "
+//			+"AND areaitem.`regionId` = ?2 "
+//			+"AND (p.`endDate` > NOW() AND p.`startDate` < NOW()) "
+//			+"AND p.`status` = 1 "
+//			+"LIMIT ?3,2 ",nativeQuery = true)
+
 
 	List<Product> findByProductItemAndStatus(ProductItem productItem, int status);
 	
-	@Query("from Product where productclassificationid = ?1 and status = 1 AND endDate > NOW() AND startDate < NOW() AND totalCount > 0")
-	List<Product> getByProductCfiId(int productcfiid);
+
 
 }

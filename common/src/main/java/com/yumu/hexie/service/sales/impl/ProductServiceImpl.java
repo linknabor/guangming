@@ -13,6 +13,7 @@ import com.yumu.hexie.model.commonsupport.info.ProductItemRepository;
 import com.yumu.hexie.model.commonsupport.info.ProductRepository;
 import com.yumu.hexie.model.commonsupport.info.Productclassification;
 import com.yumu.hexie.model.commonsupport.info.ProductclassificationRepository;
+import com.yumu.hexie.model.user.User;
 import com.yumu.hexie.service.exception.BizValidateException;
 import com.yumu.hexie.service.sales.ProductService;
 
@@ -37,8 +38,8 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	@Override
-	public List<Product> getByNameProduct(String name) {
-		return productRepository.getByNameProduct(name);
+	public List<ProductItem> getByNameProduct(String name,User user,int pageNow) {
+		return productItemRepository.getByNameProduct(user.getProvinceId(), user.getCityId(), user.getCountyId(), user.getXiaoquId(),name,pageNow);
 	}
 	
 	@Override
@@ -102,8 +103,8 @@ public class ProductServiceImpl implements ProductService {
 	}
 
 	@Override
-	public List<Product> getByProductCfiId(int productcfiid) {
+	public List<ProductItem> getByProductCfiId(int productcfiid,User user,int pageNow) {
 		// TODO Auto-generated method stub
-		return productRepository.getByProductCfiId(productcfiid);
+		return productItemRepository.getByProductCfiId( user.getProvinceId(), user.getCityId(), user.getCountyId(), user.getXiaoquId(),productcfiid, pageNow);
 	}
 }

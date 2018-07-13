@@ -280,12 +280,8 @@ public class PaymentServiceImpl implements PaymentService {
      * @see com.yumu.hexie.service.payment.PaymentService#findByPaymentNo(java.lang.String)
      */
     @Override
-    public PaymentOrder findByPaymentNo(String paymentNo) {
-        List<PaymentOrder> pos = paymentOrderRepository.findAllByPaymentNo(paymentNo);
-        if(pos != null && pos.size()>=0) {
-            return pos.get(0);
-        }
-        return null;
+    public List<PaymentOrder> findByPaymentNo(String paymentNo) {
+        return paymentOrderRepository.findAllByPaymentNo(paymentNo);
     }
 
     /** 
@@ -353,5 +349,10 @@ public class PaymentServiceImpl implements PaymentService {
         //3. 从微信获取签名
         log.warn("[Payment-req]sign["+sign.getSignature()+"]");
         return sign;
+	}
+
+	@Override
+	public PaymentOrder findByOrderId(long orderId) {
+		return paymentOrderRepository.findByOrderId(orderId);
 	}
 }

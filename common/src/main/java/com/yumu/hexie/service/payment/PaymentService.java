@@ -23,7 +23,9 @@ public interface PaymentService {
 
     public PaymentOrder save(PaymentOrder pay);
     //通过支付编号查询支付单
-    public PaymentOrder findByPaymentNo(String paymentNo);
+    public List<PaymentOrder> findByPaymentNo(String paymentNo);
+    //根据订单ID查询支付订单
+    public PaymentOrder findByOrderId(long orderId);
     //创建支付单
     public PaymentOrder fetchPaymentOrder(ServiceOrder order);
     //创建支付单(多订单支付时调用)

@@ -5,6 +5,7 @@ import java.util.List;
 import com.yumu.hexie.model.commonsupport.info.Product;
 import com.yumu.hexie.model.commonsupport.info.ProductItem;
 import com.yumu.hexie.model.commonsupport.info.Productclassification;
+import com.yumu.hexie.model.user.User;
 
 
 public interface ProductService {
@@ -15,7 +16,7 @@ public interface ProductService {
 	
 	public List<Product> getAllProduct();
 	
-	public List<Product> getByNameProduct(String name);
+	public List<ProductItem> getByNameProduct(String name,User user,int pageNow);
 	
 	public void checkSalable(Product product, int count) ;
 
@@ -27,5 +28,5 @@ public interface ProductService {
 	public List<Productclassification> getParentProductCfi();
 	public List<Productclassification> getByParentIDProductCfi(int parentid);
 	
-	public List<Product> getByProductCfiId(int productcfiid);
+	public List<ProductItem> getByProductCfiId(int productcfiid,User user,int pageNow);
 }

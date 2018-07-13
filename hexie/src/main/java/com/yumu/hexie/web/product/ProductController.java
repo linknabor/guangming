@@ -7,11 +7,17 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import com.yumu.hexie.common.Constants;
 import com.yumu.hexie.model.commonsupport.info.Product;
+import com.yumu.hexie.model.commonsupport.info.ProductItem;
+import com.yumu.hexie.model.user.User;
 import com.yumu.hexie.service.sales.ProductService;
 import com.yumu.hexie.web.BaseController;
 
@@ -24,6 +30,20 @@ public class ProductController extends BaseController{
 	@Inject
 	private ProductService product;
 	
+//	模拟用户信息
+//	@ModelAttribute
+//    public void init01(Model model)
+//    {
+//		User user = new User();
+//		user.setProvinceId(1);
+//		user.setCityId(0);
+//		user.setCountyId(0);
+//		user.setXiaoquId(0);
+////		provinceId, long cityId, long countyId, long xiaoquId
+//		model.addAttribute("sessionUser", user);
+//        System.out.println("创建了一个sessionUser");
+//    }
+	
 	/**
 	 * 模糊查询商品
 	 * @param name
@@ -31,16 +51,17 @@ public class ProductController extends BaseController{
 	 */
 	@RequestMapping(value = "/search", method = RequestMethod.GET)
 	@ResponseBody
-	public List<Product> search(String name)  throws Exception{
+	public List<ProductItem> search(String name,@ModelAttribute(Constants.USER)User user,@RequestParam(required=false,defaultValue="0")int pageNow)  throws Exception{
 		
-		List<Product> list = product.getByNameProduct(name);
-		
+		List<ProductItem> list = product.getByNameProduct(name,user,pageNow);
+
 		return list;
 	}
 	
 	@RequestMapping(value = "/getByproductCfi", method = RequestMethod.GET)
 	@ResponseBody
-	public List<Product> getByproductCfi(int productcfiid){
-		return product.getByProductCfiId(productcfiid);
+	public List<ProductItem> getByproductCfi(int productcfiid,@ModelAttribute(Constants.USER)User user,@RequestParam(required=false,defaultValue="0") int pageNow){
+		return product.getByProductCfiId(productcfiid,user, pageNow);
 	}
+	
 }
