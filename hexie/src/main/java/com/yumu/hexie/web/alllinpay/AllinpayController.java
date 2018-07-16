@@ -1,6 +1,7 @@
 package com.yumu.hexie.web.alllinpay;
 
 import java.io.IOException;
+import java.util.List;
 import java.util.TreeMap;
 
 import javax.inject.Inject;
@@ -52,9 +53,13 @@ public class AllinpayController  extends BaseController{
 			boolean flag = AllinpayUtil.validSign(map, ConstantWeChat.ALLIN_APPKEY);
 			Log.error("团购回调签名结果:"+flag);
 			if (flag) {
-				PaymentOrder payment = paymentService.findByPaymentNo(map.get("cusorderid"));
-				payment = paymentService.refreshStatus(payment, map.get("trxstatus"), map.get("trxid"));
-				baseOrderService.update4Payment(payment);
+				List<PaymentOrder> payment = paymentService.findByPaymentNo(map.get("cusorderid"));
+				for(int i=0;i<payment.size();i++) {
+					PaymentOrder pay = payment.get(i);
+					pay = paymentService.refreshStatus(pay, map.get("trxstatus"), map.get("trxid"));
+					baseOrderService.update4Payment(pay);
+				}
+				
 			}else {
 				Log.error("团购回调签名验证不通过:"+map.toString());
 			}
@@ -79,9 +84,13 @@ public class AllinpayController  extends BaseController{
 		try {
 			boolean flag = AllinpayUtil.validSign(map, ConstantWeChat.ALLIN_APPKEY);
 			if (flag) {
-				PaymentOrder payment = paymentService.findByPaymentNo(map.get("cusorderid"));
-				payment = paymentService.refreshStatus(payment, map.get("trxstatus"), map.get("trxid"));
-				xiyiService.update4Payment(payment);
+				List<PaymentOrder> payment = paymentService.findByPaymentNo(map.get("cusorderid"));
+				for(int i=0;i<payment.size();i++) {
+					PaymentOrder pay = payment.get(i);
+					pay = paymentService.refreshStatus(pay, map.get("trxstatus"), map.get("trxid"));
+					xiyiService.update4Payment(pay);
+				}
+				
 			}else {
 				Log.error("洗衣回调签名验证不通过:"+map.toString());
 			}
@@ -106,9 +115,13 @@ public class AllinpayController  extends BaseController{
 		try {
 			boolean flag = AllinpayUtil.validSign(map, ConstantWeChat.ALLIN_APPKEY);
 			if (flag) {
-				PaymentOrder payment = paymentService.findByPaymentNo(map.get("cusorderid"));
-				payment = paymentService.refreshStatus(payment, map.get("trxstatus"), map.get("trxid"));
-				baseOrderService.update4Payment(payment);
+				List<PaymentOrder> payment = paymentService.findByPaymentNo(map.get("cusorderid"));
+				for(int i=0;i<payment.size();i++) {
+					PaymentOrder pay = payment.get(i);
+					pay = paymentService.refreshStatus(pay, map.get("trxstatus"), map.get("trxid"));
+					baseOrderService.update4Payment(pay);
+				}
+				
 			}else {
 				Log.error("维修回调签名验证不通过:"+map.toString());
 			}
@@ -133,9 +146,13 @@ public class AllinpayController  extends BaseController{
 		try {
 			boolean flag = AllinpayUtil.validSign(map, ConstantWeChat.ALLIN_APPKEY);
 			if (flag) {
-				PaymentOrder payment = paymentService.findByPaymentNo(map.get("cusorderid"));
-				payment = paymentService.refreshStatus(payment, map.get("trxstatus"), map.get("trxid"));
-				baojieService.update4Payment(payment);
+				List<PaymentOrder> payment = paymentService.findByPaymentNo(map.get("cusorderid"));
+				for(int i=0;i<payment.size();i++) {
+					PaymentOrder pay = payment.get(i);
+					pay = paymentService.refreshStatus(pay, map.get("trxstatus"), map.get("trxid"));
+					baojieService.update4Payment(pay);
+				}
+				
 			}else {
 				Log.error("保洁回调签名验证不通过:"+map.toString());
 			}
