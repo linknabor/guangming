@@ -1,8 +1,12 @@
 package com.yumu.hexie.model.jingdong.getaddress;
 
-public class Region {
+import java.util.List;
+
+public class RegionJ {
 	private String region_id;//地区编号
 	private String region_name;//地区名称
+	private String parent_id;
+	private List<RegionJ> info;
 	public String getRegion_id() {
 		return region_id;
 	}
@@ -14,6 +18,18 @@ public class Region {
 	}
 	public void setRegion_name(String region_name) {
 		this.region_name = region_name;
+	}
+	public String getParent_id() {
+		return parent_id;
+	}
+	public void setParent_id(String parent_id) {
+		this.parent_id = parent_id;
+	}
+	public List<RegionJ> getInfo() {
+		return info;
+	}
+	public void setInfo(List<RegionJ> info) {
+		this.info = info;
 	}
 	
 	
