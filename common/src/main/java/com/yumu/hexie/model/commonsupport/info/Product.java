@@ -418,6 +418,7 @@ public class Product extends BaseModel {
 	  this.setRulePostageFee(rule.getPostageFee());
 	  this.setRuleFreeShippingNum(rule.getFreeShippingNum());
 	  this.setRuleProductType(rule.getSalePlanType());
+	  this.setLimitNumOnce(rule.getLimitNumOnce());
 	 }
 	
 	@Transient
@@ -434,7 +435,17 @@ public class Product extends BaseModel {
 	private int ruleFreeShippingNum;
 	@Transient
 	private int ruleProductType;
-
+	@Transient
+	private int limitNumOnce;//单次购买份数
+	
+	
+	
+	public int getLimitNumOnce() {
+		return limitNumOnce;
+	}
+	public void setLimitNumOnce(int limitNumOnce) {
+		this.limitNumOnce = limitNumOnce;
+	}
 	public long getRuleId() {
 		return ruleId;
 	}
