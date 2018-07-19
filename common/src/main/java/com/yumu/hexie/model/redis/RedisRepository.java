@@ -32,6 +32,14 @@ public class RedisRepository {
     private StringRedisTemplate stringRedisTemplate;
     
     
+    
+    public void setJDProduct(Map<String, String> map) {
+    	stringRedisTemplate.opsForHash().putAll("JDProduct", map);
+    }
+    public Map<Object, Object> getJDProduct() {
+    	return stringRedisTemplate.opsForHash().entries("JDProduct");
+    }
+    
     /**
      * 获取订单车辆信息 
      */

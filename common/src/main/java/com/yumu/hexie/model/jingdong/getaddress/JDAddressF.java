@@ -11,13 +11,13 @@ public class JDAddressF extends JDGetParent{
 	 */
 	private static final long serialVersionUID = -5797730388067824055L;
 	
-	private List<Region> info;
+	private List<RegionJ> info;
 
-	public List<Region> getInfo() {
+	public List<RegionJ> getInfo() {
 		return info;
 	}
 
-	public void setInfo(List<Region> info) {
+	public void setInfo(List<RegionJ> info) {
 		this.info = info;
 	}
 	
