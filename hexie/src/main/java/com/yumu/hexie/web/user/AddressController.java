@@ -6,6 +6,9 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.hibernate.metamodel.relational.Loggable;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -26,11 +29,14 @@ import com.yumu.hexie.service.user.UserService;
 import com.yumu.hexie.service.user.req.AddressReq;
 import com.yumu.hexie.web.BaseController;
 import com.yumu.hexie.web.BaseResult;
+import com.yumu.hexie.web.market.BuyerCartController;
 import com.yumu.hexie.web.user.resp.RegionInfo;
 
 @Controller(value = "addressController")
 public class AddressController extends BaseController{
 
+	private static Log logger = LogFactory.getLog(AddressController.class);
+	
     @Inject
     private AddressService addressService;
     @Inject
@@ -86,6 +92,10 @@ public class AddressController extends BaseController{
 		//本方法内调用无法异步
 		addressService.fillAmapInfo(addr);
 		user = userService.getById(user.getId());
+		logger.error("address user :"+user.toString());
+		logger.error("address context :" + address.toString());
+		logger.error("address userID :"+user.getId());
+		
 		pointService.addZhima(user, 50, "zhima-address-"+user.getId()+"-"+address.getId());
 		session.setAttribute(Constants.USER, user);
 		return new BaseResult<Address>().success(addr);
