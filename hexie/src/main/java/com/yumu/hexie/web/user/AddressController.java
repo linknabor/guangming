@@ -91,8 +91,8 @@ public class AddressController extends BaseController{
 		Address addr = addressService.addAddress(address);
 		//本方法内调用无法异步
 		addressService.fillAmapInfo(addr);
+		logger.error("uuuuuuuuuuuuuuuuuuuu:" + user.getId());
 		user = userService.getById(user.getId());
-		logger.error("address user :"+user.toString());
 		logger.error("address context :" + address.toString());
 		logger.error("address userID :"+user.getId());
 		
