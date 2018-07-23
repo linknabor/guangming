@@ -1,7 +1,10 @@
 package com.yumu.hexie.model.distribution.region;
 
+import java.util.List;
+
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.Transient;
 
 import com.yumu.hexie.model.BaseModel;
 import com.yumu.hexie.model.ModelConstant;
@@ -22,6 +25,8 @@ public class Region extends BaseModel{
 	private String description;
 	@Column(nullable = true)
 	private Long amapId;
+	@Transient
+	private List<Region> info;
 	
     public Region(long parentId,String parentName,String name){
     	this.regionType = ModelConstant.REGION_XIAOQU;
@@ -33,6 +38,14 @@ public class Region extends BaseModel{
 		
 	}
     
+	
+	
+	public List<Region> getInfo() {
+		return info;
+	}
+	public void setInfo(List<Region> info) {
+		this.info = info;
+	}
 	public String getName() {
 		return name;
 	}

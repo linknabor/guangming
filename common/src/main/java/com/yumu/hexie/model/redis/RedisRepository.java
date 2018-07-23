@@ -1,5 +1,6 @@
 package com.yumu.hexie.model.redis;
 
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
@@ -9,6 +10,7 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
+import com.yumu.hexie.model.jingdong.JDcarrier;
 import com.yumu.hexie.model.localservice.HomeCart;
 import com.yumu.hexie.model.market.Cart;
 import com.yumu.hexie.model.market.car.OrderCarInfo;
@@ -27,20 +29,83 @@ public class RedisRepository {
     @Inject
     private RedisTemplate<String, SystemConfig> systemConfigRedisTemplate;
     @Inject
-    private RedisTemplate<String, OrderCarInfo> orderCarInfoRedisTemplate;//创建订单之前用户填写的车辆信息
+    private RedisTemplate<String, OrderCarInfo> orderCarInfoRedisTemplate;//鍒涘缓璁㈠崟涔嬪墠鐢ㄦ埛濉啓鐨勮溅杈嗕俊鎭�
     @Inject
     private StringRedisTemplate stringRedisTemplate;
     
     
     /**
-     * 获取订单车辆信息 
+     * 把所有上架商品的价格加到redis
+     * @param map
+     */
+    public void setJDProduct(Map<String, String> map) {
+    	stringRedisTemplate.opsForHash().putAll("JDProductPrice", map);
+    }
+    
+    /**
+     * 根据商品id获取价格
+     * @param ProductNo
+     * @return
+     */
+    public Object getJDProductPrive(String productNo) {
+    	return stringRedisTemplate.opsForHash().get("JDProductPrice",productNo);
+    }
+    
+    /**
+     * 根据商品Id删除价格
+     * @param productNo
+     */
+    public void delJDProductPrice(String productNo) {
+    	stringRedisTemplate.opsForHash().delete("JDProductPrice", productNo);
+    }
+    
+    
+    public void addJDProductPrice(String productNo,String price) {
+    	stringRedisTemplate.opsForHash().put("JDProductPrice", productNo, price);
+    }
+    
+    /**
+     * 获取所有价格
+     * @return
+     */
+    public Map<Object, Object> getJDProduct() {
+    	return stringRedisTemplate.opsForHash().entries("JDProductPrice");
+    }
+    
+    /**
+     * 上架商品加入redis
+     * @param list
+     */
+    public void setListJDStatus(List<String> list) {
+    	stringRedisTemplate.opsForList().leftPushAll("listJDProduct", list);
+    }
+    
+    /**
+     * 获取所有上架商品
+     * @return
+     */
+    public List<String> getListJDStatus() {
+    	return  stringRedisTemplate.opsForList().range("listJDProduct", 0, -1);
+    }
+    /**
+     * 根据商品ID删除
+     * @param productId
+     */
+    public void delJDStatus(String productId) {
+    	stringRedisTemplate.opsForList().remove("listJDProduct", 0, productId);
+    }
+    
+    
+    
+    /**
+     * 鑾峰彇璁㈠崟杞﹁締淇℃伅 
      */
     public OrderCarInfo getOrderCarInfo(long userId) {
     	return orderCarInfoRedisTemplate.opsForValue().get(Keys.orderCarInfoKey(userId));
     }
     
     /**
-     * 保存订单车辆信息
+     * 淇濆瓨璁㈠崟杞﹁締淇℃伅
      * @param carInfo
      */
     public void setOrderCarInfo(OrderCarInfo carInfo) {
@@ -72,7 +137,7 @@ public class RedisRepository {
     	cartRedisTemplate.delete(key);
     }
     
-    //分享信息保存1天
+    //鍒嗕韩淇℃伅淇濆瓨1澶�
     public void setShareRecord(String key, ShareAccessRecord value) {
     	shareAccessRecordTemplate.opsForValue().set(key, value, 1, TimeUnit.DAYS);
     }
@@ -84,9 +149,9 @@ public class RedisRepository {
     	shareAccessRecordTemplate.delete(key);
     }
     
-    //登录token,120分钟有效
+    //鐧诲綍token,120鍒嗛挓鏈夋晥
     public void setToken(String key, String token) {
-    	stringRedisTemplate.opsForValue().set(Keys.tokenKey(key), token, 120, TimeUnit.MINUTES);	//120分钟过期
+    	stringRedisTemplate.opsForValue().set(Keys.tokenKey(key), token, 120, TimeUnit.MINUTES);	//120鍒嗛挓杩囨湡
     }
     
     public String getToken(String key) {
@@ -117,7 +182,7 @@ public class RedisRepository {
     	stringRedisTemplate.delete(Keys.pushOrderRequestKey(key));
     }
 
-    /* 新版购物车 */
+    /* 鏂扮増璐墿杞� */
     public Object getBuyerCartByKey(long userId, String valueKey) {
     	return stringRedisTemplate.opsForHash().get(Keys.uidNewCardKey(userId), valueKey);
     	
