@@ -32,6 +32,7 @@ import com.yumu.hexie.model.jingdong.limitregion.JDRegion;
 import com.yumu.hexie.model.jingdong.limitregion.JDRegionF;
 import com.yumu.hexie.model.jingdong.token.JDToken;
 import com.yumu.hexie.model.jingdong.token.JDTokenF;
+import com.yumu.hexie.service.exception.OvertimeException;
 import com.yumu.hexie.service.jingdong.JDService;
 
 public class JDServiceImpl implements JDService{
@@ -217,7 +218,12 @@ public class JDServiceImpl implements JDService{
 		try {
 			response = HttpUtil.doPostMap(JDOrderService.JD_URL, map, JDOrderService.DEFAULT_CHARACTER);
 		} catch (Exception e) {
-			e.printStackTrace();
+			if (e instanceof OvertimeException) {
+				response = HttpUtil.doPostMap(JDOrderService.JD_URL, map, JDOrderService.DEFAULT_CHARACTER);
+			}else {
+				e.printStackTrace();
+			}
+		
 		}
 		logger.info("response is : " + response);
 		return response;
