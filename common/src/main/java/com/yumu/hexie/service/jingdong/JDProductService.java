@@ -22,7 +22,11 @@ public interface JDProductService {
 	
 	Map<String, List<SKUImage>> getImage(List<String> list);//拿到所有上架商品的图片
 	
+	List<SKUImage> getImageSingle(String productNo);//根据商品编号拿到商品的图片
+	
 	Map<String, PriceVo> getPrice(List<String> list);//拿到所有上架商品的价格
+	
+	PriceVo getPriceSingle(String productNo);//根据商品编号拿到价格
 	
 	List<RegionJ> getAllRegion();//获取京东   所有省 市 区
 	
@@ -36,5 +40,13 @@ public interface JDProductService {
 	
 	void redisSku();//商品状态缓存到redis
 	
-	Map<Object, Object> getRedisSku();//拿到所有商品状态
+	void redisSkuPrice();//商品价格缓存到redis
+	
+	Map<Object, Object> getRedisSku();//从reids拿到所有商品状态
+	
+	void synchronization();//上下架同步
+	
+	void priceContrast();
+	
+	void dataSynRedis();
 }

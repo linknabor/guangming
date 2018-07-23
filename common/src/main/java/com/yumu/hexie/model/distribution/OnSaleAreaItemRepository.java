@@ -4,12 +4,30 @@ import java.util.List;
 
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.yumu.hexie.model.ModelConstant;
 
+@Transactional
 public interface OnSaleAreaItemRepository extends JpaRepository<OnSaleAreaItem, Long> {
 
+	@Modifying
+	@Query(value="update OnSaleAreaItem set status = 0 where productId = ?1",nativeQuery = true)
+	void upStatusEnd(String productNo);
+	
+	
+	@Modifying
+	@Query(value="update OnSaleAreaItem set status = 1 where productId = ?1",nativeQuery = true)
+	void upStatusStart(String productNo);
+	
+	@Modifying
+	@Query(value="UPDATE OnSaleAreaItem s SET s.price = :price,s.oriPrice = :jdPrice WHERE s.productId = :productNo",nativeQuery = true)
+	public void upProductPrice(@Param("productNo")String productNo,@Param("jdPrice")String jdPrice,@Param("price")String price);
+	
+	
 	@Query("from OnSaleAreaItem m where m.status="+ModelConstant.DISTRIBUTION_STATUS_ON+" and ((m.regionType=0) "
 			+ "or (m.regionType=1 and m.regionId=?1) "
 			+ "or (m.regionType=2 and m.regionId=?2) "

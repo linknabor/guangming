@@ -1,11 +1,7 @@
 package com.yumu.hexie.web.product;
 
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.inject.Inject;
-
-import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -14,37 +10,17 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.yumu.hexie.common.util.JacksonJsonUtil;
-import com.yumu.hexie.model.commonsupport.info.Product;
-import com.yumu.hexie.model.distribution.region.Region;
 import com.yumu.hexie.model.jingdong.JDconstant;
-import com.yumu.hexie.model.jingdong.JDregionMapping;
 import com.yumu.hexie.model.jingdong.getSecurity.JDLoad;
 import com.yumu.hexie.model.jingdong.getSecurity.JDSecurity;
-import com.yumu.hexie.model.jingdong.getaddress.JDAddress;
-import com.yumu.hexie.model.jingdong.getaddress.JDAddressF;
-import com.yumu.hexie.model.jingdong.getaddress.RegionJ;
 import com.yumu.hexie.model.jingdong.getsku.JDSku;
 import com.yumu.hexie.model.jingdong.getsku.JDSkuF;
 import com.yumu.hexie.model.jingdong.getskuid.JDSkuID;
 import com.yumu.hexie.model.jingdong.getskuid.detail.JDSkuIDF;
-import com.yumu.hexie.model.jingdong.getskuid.image.JDSkuIdImageF;
-import com.yumu.hexie.model.jingdong.getskuid.price.PriceF;
-import com.yumu.hexie.model.jingdong.getskuid.status.JDSkuIDStatusF;
-import com.yumu.hexie.model.jingdong.getstock.SkuNums;
-import com.yumu.hexie.model.jingdong.getstock.Stock;
-import com.yumu.hexie.model.jingdong.getstock.StockF;
-import com.yumu.hexie.model.jingdong.getstock.StockVO;
-import com.yumu.hexie.model.jingdong.gettype.Classification;
-import com.yumu.hexie.model.jingdong.gettype.ClassificationF;
-import com.yumu.hexie.model.jingdong.limitregion.JDRegion;
-import com.yumu.hexie.model.jingdong.limitregion.JDRegionF;
 import com.yumu.hexie.model.jingdong.token.JDToken;
 import com.yumu.hexie.model.jingdong.token.JDTokenF;
 import com.yumu.hexie.service.jingdong.JDProductService;
 import com.yumu.hexie.service.jingdong.JDService;
-import com.yumu.hexie.service.sales.ProductService;
-import com.yumu.hexie.vo.JDProductVO;
 import com.yumu.hexie.web.BaseController;
 
 @Controller
@@ -69,7 +45,11 @@ public class JDProductController extends BaseController{
 //		
 //		List<Region> listre = jdproductService.getRegion();
 //		jdproductService.redisSku();//缓存到redis
-		System.out.println(jdproductService.getRedisSku());
+//		jdproductService.redisSkuPrice();//缓存价格
+		jdproductService.priceContrast();
+//		jdproductService.synchronization();
+		
+//		System.out.println(jdproductService.getRedisSku());
 //		jdproductService.addproduct();
 //		jdproductService.addregionMapping();
 		return "chengong";

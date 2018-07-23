@@ -41,7 +41,6 @@ import com.yumu.hexie.model.market.ServiceAreaItem;
 import com.yumu.hexie.model.market.ServiceAreaItemRepository;
 import com.yumu.hexie.model.market.saleplan.OnSaleRule;
 import com.yumu.hexie.model.market.saleplan.OnSaleRuleRepository;
-import com.yumu.hexie.model.provider.ilohas.IlohasProduct;
 import com.yumu.hexie.model.redis.RedisRepository;
 import com.yumu.hexie.service.exception.BizValidateException;
 import com.yumu.hexie.service.jingdong.JDProductService;
@@ -775,21 +774,196 @@ public class JDProductServiceImpl implements JDProductService{
 		}
 	}
 
+	/**
+	 * 上架的商品缓存到redis
+	 */
 	@Override
 	public void redisSku() {
 		// TODO Auto-generated method stub
-		List<String> list = getProductStatus();
-		Map<String, String> map = new HashMap<>();
-		for (int i = 0; i < list.size(); i++) {
-			map.put(list.get(i), "1");
-		}
-		redisRepository.setJDProduct(map);
+		List<String> list1 = getProductStatus();//拿到所有上架商品信息
+		redisRepository.setListJDStatus(list1);
 	}
-
+	
+	/**
+	 * 上架的商品价格缓存到reids
+	 */
+	@Override
+	public void redisSkuPrice() {
+		// TODO Auto-generated method stub
+		List<String> list1 = getProductStatus();//拿到所有上架商品信息
+		Map<String, PriceVo> map = getPrice(list1);//拿到所有上架商品的价格
+		Map<String, String> mapre = new HashMap<String, String>();
+		for (Map.Entry<String, PriceVo> entry : map.entrySet()) {
+			mapre.put(entry.getKey(), entry.getValue().getJdPrice()+","+entry.getValue().getPrice());
+		}
+		redisRepository.setJDProduct(mapre);
+	}
+	
+	/**
+	 * 数据库价格缓存到redis
+	 */
+	@Override
+	public void dataSynRedis(){
+		List<Product> list = productRepository.findAll();
+		Map<String, String> mapre = new HashMap<String, String>();
+		
+		for (int i = 0; i < list.size(); i++) {
+			//mapre.put(, entry.getValue().getJdPrice()+","+entry.getValue().getPrice());
+		}
+//			mapre.put(entry.getKey(), entry.getValue().getJdPrice()+","+entry.getValue().getPrice());
+		redisRepository.setJDProduct(mapre);
+		
+	}
+	
+	
+	/**
+	 * 价格对比 如有变化更新到reids 和 数据库
+	 */
+	public void priceContrast() {
+		List<String> list1 = getProductStatus();//拿到所有上架商品信息
+		Map<String, PriceVo> map = getPrice(list1);//拿到所有上架商品的价格
+		for (Map.Entry<String, PriceVo> entry : map.entrySet()) {
+			String price = (String)redisRepository.getJDProductPrive(entry.getKey());
+			String[] pril = price.split(",");
+			
+			if(entry.getValue().getJdPrice().equals(pril[0])&&entry.getValue().getPrice().equals(pril[1])) {
+					
+			}else {
+				redisRepository.delJDProductPrice(entry.getKey());
+				redisRepository.addJDProductPrice(entry.getKey(),entry.getValue().getJdPrice()+","+entry.getValue().getPrice());
+				synUpPrice(entry.getValue().getJdPrice(),entry.getValue().getPrice(),entry.getKey());
+			}
+			
+		}
+	}
+	
+	
 	@Override
 	public Map<Object, Object> getRedisSku() {
 		// TODO Auto-generated method stub
 		return redisRepository.getJDProduct();
 	}
+
+	/**
+	 * 上下架同步
+	 */
+	@Override
+	public void synchronization() {
+		// TODO Auto-generated method stub
+		
+		List<String> listsj = getProductStatus();//拿到所有上架商品信息
+		List<String> list1 = getProductStatus();
+		
+		List<String> listrd = redisRepository.getListJDStatus();
+		List<String> list2 = redisRepository.getListJDStatus();
+		
+		list1.removeAll(list2);//上架的
+		listrd.removeAll(listsj);//下架的
+		
+		if(list1.size()>0) {
+			List<String> redis =new ArrayList<>();
+			for (int i = 0; i < list1.size(); i++) {
+				synUPStart(list1.get(i));
+				redis.add(list1.get(i));
+			}
+			redisRepository.setListJDStatus(redis);
+		}
+		
+		if(listrd.size()>0) {
+			for (int i = 0; i < listrd.size(); i++) {
+				synUPEnd(listrd.get(i));
+				redisRepository.delJDStatus(listrd.get(i));
+			}
+		}
+		
+	}
+	
+	/**
+	 * 更新价格
+	 * @param jdPrice
+	 * @param price
+	 * @param productNo
+	 */
+	public void synUpPrice(String jdPrice,String price,String productNo) {
+		Product pro = productRepository.findByProductNo(productNo);
+		productRepository.upProductPrice(productNo, jdPrice, price);
+		System.out.println(Long.toString(pro.getId()));
+		onSaleRuleRepository.upProductPrice(Long.toString(pro.getId()), jdPrice, price);
+		onSaleAreaItemRepository.upProductPrice(Long.toString(pro.getId()), jdPrice, price);
+	}
+	
+	
+	//下架商品 根据京东id
+	public void synUPEnd(String productNo) {
+		Product pro = productRepository.findByProductNo(productNo);
+		productRepository.invalidByProductNoEnd(productNo);
+		onSaleRuleRepository.upStatusEnd(Long.toString(pro.getId()));;
+		serviceAreaItemRepository.upStatusEnd(Long.toString(pro.getId()));
+		onSaleAreaItemRepository.upStatusEnd(Long.toString(pro.getId()));
+	}
+	
+	//上架商品 根据京东id
+	public void synUPStart(String productNo) {
+		
+		Product pro = productRepository.findByProductNo(productNo);
+		if(pro!=null) {
+			productRepository.invalidByProductNo(productNo);
+			onSaleRuleRepository.upStatusStart(Long.toString(pro.getId()));;
+			serviceAreaItemRepository.upStatusStart(Long.toString(pro.getId()));
+			onSaleAreaItemRepository.upStatusStart(Long.toString(pro.getId()));
+		}else {
+			JDSkuIDF skuf = getByidSku(productNo);
+			List<SKUImage> list = getImageSingle(productNo);
+			PriceVo pri =getPriceSingle(productNo);
+			JDProductVO sku = new JDProductVO();
+			sku.setJdskuidf(skuf);
+			sku.setJdskuidimagef(list);//根据商品id拿到image
+			sku.setPrivef(pri);//根据商品id拿到价格
+			Product product = saveProdcut(sku);
+			OnSaleRule onsalerule = saveOnSaleRule(product);
+		    ServiceAreaItem serviceareaitem = saveServiceAreaItem(product,onsalerule);
+		    saveOnSaleAreaItem(product,onsalerule,serviceareaitem);
+		}
+	}
+
+	/**
+	 * 根据商品id获取单个商品图片
+	 */
+	@Override
+	public List<SKUImage> getImageSingle(String productNo) {
+		// TODO Auto-generated method stub
+		String strToken = getToken();
+		//批量查询图片 最多100
+		JDSkuID skuid = new JDSkuID();
+		skuid.setFunc(JDconstant.SKUIMAGE);
+		skuid.setToken(strToken);
+		skuid.setSku(productNo);
+		JDSkuIdImageF skuimageF = jdservice.skuImage(skuid);
+		List<SKUImage> listimg = new ArrayList<>();
+		for (int j = 0; j < skuimageF.getInfo().size(); j++) {
+			for (int j2 = 0; j2 < skuimageF.getInfo().get(j).length; j2++) {
+				listimg.add(skuimageF.getInfo().get(j)[j2]);
+			}
+		}
+		return listimg;
+	}
+
+	/**
+	 * 根据商品id获取商品价格
+	 */
+	@Override
+	public PriceVo getPriceSingle(String productNo) {
+		// TODO Auto-generated method stub
+		String strToken = getToken();
+		
+		//获取京东价协议价
+		JDSkuID sku2 = new JDSkuID();
+		sku2.setFunc(JDconstant.GETPRICE);
+		sku2.setToken(strToken);
+		sku2.setSku(productNo);
+		PriceF price = jdservice.getPrice(sku2);
+		return price.getInfo().get(0);
+	}
+	
 	
 }
