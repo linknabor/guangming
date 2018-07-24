@@ -1,9 +1,13 @@
 package com.yumu.hexie.service.shequ.impl;
 
+import java.io.UnsupportedEncodingException;
+
 import javax.xml.bind.ValidationException;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+
 import com.yumu.hexie.integration.wuye.WuyeUtil;
 import com.yumu.hexie.integration.wuye.resp.BaseResult;
 import com.yumu.hexie.integration.wuye.resp.BillListVO;
@@ -136,6 +140,30 @@ public class WuyeServiceImpl implements WuyeService {
 	public CellListVO querySectList(String sect_id, String build_id,
 			String unit_id, String data_type) {
 		return WuyeUtil.getMngList(sect_id, build_id, unit_id, data_type).getData();
+	}
+
+	@Override
+	public CellListVO querySectHeXieList(String sect_name, String build_id,
+			String unit_id, String data_type) {
+		try {
+			return WuyeUtil.getMngHeXieList(sect_name, build_id, unit_id, data_type).getData();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	//根据名称模糊查询合协社区小区列表
+	@Override
+	public CellListVO getVagueSectByName(String sect_name) {
+		try {
+			return WuyeUtil.getVagueSectByName(sect_name).getData();
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return null;
 	}
 	
 	
