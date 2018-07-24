@@ -1,6 +1,8 @@
 package com.yumu.hexie.web.product;
 
 
+import java.util.List;
+
 import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,8 +56,18 @@ public class JDProductController extends BaseController{
 //		System.out.println(jdproductService.getRedisSku());
 //		jdproductService.addproduct();
 //		jdproductService.addregionMapping();
-		return jdproductService.getToken();
+		List<String> list = jdproductService.getProductStatus();
+		String listsize = Integer.toString(list.size());
+		return listsize;
 	}
+	
+	@RequestMapping(value = "/helloWord", method = RequestMethod.GET)
+	@ResponseBody
+	public String helloWord() {
+		
+		return "helloWord";
+	}
+	
 	
 	
 	@RequestMapping(value = "/getTokenSafeCode/{page}/{parentId}", method = RequestMethod.GET)
