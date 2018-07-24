@@ -83,6 +83,8 @@ public class JDProductServiceImpl implements JDProductService{
 		load.setApi_secret(JDconstant.API_SECRET);
 		JDSecurity jds = jdservice.getTokenSafeCode(load);//获取安全码
 		
+		
+		
 		JDToken token = new JDToken();
 		token.setFunc(JDconstant.GETAPITOKEN);
 		token.setUsername(JDconstant.USERNAME);
