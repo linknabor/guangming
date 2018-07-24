@@ -115,8 +115,8 @@ public class JDProductServiceImpl implements JDProductService{
 			sku1.setPage(Integer.toString(page));
 			JDSkuF sku = jdservice.getSku(sku1);//获取所有sku page页数
 			page = page+1;
-			//pageSum = Integer.parseInt(sku.getTotal_page());
-			pageSum = 1;
+			pageSum = Integer.parseInt(sku.getTotal_page());
+//			pageSum = 1;
 			
 			int a = sku.getSkus().length;
 			int b = 0;
