@@ -28,6 +28,8 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
+import com.yumu.hexie.service.exception.OvertimeException;
+
 
 public class HttpUtil {
 	
@@ -159,7 +161,7 @@ public class HttpUtil {
             HttpEntity entity = response.getEntity();
             httpStr = EntityUtils.toString(entity, codePage);
         } catch (IOException e) {
-            e.printStackTrace();
+            throw new OvertimeException();
         } finally {
             if (response != null) {
                 try {

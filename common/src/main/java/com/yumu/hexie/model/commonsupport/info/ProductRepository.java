@@ -3,9 +3,29 @@ package com.yumu.hexie.model.commonsupport.info;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
-
+import org.springframework.data.repository.query.Param;
+import org.springframework.transaction.annotation.Transactional;
+@Transactional
 public interface ProductRepository extends JpaRepository<Product, Long> {
+	
+	
+	@Modifying
+	@Query(value="update Product p set p.status = 1 where p.productNo = ?1",nativeQuery = true)
+	public void invalidByProductNo(String productNo);
+	
+	@Modifying
+	@Query(value="update Product p set p.status = 0 where p.productNo = ?1",nativeQuery = true)
+	public void invalidByProductNoEnd(String productNo);
+	
+	@Modifying
+	@Query(value="update Product p set p.oriPrice = :jdPrice,p.singlePrice = :price,p.miniPrice= :price where p.productNo = :productNo",nativeQuery = true)
+	public void upProductPrice(@Param("productNo")String productNo,@Param("jdPrice")String jdPrice,@Param("price")String price);
+	
+	@Query(value = "select * from Product where productType =?1 and status = 1",nativeQuery = true)
+	List<Product> findByProductType(String ProductType);
+	
 	
 //	@Query("select ifnull(max(substring(productNo,5)),0) as max_no from Product "
 //			+ "where productNo >= ?1 and productNo <= ?2 ")
@@ -30,5 +50,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 	List<Product> findByProductItemAndStatus(ProductItem productItem, int status);
 	
 
+	
 
+	Product findByProductNo(String productNo);
 }

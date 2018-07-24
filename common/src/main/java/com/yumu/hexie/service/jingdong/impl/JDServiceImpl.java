@@ -1,7 +1,6 @@
 package com.yumu.hexie.service.jingdong.impl;
 
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 import org.json.JSONException;
@@ -11,8 +10,6 @@ import org.slf4j.LoggerFactory;
 import com.yumu.hexie.common.util.HttpUtil;
 import com.yumu.hexie.common.util.JacksonJsonUtil;
 import com.yumu.hexie.integration.jingdong.JDOrderService;
-import com.yumu.hexie.integration.provider.ilohas.service.ProviderOrderService;
-import com.yumu.hexie.model.jingdong.JDconstant;
 import com.yumu.hexie.model.jingdong.getSecurity.JDLoad;
 import com.yumu.hexie.model.jingdong.getSecurity.JDSecurity;
 import com.yumu.hexie.model.jingdong.getaddress.JDAddress;
@@ -24,7 +21,6 @@ import com.yumu.hexie.model.jingdong.getskuid.detail.JDSkuIDF;
 import com.yumu.hexie.model.jingdong.getskuid.image.JDSkuIdImageF;
 import com.yumu.hexie.model.jingdong.getskuid.price.PriceF;
 import com.yumu.hexie.model.jingdong.getskuid.status.JDSkuIDStatusF;
-import com.yumu.hexie.model.jingdong.getstock.SkuNums;
 import com.yumu.hexie.model.jingdong.getstock.Stock;
 import com.yumu.hexie.model.jingdong.getstock.StockF;
 import com.yumu.hexie.model.jingdong.gettype.Classification;
@@ -32,6 +28,7 @@ import com.yumu.hexie.model.jingdong.limitregion.JDRegion;
 import com.yumu.hexie.model.jingdong.limitregion.JDRegionF;
 import com.yumu.hexie.model.jingdong.token.JDToken;
 import com.yumu.hexie.model.jingdong.token.JDTokenF;
+import com.yumu.hexie.service.exception.OvertimeException;
 import com.yumu.hexie.service.jingdong.JDService;
 
 public class JDServiceImpl implements JDService{
@@ -217,8 +214,16 @@ public class JDServiceImpl implements JDService{
 		try {
 			response = HttpUtil.doPostMap(JDOrderService.JD_URL, map, JDOrderService.DEFAULT_CHARACTER);
 		} catch (Exception e) {
-			e.printStackTrace();
+			if (e instanceof OvertimeException) {
+				response = HttpUtil.doPostMap(JDOrderService.JD_URL, map, JDOrderService.DEFAULT_CHARACTER);
+			}else {
+				e.printStackTrace();
+			}
+		
 		}
+		
+		logger.info("response is : " + JDOrderService.JD_URL+ "   map==" +map);
+		
 		logger.info("response is : " + response);
 		return response;
 	}
