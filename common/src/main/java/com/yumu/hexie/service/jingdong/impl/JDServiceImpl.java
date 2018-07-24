@@ -221,6 +221,9 @@ public class JDServiceImpl implements JDService{
 			}
 		
 		}
+		
+		logger.info("response is : " + JDOrderService.JD_URL+ "   map==" +map);
+		
 		logger.info("response is : " + response);
 		return response;
 	}
