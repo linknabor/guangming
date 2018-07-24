@@ -2,26 +2,18 @@ package com.yumu.hexie.integration.wuye;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
-
 import javax.xml.bind.ValidationException;
-
 import org.apache.http.client.methods.HttpGet;
 import org.hibernate.bytecode.buildtime.spi.ExecutionException;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.databind.JavaType;
-import com.yumu.hexie.common.util.HttpUtil;
 import com.yumu.hexie.common.util.JacksonJsonUtil;
 import com.yumu.hexie.common.util.MyHttpClient;
-import com.yumu.hexie.common.util.StringUtil;
 import com.yumu.hexie.integration.wechat.entity.common.JsSign;
 import com.yumu.hexie.integration.wuye.resp.BaseResult;
 import com.yumu.hexie.integration.wuye.resp.BillListVO;
@@ -50,7 +42,7 @@ public class WuyeUtil {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-
+		
 		REQUEST_ADDRESS = props.getProperty("requestUrl");
 		SYSTEM_NAME = props.getProperty("sysName");
 		CSPID = props.getProperty("cspId");
@@ -79,10 +71,6 @@ public class WuyeUtil {
 	private static final String ORDER_PAY_URL = "orderPaySDO.do?trade_no=%s&csp_id=%s&openid=%s&return_url=%s&price=%s"; //商品支付
 	private static final String ORDER_NOTIFY_URL = "orderNotifySDO.do?trade_no=%s&csp_id=%s"; //商品支付查询
 	private static final String ORDER_REFUND_URL = "refundOrderSDO.do?trade_no=%s&csp_id=%srefund_id=%s&refund_price=%s"; //商品支付退款
-	private static final String MNG_HEXIE_LIST_URL = "queryHeXieMngByIdSDO.do";
-//			+ "?sect_name=%s&build_id=%s&unit_id=%s&data_type=%s";//合协社区物业缴费的小区级联
-	private static final String SECT_VAGUE_LIST_URL = "queryVagueSectByNameSDO.do";
-//			+ "?sect_name=%s";//合协社区物业缴费的小区级联 模糊查询小区
 	
 	public static BaseResult<BillListVO> quickPayInfo(String stmtId, String currPage, String totalCount) {
 		String url = REQUEST_ADDRESS + String.format(QUICK_PAY_URL, stmtId, currPage, totalCount);
@@ -198,74 +186,19 @@ public class WuyeUtil {
 	//16.商品支付
 	public static BaseResult<JsSign> getOrderPay(String trade_no, String openId, String return_url, String price) {
 		String url = REQUEST_ADDRESS + String.format(ORDER_PAY_URL, trade_no, CSPID, openId, return_url, price);
-		BaseResult<JsSign> result = (BaseResult<JsSign>)httpGet(url, JsSign.class);
-		return result;
+		return (BaseResult<JsSign>)httpGet(url, JsSign.class);
 	}
 	
 	//17.商品支付通知查询
-	public static BaseResult<JSONObject> notifyPayed(String trade_no){
+	public static BaseResult<JSONObject> notifyPayed(String trade_no) {
 		String url = REQUEST_ADDRESS + String.format(ORDER_NOTIFY_URL, trade_no, CSPID);
-		BaseResult<JSONObject> result = (BaseResult<JSONObject>)httpGet(url, String.class);
-		return result;
+		return (BaseResult<JSONObject>)httpGet(url, String.class);
 	}
 	
 	//18.商品支付退款
 	public static BaseResult<JSONObject> refundPayed(String trade_no, String refund_id, String refundFee) {
 		String url = REQUEST_ADDRESS + String.format(ORDER_REFUND_URL, trade_no, CSPID, refund_id, refundFee);
 		return (BaseResult<JSONObject>)httpGet(url, String.class);
-	}
-	
-	//19.根据ID查询指定类型的合协社区物业信息
-	public static BaseResult<CellListVO> getMngHeXieList(String sect_name, String build_id, String unit_id, String data_type) throws Exception{
-//		String url = REQUEST_ADDRESS + String.format(MNG_HEXIE_LIST_URL, sect_name, build_id, unit_id, data_type);
-//		sect_name=%s&build_id=%s&unit_id=%s&data_type=%s
-		//中文打码
-		sect_name = URLEncoder.encode(sect_name, "gbk");
-		Map<String, String>map = new HashMap<String, String>();
-		map.put("sect_name", sect_name);
-		map.put("build_id", build_id);
-		map.put("unit_id", unit_id);
-		map.put("data_type", data_type);
-		String response = "";
-		//请求
-		response = HttpUtil.doPostMap(REQUEST_ADDRESS+MNG_HEXIE_LIST_URL, map, "gbk");
-		
-//		CellListVO vo = new CellListVO();
-		BaseResult v = new BaseResult<CellListVO>();
-		try {
-//			vo = (CellListVO) JacksonJsonUtil.jsonToBean(response, CellListVO.class);
-			v =jsonToBeanResult(response, CellListVO.class);
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-//		BaseResult<CellListVO> br = new BaseResult<CellListVO>();
-//		br.setData(vo);
-		return v;
-//		return (BaseResult<CellListVO>)httpGet(url,CellListVO.class);
-	}
-	
-	//20.根据名称模糊查询合协社区小区列表
-	public static BaseResult<CellListVO> getVagueSectByName(String sect_name) throws Exception{
-//		String url = REQUEST_ADDRESS + String.format(SECT_VAGUE_LIST_URL, sect_name);
-//		return (BaseResult<CellListVO>)httpGet(url,CellListVO.class);
-		
-		//中文打码
-		sect_name = URLEncoder.encode(sect_name, "gbk");
-		Map<String, String>map = new HashMap<String, String>();
-		map.put("sect_name", sect_name);
-		String response = "";
-		//请求
-		response = HttpUtil.doPostMap(REQUEST_ADDRESS+SECT_VAGUE_LIST_URL, map, "gbk");
-		
-		BaseResult v = new BaseResult<CellListVO>();
-		try {
-			v = jsonToBeanResult(response, CellListVO.class);
-		} catch (JSONException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-		return v;
 	}
 	
 	private static BaseResult httpGet(String reqUrl, Class c){
@@ -298,29 +231,6 @@ public class WuyeUtil {
 					err_msg = (String)respMap.get("err_msg");
 					err_code = result;
 					throw new ExecutionException(err_code+", " +err_msg);
-				}
-			}
-			
-			if (reqUrl.indexOf("orderPaySDO.do")>=0) {
-				Map respMap = JacksonJsonUtil.json2map(resp);
-				String result = (String)respMap.get("result");
-				if (!"00".equals(result)) {
-					err_msg = (String)respMap.get("err_msg");
-					err_code = result;
-					throw new ExecutionException(err_code+", " +err_msg);
-				}
-			}
-			
-			if (reqUrl.indexOf("orderNotifySDO.do")>=0) {
-				Log.info(">>>>>> resp is :"+ resp);
-				if (!StringUtil.isEmpty(resp)) {
-					Map respMap = JacksonJsonUtil.json2map(resp);
-					String result = (String)respMap.get("result");
-					if (!"00".equals(result)) {
-						err_msg = (String)respMap.get("err_msg");
-						err_code = result;
-						throw new ExecutionException(err_code+", " +err_msg);
-					}
 				}
 			}
 			

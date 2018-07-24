@@ -79,12 +79,12 @@ public class AppConfig {
     public EmbeddedServletContainerFactory EmbeddedServletContainerFactory(){
         TomcatEmbeddedServletContainerFactory factory = new TomcatEmbeddedServletContainerFactory();
         factory.setPort(85);
-//        factory.addAdditionalTomcatConnectors(createSslConnector());
+        factory.addAdditionalTomcatConnectors(createSslConnector());
         return factory;
     }
     
     /**
-     * https  访问
+     * https访问
      * @return
      */
     private Connector createSslConnector() {
