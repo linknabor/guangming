@@ -74,16 +74,18 @@ public class HttpUtil {
     public static String doGet(String url, Map<String, String> params, String codePage) {
         String apiUrl = url;
         StringBuffer param = new StringBuffer();
-        int i = 0;
-        for (String key : params.keySet()) {
-            if (i == 0)
-                param.append("?");
-            else
-                param.append("&");
-            param.append(key).append("=").append(params.get(key));
-            i++;
+        if (params != null) {
+	        int i = 0;
+	        for (String key : params.keySet()) {
+	            if (i == 0)
+	                param.append("?");
+	            else
+	                param.append("&");
+	            param.append(key).append("=").append(params.get(key));
+	            i++;
+	        }
+	        apiUrl += param;
         }
-        apiUrl += param;
         String result = null;
         HttpClient httpclient = new HttpClient();
         try {
