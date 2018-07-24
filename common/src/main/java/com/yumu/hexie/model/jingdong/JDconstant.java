@@ -6,6 +6,10 @@ public class JDconstant {
 	
 	public static final String API_NAME = "wangdu";//接口帐号
 	public static final String API_SECRET = "wangdu123";//接口密码
+	
+	public static final String JDPRODUCTPRICE = "JDProductPrice";//京东价格redis
+	
+	public static final String LISTJDPRODUCT = "listJDProduct";//京东状态redis
 	/**
 	 * 获取安全码
 	 */

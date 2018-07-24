@@ -46,13 +46,15 @@ public class JDProductController extends BaseController{
 //		List<Region> listre = jdproductService.getRegion();
 //		jdproductService.redisSku();//缓存到redis
 //		jdproductService.redisSkuPrice();//缓存价格
-		jdproductService.priceContrast();
+//		jdproductService.priceContrast();
+//		jdproductService.dataSynRedis();//数据库价格缓存到reids
+//		jdproductService.dataStatusSynRedis();//数据库上架的商品缓存到redis
 //		jdproductService.synchronization();
 		
 //		System.out.println(jdproductService.getRedisSku());
 //		jdproductService.addproduct();
 //		jdproductService.addregionMapping();
-		return "chengong";
+		return jdproductService.getToken();
 	}
 	
 	

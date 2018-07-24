@@ -38,15 +38,15 @@ public interface JDProductService {
 	
 	void addproduct();//上架商品增加到数据库
 	
-	void redisSku();//商品状态缓存到redis
+	void redisSku();//商品状态缓存到redis    无用
 	
-	void redisSkuPrice();//商品价格缓存到redis
-	
-	Map<Object, Object> getRedisSku();//从reids拿到所有商品状态
+	void redisSkuPrice();//商品价格缓存到redis     无用
 	
 	void synchronization();//上下架同步
 	
-	void priceContrast();
+	void priceContrast();//价格同步
 	
-	void dataSynRedis();
+	void dataSynRedis();//数据库价格缓存到redis
+	
+	void dataStatusSynRedis();//数据库上架的商品缓存到redis
 }
