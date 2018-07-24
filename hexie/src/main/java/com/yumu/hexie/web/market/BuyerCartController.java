@@ -90,16 +90,17 @@ public class BuyerCartController extends BaseController {
 			}
 			
 			//2.校验
-			//获取商品规则信息
-			OnSaleRule saleRule = onSaleRuleRepository.findOne(ruleId);
-			
-			//校验规则
-			if(!saleRule.valid(Integer.parseInt(o.toString())+amount)){
-				throw new BizValidateException(ModelConstant.EXCEPTION_BIZ_TYPE_ONSALE, saleRule.getId(), "商品信息已过期，请重新下单！").setError();
-	        }
-			
-			//校验商品（库存）
-			productService.checkSalable(product, Integer.parseInt(o.toString()));
+			if (amount!=0) { //如果是0，代表是删除动作，不检验商品，直接删除
+				//获取商品规则信息
+				OnSaleRule saleRule = onSaleRuleRepository.findOne(ruleId);
+				//校验规则
+				if(!saleRule.valid(Integer.parseInt(o.toString())+amount)){
+					throw new BizValidateException(ModelConstant.EXCEPTION_BIZ_TYPE_ONSALE, saleRule.getId(), "商品信息已过期，请重新下单！").setError();
+		        }
+				
+				//校验商品（库存）
+				productService.checkSalable(product, Integer.parseInt(o.toString()));
+			}
 			
 			//3.将当前款商品追加到购物车
 			BuyerCart buyerCart = new BuyerCart();

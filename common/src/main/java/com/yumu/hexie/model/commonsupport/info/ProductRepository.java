@@ -23,6 +23,11 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 	@Query(value="update Product p set p.oriPrice = :jdPrice,p.singlePrice = :price,p.miniPrice= :price where p.productNo = :productNo",nativeQuery = true)
 	public void upProductPrice(@Param("productNo")String productNo,@Param("jdPrice")String jdPrice,@Param("price")String price);
 	
+	@Query(value = "select * from Product where productType =?1 and status = 1",nativeQuery = true)
+	List<Product> findByProductType(String ProductType);
+	
+	@Query(value = "select * from Product where merchantId =?1 and status = 1",nativeQuery = true)
+	List<Product> findByMerchantId(String MerchantId);
 	
 	
 //	@Query("select ifnull(max(substring(productNo,5)),0) as max_no from Product "

@@ -9,6 +9,7 @@ import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.yumu.hexie.common.util.DateUtil;
 import com.yumu.hexie.model.ModelConstant;
@@ -16,6 +17,8 @@ import com.yumu.hexie.model.commonsupport.info.Product;
 import com.yumu.hexie.model.commonsupport.info.ProductRepository;
 import com.yumu.hexie.model.distribution.OnSaleAreaItem;
 import com.yumu.hexie.model.distribution.OnSaleAreaItemRepository;
+import com.yumu.hexie.model.distribution.region.Merchant;
+import com.yumu.hexie.model.distribution.region.MerchantRepository;
 import com.yumu.hexie.model.distribution.region.Region;
 import com.yumu.hexie.model.distribution.region.RegionRepository;
 import com.yumu.hexie.model.jingdong.JDconstant;
@@ -47,6 +50,7 @@ import com.yumu.hexie.service.jingdong.JDProductService;
 import com.yumu.hexie.service.jingdong.JDService;
 import com.yumu.hexie.vo.JDProductVO;
 
+@Transactional
 public class JDProductServiceImpl implements JDProductService{
 	
 	private static final Logger logger = LoggerFactory.getLogger(JDProductServiceImpl.class);
@@ -61,6 +65,8 @@ public class JDProductServiceImpl implements JDProductService{
 	private ServiceAreaItemRepository serviceAreaItemRepository;
 	@Inject
 	private OnSaleAreaItemRepository onSaleAreaItemRepository;
+	@Inject
+	private MerchantRepository merchantRepository;
 	@Inject
 	private RegionRepository regionrepository;
 	@Inject
@@ -80,6 +86,8 @@ public class JDProductServiceImpl implements JDProductService{
 		load.setApi_name(JDconstant.API_NAME);
 		load.setApi_secret(JDconstant.API_SECRET);
 		JDSecurity jds = jdservice.getTokenSafeCode(load);//获取安全码
+		
+		
 		
 		JDToken token = new JDToken();
 		token.setFunc(JDconstant.GETAPITOKEN);
@@ -113,8 +121,8 @@ public class JDProductServiceImpl implements JDProductService{
 			sku1.setPage(Integer.toString(page));
 			JDSkuF sku = jdservice.getSku(sku1);//获取所有sku page页数
 			page = page+1;
-			//pageSum = Integer.parseInt(sku.getTotal_page());
-			pageSum = 1;
+			pageSum = Integer.parseInt(sku.getTotal_page());
+//			pageSum = 1;
 			
 			int a = sku.getSkus().length;
 			int b = 0;
@@ -423,7 +431,10 @@ public class JDProductServiceImpl implements JDProductService{
 		return mapJD;
 	}
 	
-	
+	private long getJDID() {
+		Merchant merchant = merchantRepository.findMechantByName("京东");
+        return merchant.getId();
+	}
 	
 	
 	private Product saveProdcut(JDProductVO jdproduct) {
@@ -431,7 +442,7 @@ public class JDProductServiceImpl implements JDProductService{
 		Product product = new Product();
 		
 		
-		product.setMerchantId(1);//供应商id
+		product.setMerchantId(getJDID());//供应商id
 		
 		
 		product.setProductNo(jdproduct.getJdskuidf().getInfo().getSku());//京东商品编号
@@ -753,7 +764,7 @@ public class JDProductServiceImpl implements JDProductService{
 	@Override
 	public void addregionMapping() {
 		// TODO Auto-generated method stub
-		List<JDregionMapping> list1 = getregionMapping();
+		List<JDregionMapping> list1 = getregionMapping();//拿映射实体
 		for (int i = 0; i < list1.size(); i++) {
 			jdregionMappingRepository.save(list1.get(i));
 		}
@@ -771,6 +782,7 @@ public class JDProductServiceImpl implements JDProductService{
 		    OnSaleRule onsalerule = saveOnSaleRule(product);
 		    ServiceAreaItem serviceareaitem = saveServiceAreaItem(product,onsalerule);
 		    saveOnSaleAreaItem(product,onsalerule,serviceareaitem);
+		    logger.info("商品已成功上架："+i);
 		}
 	}
 
@@ -804,17 +816,33 @@ public class JDProductServiceImpl implements JDProductService{
 	 */
 	@Override
 	public void dataSynRedis(){
-		List<Product> list = productRepository.findAll();
+		List<Product> list = productRepository.findByMerchantId(Long.toString(getJDID()));
 		Map<String, String> mapre = new HashMap<String, String>();
 		
 		for (int i = 0; i < list.size(); i++) {
-			//mapre.put(, entry.getValue().getJdPrice()+","+entry.getValue().getPrice());
+			
+			if(redisRepository.judgePrice(list.get(i).getProductNo())) {
+				
+			}else {
+				mapre.put(list.get(i).getProductNo(), list.get(i).getOriPrice()+","+list.get(i).getMiniPrice());
+			}
 		}
-//			mapre.put(entry.getKey(), entry.getValue().getJdPrice()+","+entry.getValue().getPrice());
 		redisRepository.setJDProduct(mapre);
-		
 	}
 	
+	/**
+	 * 数据库上架商品缓存到redis
+	 */
+	@Override
+	public void dataStatusSynRedis() {
+		List<Product> list = productRepository.findByMerchantId(Long.toString(getJDID()));
+		List<String> listStatus = new ArrayList<>();
+		for (int i = 0; i < list.size(); i++) {
+			listStatus.add(list.get(i).getProductNo());
+			redisRepository.delJDStatus(list.get(i).getProductNo());
+		}
+		redisRepository.setListJDStatus(listStatus);
+	}
 	
 	/**
 	 * 价格对比 如有变化更新到reids 和 数据库
@@ -823,26 +851,30 @@ public class JDProductServiceImpl implements JDProductService{
 		List<String> list1 = getProductStatus();//拿到所有上架商品信息
 		Map<String, PriceVo> map = getPrice(list1);//拿到所有上架商品的价格
 		for (Map.Entry<String, PriceVo> entry : map.entrySet()) {
-			String price = (String)redisRepository.getJDProductPrive(entry.getKey());
-			String[] pril = price.split(",");
 			
-			if(entry.getValue().getJdPrice().equals(pril[0])&&entry.getValue().getPrice().equals(pril[1])) {
-					
+			if(redisRepository.judgePrice(entry.getKey())) {
+				String price = (String)redisRepository.getJDProductPrive(entry.getKey());
+				String[] pril = price.split(",");
+				
+				if(entry.getValue().getJdPrice().equals(pril[0])&&entry.getValue().getPrice().equals(pril[1])) {
+						
+				}else {
+					redisRepository.delJDProductPrice(entry.getKey());
+					redisRepository.addJDProductPrice(entry.getKey(),entry.getValue().getJdPrice()+","+entry.getValue().getPrice());
+					synUpPrice(entry.getValue().getJdPrice(),entry.getValue().getPrice(),entry.getKey());
+				}
 			}else {
-				redisRepository.delJDProductPrice(entry.getKey());
 				redisRepository.addJDProductPrice(entry.getKey(),entry.getValue().getJdPrice()+","+entry.getValue().getPrice());
 				synUpPrice(entry.getValue().getJdPrice(),entry.getValue().getPrice(),entry.getKey());
 			}
+			
+			
 			
 		}
 	}
 	
 	
-	@Override
-	public Map<Object, Object> getRedisSku() {
-		// TODO Auto-generated method stub
-		return redisRepository.getJDProduct();
-	}
+
 
 	/**
 	 * 上下架同步

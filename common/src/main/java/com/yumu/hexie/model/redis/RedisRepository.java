@@ -11,6 +11,7 @@ import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
 import com.yumu.hexie.model.jingdong.JDcarrier;
+import com.yumu.hexie.model.jingdong.JDconstant;
 import com.yumu.hexie.model.localservice.HomeCart;
 import com.yumu.hexie.model.market.Cart;
 import com.yumu.hexie.model.market.car.OrderCarInfo;
@@ -39,7 +40,7 @@ public class RedisRepository {
      * @param map
      */
     public void setJDProduct(Map<String, String> map) {
-    	stringRedisTemplate.opsForHash().putAll("JDProductPrice", map);
+    	stringRedisTemplate.opsForHash().putAll(JDconstant.JDPRODUCTPRICE, map);
     }
     
     /**
@@ -48,7 +49,7 @@ public class RedisRepository {
      * @return
      */
     public Object getJDProductPrive(String productNo) {
-    	return stringRedisTemplate.opsForHash().get("JDProductPrice",productNo);
+    	return stringRedisTemplate.opsForHash().get(JDconstant.JDPRODUCTPRICE,productNo);
     }
     
     /**
@@ -56,12 +57,25 @@ public class RedisRepository {
      * @param productNo
      */
     public void delJDProductPrice(String productNo) {
-    	stringRedisTemplate.opsForHash().delete("JDProductPrice", productNo);
+    	stringRedisTemplate.opsForHash().delete(JDconstant.JDPRODUCTPRICE, productNo);
+    }
+    
+    /**
+     * 根据商品Id删除价格
+     * @param productNo
+     */
+    public boolean judgePrice(String productNo) {
+    	return stringRedisTemplate.opsForHash().hasKey(JDconstant.JDPRODUCTPRICE, productNo);
     }
     
     
+    /**
+     * 增加价格
+     * @param productNo
+     * @param price
+     */
     public void addJDProductPrice(String productNo,String price) {
-    	stringRedisTemplate.opsForHash().put("JDProductPrice", productNo, price);
+    	stringRedisTemplate.opsForHash().put(JDconstant.JDPRODUCTPRICE, productNo, price);
     }
     
     /**
@@ -69,15 +83,16 @@ public class RedisRepository {
      * @return
      */
     public Map<Object, Object> getJDProduct() {
-    	return stringRedisTemplate.opsForHash().entries("JDProductPrice");
+    	return stringRedisTemplate.opsForHash().entries(JDconstant.JDPRODUCTPRICE);
     }
+    
     
     /**
      * 上架商品加入redis
      * @param list
      */
     public void setListJDStatus(List<String> list) {
-    	stringRedisTemplate.opsForList().leftPushAll("listJDProduct", list);
+    	stringRedisTemplate.opsForList().leftPushAll(JDconstant.LISTJDPRODUCT, list);
     }
     
     /**
@@ -85,15 +100,19 @@ public class RedisRepository {
      * @return
      */
     public List<String> getListJDStatus() {
-    	return  stringRedisTemplate.opsForList().range("listJDProduct", 0, -1);
+    	return  stringRedisTemplate.opsForList().range(JDconstant.LISTJDPRODUCT, 0, -1);
     }
     /**
      * 根据商品ID删除
      * @param productId
      */
     public void delJDStatus(String productId) {
-    	stringRedisTemplate.opsForList().remove("listJDProduct", 0, productId);
+    	stringRedisTemplate.opsForList().remove(JDconstant.LISTJDPRODUCT, 0, productId);
     }
+    
+    
+    
+    
     
     
     
