@@ -9,6 +9,7 @@ import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.yumu.hexie.common.util.DateUtil;
 import com.yumu.hexie.model.ModelConstant;
@@ -47,6 +48,7 @@ import com.yumu.hexie.service.jingdong.JDProductService;
 import com.yumu.hexie.service.jingdong.JDService;
 import com.yumu.hexie.vo.JDProductVO;
 
+@Transactional
 public class JDProductServiceImpl implements JDProductService{
 	
 	private static final Logger logger = LoggerFactory.getLogger(JDProductServiceImpl.class);
@@ -804,17 +806,33 @@ public class JDProductServiceImpl implements JDProductService{
 	 */
 	@Override
 	public void dataSynRedis(){
-		List<Product> list = productRepository.findAll();
+		List<Product> list = productRepository.findByProductType("京东");
 		Map<String, String> mapre = new HashMap<String, String>();
 		
 		for (int i = 0; i < list.size(); i++) {
-			//mapre.put(, entry.getValue().getJdPrice()+","+entry.getValue().getPrice());
+			
+			if(redisRepository.judgePrice(list.get(i).getProductNo())) {
+				
+			}else {
+				mapre.put(list.get(i).getProductNo(), list.get(i).getOriPrice()+","+list.get(i).getMiniPrice());
+			}
 		}
-//			mapre.put(entry.getKey(), entry.getValue().getJdPrice()+","+entry.getValue().getPrice());
 		redisRepository.setJDProduct(mapre);
-		
 	}
 	
+	/**
+	 * 数据库上架商品缓存到redis
+	 */
+	@Override
+	public void dataStatusSynRedis() {
+		List<Product> list = productRepository.findByProductType("京东");
+		List<String> listStatus = new ArrayList<>();
+		for (int i = 0; i < list.size(); i++) {
+			listStatus.add(list.get(i).getProductNo());
+			redisRepository.delJDStatus(list.get(i).getProductNo());
+		}
+		redisRepository.setListJDStatus(listStatus);
+	}
 	
 	/**
 	 * 价格对比 如有变化更新到reids 和 数据库
@@ -823,26 +841,30 @@ public class JDProductServiceImpl implements JDProductService{
 		List<String> list1 = getProductStatus();//拿到所有上架商品信息
 		Map<String, PriceVo> map = getPrice(list1);//拿到所有上架商品的价格
 		for (Map.Entry<String, PriceVo> entry : map.entrySet()) {
-			String price = (String)redisRepository.getJDProductPrive(entry.getKey());
-			String[] pril = price.split(",");
 			
-			if(entry.getValue().getJdPrice().equals(pril[0])&&entry.getValue().getPrice().equals(pril[1])) {
-					
+			if(redisRepository.judgePrice(entry.getKey())) {
+				String price = (String)redisRepository.getJDProductPrive(entry.getKey());
+				String[] pril = price.split(",");
+				
+				if(entry.getValue().getJdPrice().equals(pril[0])&&entry.getValue().getPrice().equals(pril[1])) {
+						
+				}else {
+					redisRepository.delJDProductPrice(entry.getKey());
+					redisRepository.addJDProductPrice(entry.getKey(),entry.getValue().getJdPrice()+","+entry.getValue().getPrice());
+					synUpPrice(entry.getValue().getJdPrice(),entry.getValue().getPrice(),entry.getKey());
+				}
 			}else {
-				redisRepository.delJDProductPrice(entry.getKey());
 				redisRepository.addJDProductPrice(entry.getKey(),entry.getValue().getJdPrice()+","+entry.getValue().getPrice());
 				synUpPrice(entry.getValue().getJdPrice(),entry.getValue().getPrice(),entry.getKey());
 			}
+			
+			
 			
 		}
 	}
 	
 	
-	@Override
-	public Map<Object, Object> getRedisSku() {
-		// TODO Auto-generated method stub
-		return redisRepository.getJDProduct();
-	}
+
 
 	/**
 	 * 上下架同步
