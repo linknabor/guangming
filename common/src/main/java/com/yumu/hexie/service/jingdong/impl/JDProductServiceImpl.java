@@ -17,6 +17,8 @@ import com.yumu.hexie.model.commonsupport.info.Product;
 import com.yumu.hexie.model.commonsupport.info.ProductRepository;
 import com.yumu.hexie.model.distribution.OnSaleAreaItem;
 import com.yumu.hexie.model.distribution.OnSaleAreaItemRepository;
+import com.yumu.hexie.model.distribution.region.Merchant;
+import com.yumu.hexie.model.distribution.region.MerchantRepository;
 import com.yumu.hexie.model.distribution.region.Region;
 import com.yumu.hexie.model.distribution.region.RegionRepository;
 import com.yumu.hexie.model.jingdong.JDconstant;
@@ -63,6 +65,8 @@ public class JDProductServiceImpl implements JDProductService{
 	private ServiceAreaItemRepository serviceAreaItemRepository;
 	@Inject
 	private OnSaleAreaItemRepository onSaleAreaItemRepository;
+	@Inject
+	private MerchantRepository merchantRepository;
 	@Inject
 	private RegionRepository regionrepository;
 	@Inject
@@ -427,7 +431,10 @@ public class JDProductServiceImpl implements JDProductService{
 		return mapJD;
 	}
 	
-	
+	private long getJDID() {
+		Merchant merchant = merchantRepository.findMechantByName("京东");
+        return merchant.getId();
+	}
 	
 	
 	private Product saveProdcut(JDProductVO jdproduct) {
@@ -435,7 +442,7 @@ public class JDProductServiceImpl implements JDProductService{
 		Product product = new Product();
 		
 		
-		product.setMerchantId(1);//供应商id
+		product.setMerchantId(getJDID());//供应商id
 		
 		
 		product.setProductNo(jdproduct.getJdskuidf().getInfo().getSku());//京东商品编号
@@ -757,7 +764,7 @@ public class JDProductServiceImpl implements JDProductService{
 	@Override
 	public void addregionMapping() {
 		// TODO Auto-generated method stub
-		List<JDregionMapping> list1 = getregionMapping();
+		List<JDregionMapping> list1 = getregionMapping();//拿映射实体
 		for (int i = 0; i < list1.size(); i++) {
 			jdregionMappingRepository.save(list1.get(i));
 		}
@@ -808,7 +815,7 @@ public class JDProductServiceImpl implements JDProductService{
 	 */
 	@Override
 	public void dataSynRedis(){
-		List<Product> list = productRepository.findByProductType("京东");
+		List<Product> list = productRepository.findByMerchantId(Long.toString(getJDID()));
 		Map<String, String> mapre = new HashMap<String, String>();
 		
 		for (int i = 0; i < list.size(); i++) {
@@ -827,7 +834,7 @@ public class JDProductServiceImpl implements JDProductService{
 	 */
 	@Override
 	public void dataStatusSynRedis() {
-		List<Product> list = productRepository.findByProductType("京东");
+		List<Product> list = productRepository.findByMerchantId(Long.toString(getJDID()));
 		List<String> listStatus = new ArrayList<>();
 		for (int i = 0; i < list.size(); i++) {
 			listStatus.add(list.get(i).getProductNo());

@@ -11,4 +11,8 @@ public interface MerchantRepository extends JpaRepository<Merchant, Long> {
 	//根据商户名称来查找商户
 	@Query(value="select * from Merchant p where p.name like %?1% " ,nativeQuery=true)
 	public Merchant findMechantByNameLike(String merchantName);
+	
+	//根据商户名称来查找商户
+	@Query(value="select * from Merchant p where p.name =?1 " ,nativeQuery=true)
+	public Merchant findMechantByName(String merchantName);
 }
