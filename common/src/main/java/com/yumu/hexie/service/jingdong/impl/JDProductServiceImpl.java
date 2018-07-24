@@ -782,6 +782,7 @@ public class JDProductServiceImpl implements JDProductService{
 		    OnSaleRule onsalerule = saveOnSaleRule(product);
 		    ServiceAreaItem serviceareaitem = saveServiceAreaItem(product,onsalerule);
 		    saveOnSaleAreaItem(product,onsalerule,serviceareaitem);
+		    logger.info("商品已成功上架："+i);
 		}
 	}
 
