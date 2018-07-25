@@ -69,8 +69,19 @@ public class JDProductController extends BaseController{
 		return "商品增加完毕";
 	}
 	
+	@RequestMapping(value = "/dataStatusSynRedis", method = RequestMethod.GET)
+	@ResponseBody
+	public String dataStatusSynRedis() {
+		jdproductService.dataStatusSynRedis();
+		return "数据库上架的商品缓存到redis";
+	}
 	
-	
+	@RequestMapping(value = "/synchronization", method = RequestMethod.GET)
+	@ResponseBody
+	public String synchronization() {
+		jdproductService.synchronization();
+		return "商品上下架同步";
+	}
 	
 	@RequestMapping(value = "/helloWord", method = RequestMethod.GET)
 	@ResponseBody
