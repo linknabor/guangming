@@ -235,8 +235,10 @@ public class OrderController extends BaseController{
 	
 	@RequestMapping(value = "/getOrder/{orderId}", method = RequestMethod.GET)
 	@ResponseBody
-	public BaseResult<ServiceOrder> getOrder(@ModelAttribute(Constants.USER)User user,@PathVariable long orderId) throws Exception {
-		ServiceOrder order = baseOrderService.findOne(orderId);
+	public BaseResult<ServiceOrder> getOrder(@ModelAttribute(Constants.USER)User user,@PathVariable String orderId) throws Exception {
+		String[] orderIds = orderId.split(",");
+		long id = Long.parseLong(orderIds[0]);
+		ServiceOrder order = baseOrderService.findOne(id);
 		if(order.getUserId() != user.getId()){
 			return new BaseResult<ServiceOrder>().failMsg("你没有权限查看该订单！");
 		}
