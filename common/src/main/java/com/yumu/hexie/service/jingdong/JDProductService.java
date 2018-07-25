@@ -9,6 +9,7 @@ import com.yumu.hexie.model.jingdong.getaddress.RegionJ;
 import com.yumu.hexie.model.jingdong.getskuid.detail.JDSkuIDF;
 import com.yumu.hexie.model.jingdong.getskuid.image.SKUImage;
 import com.yumu.hexie.model.jingdong.getskuid.price.PriceVo;
+import com.yumu.hexie.model.jingdong.limitregion.JDRegionF;
 import com.yumu.hexie.vo.JDProductVO;
 
 public interface JDProductService {
@@ -34,6 +35,7 @@ public interface JDProductService {
 	
 	List<JDregionMapping> getregionMapping();//地区映射 集合
 	
+	JDRegionF getRegionLimit(String region,String productNo);
 	
 	
 	void addregionMapping();//地区映射到数据库
@@ -48,6 +50,7 @@ public interface JDProductService {
 	
 	void dataStatusSynRedis();//数据库上架的商品缓存到redis
 	
+	String isProduct(String productNo,String region,String price,String jdPrice);//单个查询 商品上下架 价格 地区购买限制
 	
 	
 	void redisSku();//商品状态缓存到redis    无用

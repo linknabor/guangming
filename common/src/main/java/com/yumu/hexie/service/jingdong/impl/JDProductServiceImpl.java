@@ -38,6 +38,8 @@ import com.yumu.hexie.model.jingdong.getskuid.image.SKUImage;
 import com.yumu.hexie.model.jingdong.getskuid.price.PriceF;
 import com.yumu.hexie.model.jingdong.getskuid.price.PriceVo;
 import com.yumu.hexie.model.jingdong.getskuid.status.JDSkuIDStatusF;
+import com.yumu.hexie.model.jingdong.limitregion.JDRegion;
+import com.yumu.hexie.model.jingdong.limitregion.JDRegionF;
 import com.yumu.hexie.model.jingdong.token.JDToken;
 import com.yumu.hexie.model.jingdong.token.JDTokenF;
 import com.yumu.hexie.model.market.ServiceAreaItem;
@@ -241,10 +243,26 @@ public class JDProductServiceImpl implements JDProductService{
 			sku.setJdskuidimagef(mapimg.get(strlist.get(i)));//根据商品id拿到image
 			sku.setPrivef(mapprice.get(strlist.get(i)));//根据商品id拿到价格
 			list.add(sku);
+			logger.info("商品加入集合："+i);
 		}
 		return list;
 	}
 
+	@Override
+	public JDRegionF getRegionLimit(String reg,String productNo) {
+		String strToken = getToken();
+		//商品购买区域限制查询  1805948
+	    JDRegion region1 = new JDRegion();
+	    region1.setFunc(JDconstant.CHECKAREALIMIT);
+	    region1.setToken(strToken);
+	    region1.setArea(reg);
+	    region1.setSkuIds(productNo);
+	    JDRegionF region = jdservice.CheckAreaLimit(region1);
+		
+		return region;
+	}
+	
+	
 	/**
 	 * 拿到所有上架的商品图片
 	 */
@@ -843,6 +861,26 @@ public class JDProductServiceImpl implements JDProductService{
 		}
 		redisRepository.setListJDStatus(listStatus);
 	}
+	
+	@Override
+	public String isProduct(String productNo,String region,String price,String jdPrice) {
+		boolean jd = false;
+		JDSkuIDF sku = getByidSku(productNo);
+		if(sku.getInfo().getState().equals("1")) {
+			jd = true;
+		}
+		if(jd) {
+			PriceVo pri = getPriceSingle(productNo);
+			if(price.equals(pri.getPrice())&&jdPrice.equals(pri.getJdPrice())) {
+				JDRegionF jdr = getRegionLimit(region,productNo);
+				return jdr.getInfo().get(0).getIsAreaRestrict();
+			}else {
+				synUpPrice(pri.getJdPrice(),pri.getPrice(),productNo);
+			}
+		}
+		return "true";
+	}
+	
 	
 	/**
 	 * 价格对比 如有变化更新到reids 和 数据库
