@@ -81,6 +81,8 @@ public class OrderController extends BaseController{
 	@Inject
     private CustomOrderService customOnSaleService;
 	
+	
+	
 	@RequestMapping(value = "/getProduct/{productId}", method = RequestMethod.GET)
 	@ResponseBody
 	public BaseResult<Product> getProduct(@PathVariable long productId) throws Exception {
@@ -265,8 +267,8 @@ public class OrderController extends BaseController{
 
 	@RequestMapping(value = "/notifyPayed/{orderId}", method = RequestMethod.GET)
 	@ResponseBody
-	public BaseResult<String> notifyPayed(@PathVariable long orderId,@ModelAttribute(Constants.USER)User user) throws Exception {
-		baseOrderService.notifyPayed(orderId, "", "");
+	public BaseResult<String> notifyPayed(@PathVariable String orderId,@ModelAttribute(Constants.USER)User user) throws Exception {
+//		baseOrderService.notifyPayed(orderId, "", "");
 		return new BaseResult<String>().success("通知成功");
 	}
 
