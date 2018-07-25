@@ -52,7 +52,7 @@ import com.yumu.hexie.service.jingdong.JDProductService;
 import com.yumu.hexie.service.jingdong.JDService;
 import com.yumu.hexie.vo.JDProductVO;
 
-@Transactional
+
 public class JDProductServiceImpl implements JDProductService{
 	
 	private static final Logger logger = LoggerFactory.getLogger(JDProductServiceImpl.class);
@@ -792,16 +792,23 @@ public class JDProductServiceImpl implements JDProductService{
 	 * 添加所有上架商品
 	 */
 	@Override
+	@Transactional
 	public void addproduct() {
 		// TODO Auto-generated method stub
-		List<JDProductVO> list = getAllSku();//拿到所有上架商品信息
-		for (int i = 0; i < list.size(); i++) {
-		    Product product = saveProdcut(list.get(i));
-		    OnSaleRule onsalerule = saveOnSaleRule(product);
-		    ServiceAreaItem serviceareaitem = saveServiceAreaItem(product,onsalerule);
-		    saveOnSaleAreaItem(product,onsalerule,serviceareaitem);
-		    logger.info("商品已成功上架："+i);
+		try {
+			List<JDProductVO> list = getAllSku();//拿到所有上架商品信息
+			for (int i = 0; i < list.size(); i++) {
+			    Product product = saveProdcut(list.get(i));
+			    OnSaleRule onsalerule = saveOnSaleRule(product);
+			    ServiceAreaItem serviceareaitem = saveServiceAreaItem(product,onsalerule);
+			    saveOnSaleAreaItem(product,onsalerule,serviceareaitem);
+			    logger.info("商品已成功上架："+i);
+			}
+		} catch (Throwable e) {
+			logger.info("!!!!!!!此行存在问题："+e);
+			throw e;
 		}
+		
 	}
 
 	/**
