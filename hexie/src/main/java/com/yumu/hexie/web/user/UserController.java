@@ -29,7 +29,6 @@ import com.yumu.hexie.model.user.User;
 import com.yumu.hexie.service.common.GotongService;
 import com.yumu.hexie.service.common.SmsService;
 import com.yumu.hexie.service.common.SystemConfigService;
-import com.yumu.hexie.service.exception.BizValidateException;
 import com.yumu.hexie.service.o2o.OperatorService;
 import com.yumu.hexie.service.shequ.WuyeService;
 import com.yumu.hexie.service.user.CouponService;
@@ -107,32 +106,23 @@ public class UserController extends BaseController{
     @ResponseBody
     public BaseResult<UserInfo> bindBaofang(HttpSession session,@ModelAttribute(Constants.USER)User user,@PathVariable String appId,@PathVariable String code) throws Exception {
 
-		if (user!=null) {
-			if (!StringUtil.isEmpty(user.getOpenid()) && !StringUtil.isEmpty(user.getName())) {
-				UserWeiXin wuser = userService.getOtherWechatUser(appId, code);
+		UserWeiXin wuser = userService.getOtherWechatUser(appId, code);
 
-			    if(wuser != null) {
-			        user.setBindOpenId(wuser.getOpenid());
-			        user.setBindAppId(appId);
-			        user = userService.save(user);
-			        
-			        UserWeiXin baofangUser = userService.getOtherUserByOpenId(appId, wuser.getOpenid());
-			        
-			        if(user.isNewRegiste()) {
-			            //通过openId获取宝房用户，判断是否关注，关注则发红包
-			            updateWeUserInfo(user, baofangUser);
-			        }
-			    }
-		        session.setAttribute(Constants.USER, user);
-		        return new BaseResult<UserInfo>().success(new UserInfo(user,
-		            operatorService.isOperator(HomeServiceConstant.SERVICE_TYPE_REPAIR, user.getId())));
-			}
-		}else {
-			throw new BizValidateException("cannot find current user !");
-		}
-		return null;
-		
-		
+	    if(wuser != null) {
+	        user.setBindOpenId(wuser.getOpenid());
+	        user.setBindAppId(appId);
+	        user = userService.save(user);
+	        
+	        UserWeiXin baofangUser = userService.getOtherUserByOpenId(appId, wuser.getOpenid());
+	        
+	        if(user.isNewRegiste()) {
+	            //通过openId获取宝房用户，判断是否关注，关注则发红包
+	            updateWeUserInfo(user, baofangUser);
+	        }
+	    }
+        session.setAttribute(Constants.USER, user);
+        return new BaseResult<UserInfo>().success(new UserInfo(user,
+            operatorService.isOperator(HomeServiceConstant.SERVICE_TYPE_REPAIR, user.getId())));
 	}
 	
 	@RequestMapping(value = "/login/{code}", method = RequestMethod.POST)
