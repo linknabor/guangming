@@ -29,6 +29,10 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 	@Query(value = "select * from Product where merchantId =?1 and status = 1",nativeQuery = true)
 	List<Product> findByMerchantId(String MerchantId);
 	
+	@Query(value = "SELECT p.* FROM Product p JOIN merchant m ON p.merchantId = m.id WHERE m.name = '京东' AND (productNo IS NULL OR productNo = '')",nativeQuery = true)
+	List<Product> findByJDProductNoIsNull();
+	
+	
 	
 //	@Query("select ifnull(max(substring(productNo,5)),0) as max_no from Product "
 //			+ "where productNo >= ?1 and productNo <= ?2 ")

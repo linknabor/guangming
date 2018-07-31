@@ -24,11 +24,18 @@ import com.yumu.hexie.model.distribution.region.RegionRepository;
 import com.yumu.hexie.model.jingdong.JDconstant;
 import com.yumu.hexie.model.jingdong.JDregionMapping;
 import com.yumu.hexie.model.jingdong.JDregionMappingRepository;
-import com.yumu.hexie.model.jingdong.getSecurity.JDLoad;
-import com.yumu.hexie.model.jingdong.getSecurity.JDSecurity;
 import com.yumu.hexie.model.jingdong.getaddress.JDAddress;
 import com.yumu.hexie.model.jingdong.getaddress.JDAddressF;
 import com.yumu.hexie.model.jingdong.getaddress.RegionJ;
+import com.yumu.hexie.model.jingdong.getorder.ConfirmOrder;
+import com.yumu.hexie.model.jingdong.getorder.ConfirmOrderF;
+import com.yumu.hexie.model.jingdong.getorder.DownloadOrder;
+import com.yumu.hexie.model.jingdong.getorder.DownloadOrderF;
+import com.yumu.hexie.model.jingdong.getorder.WHOrder;
+import com.yumu.hexie.model.jingdong.getorder.WHOrderF;
+import com.yumu.hexie.model.jingdong.getorder.query.QueryOrder;
+import com.yumu.hexie.model.jingdong.getorder.query.QueryOrderF;
+import com.yumu.hexie.model.jingdong.getorder.query.QueryTrackF;
 import com.yumu.hexie.model.jingdong.getsku.JDSku;
 import com.yumu.hexie.model.jingdong.getsku.JDSkuF;
 import com.yumu.hexie.model.jingdong.getskuid.JDSkuID;
@@ -38,10 +45,11 @@ import com.yumu.hexie.model.jingdong.getskuid.image.SKUImage;
 import com.yumu.hexie.model.jingdong.getskuid.price.PriceF;
 import com.yumu.hexie.model.jingdong.getskuid.price.PriceVo;
 import com.yumu.hexie.model.jingdong.getskuid.status.JDSkuIDStatusF;
+import com.yumu.hexie.model.jingdong.getstock.SkuNums;
+import com.yumu.hexie.model.jingdong.getstock.Stock;
+import com.yumu.hexie.model.jingdong.getstock.StockF;
 import com.yumu.hexie.model.jingdong.limitregion.JDRegion;
 import com.yumu.hexie.model.jingdong.limitregion.JDRegionF;
-import com.yumu.hexie.model.jingdong.token.JDToken;
-import com.yumu.hexie.model.jingdong.token.JDTokenF;
 import com.yumu.hexie.model.market.ServiceAreaItem;
 import com.yumu.hexie.model.market.ServiceAreaItemRepository;
 import com.yumu.hexie.model.market.saleplan.OnSaleRule;
@@ -81,26 +89,7 @@ public class JDProductServiceImpl implements JDProductService{
 	@Override
 	public String getToken() {
 		// TODO Auto-generated method stub
-		JDLoad load = new JDLoad();
-		load.setFunc(JDconstant.GETTOKENSAFECODE);
-		load.setUsername(JDconstant.USERNAME);
-		load.setPassword(JDconstant.PASSWORD);
-		load.setApi_name(JDconstant.API_NAME);
-		load.setApi_secret(JDconstant.API_SECRET);
-		JDSecurity jds = jdservice.getTokenSafeCode(load);//获取安全码
-		
-		
-		
-		JDToken token = new JDToken();
-		token.setFunc(JDconstant.GETAPITOKEN);
-		token.setUsername(JDconstant.USERNAME);
-		token.setPassword(JDconstant.PASSWORD);
-		token.setApi_name(JDconstant.API_NAME);
-		token.setApi_secret(JDconstant.API_SECRET);
-		token.setSafecode(jds.getSafecode());
-		JDTokenF tokenf = jdservice.getApiToken(token);//用安全码获取token
-		
-		return tokenf.getToken();//拿到token
+		return redisRepository.getJDtoken();//拿到token
 	}
 
 	/**
@@ -236,7 +225,6 @@ public class JDProductServiceImpl implements JDProductService{
 		Map<String, List<SKUImage>> mapimg = getImage(strlist);//拿到所有image
 		Map<String, PriceVo> mapprice = getPrice(strlist);//拿到所有商品价格
 		
-		System.out.println(strlist.size());
 		for (int i = 0; i < strlist.size(); i++) {
 			JDProductVO sku = new JDProductVO();
 			sku.setJdskuidf(getByidSku(strlist.get(i)));
@@ -261,6 +249,33 @@ public class JDProductServiceImpl implements JDProductService{
 		
 		return region;
 	}
+	
+	/**
+	 * 单个查询某地区  物品库存
+	 */
+	@Override
+	public boolean getProductStock(String region,String productNo,String proNums) {
+		String strToken = getToken();
+		List<SkuNums> skuNums = new ArrayList<>();
+		SkuNums s = new SkuNums();
+        s.setNum(proNums);
+        s.setSkuId(productNo);
+        skuNums.add(s);
+	    Stock sto1 = new Stock();
+	    sto1.setFunc(JDconstant.GETNEWSTOCKBYID);
+	    sto1.setToken(strToken);
+	    sto1.setArea(getAddress(region));//拿到京东地址编号
+	    sto1.setSkuNums(skuNums);
+	    StockF sto = jdservice.GetNewStockById(sto1);//根据商品id 三级地址 获取库存
+	    
+	    boolean pan = true;
+		if(sto.getInfo().get(0).getStockStateId().equals("36")||sto.getInfo().get(0).getStockStateId().equals("34")) {
+			pan = false;
+		}
+	    
+	    return pan;
+	}
+	
 	
 	
 	/**
@@ -775,11 +790,87 @@ public class JDProductServiceImpl implements JDProductService{
 		
 		return list;
 	}
+	
+	
+	/**
+	 * 获取网壕订单号
+	 */
+	@Override
+	public WHOrderF getWHOrder(String orderId) {
+		// TODO Auto-generated method stub
+		String strToken = getToken();
+		WHOrder whorder = new WHOrder();
+		whorder.setFunc(JDconstant.GETORDERSN);
+		whorder.setThirdsn(orderId);
+		whorder.setToken(strToken);
+		
+		return jdservice.getOrder(whorder);
+	}
+	
+	/**
+	 * 发送订单
+	 */
+	@Override
+	public DownloadOrderF sendDlo() {
+		// TODO Auto-generated method stub
+		String strToken = getToken();
+		DownloadOrder download = new DownloadOrder();
+		download.setToken(strToken);
+		download.setFunc(JDconstant.ORDERSUBMIT);
+		
+		return jdservice.sendOrder(download);
+	}
+	
+	/**
+	 * 确认订单
+	 */
+	@Override
+	public ConfirmOrderF getConfirmOd(String ordersn) {
+		// TODO Auto-generated method stub
+		String strToken = getToken();
+		ConfirmOrder cfo = new ConfirmOrder();
+		cfo.setFunc(JDconstant.CONFIRMORDER);
+		cfo.setToken(strToken);
+		cfo.setOrdersn(ordersn);
+		return jdservice.confirmSendOd(cfo);
+	}
+
+	/**
+	 * 查询订单信息
+	 */
+	@Override
+	public QueryOrderF getOrderinfo(String ordersn) {
+		// TODO
+		String strToken = getToken();
+		QueryOrder queryorder = new QueryOrder();
+		queryorder.setFunc(JDconstant.SELECTORDER);
+		queryorder.setOrdersn(ordersn);
+		queryorder.setToken(strToken);
+		return jdservice.getOrderInfo(queryorder);
+	}
+
+	/**
+	 * 查询配送信息
+	 */
+	@Override
+	public QueryTrackF getOrderTrackInfo(String ordersn) {
+		// TODO Auto-generated method stub
+		String strToken = getToken();
+		QueryOrder queryorder = new QueryOrder();
+		queryorder.setFunc(JDconstant.ORDERTRACK);
+		queryorder.setOrdersn(ordersn);
+		queryorder.setToken(strToken);
+		return jdservice.getOrderTrackInfo(queryorder);
+	}
+	
+	
+	
 
 	/**
 	 * 地区映射
 	 */
 	@Override
+	@Transactional
 	public void addregionMapping() {
 		// TODO Auto-generated method stub
 		List<JDregionMapping> list1 = getregionMapping();//拿映射实体
@@ -840,6 +931,7 @@ public class JDProductServiceImpl implements JDProductService{
 	 * 数据库价格缓存到redis
 	 */
 	@Override
+	@Transactional
 	public void dataSynRedis(){
 		List<Product> list = productRepository.findByMerchantId(Long.toString(getJDID()));
 		Map<String, String> mapre = new HashMap<String, String>();
@@ -859,6 +951,7 @@ public class JDProductServiceImpl implements JDProductService{
 	 * 数据库上架商品缓存到redis
 	 */
 	@Override
+	@Transactional
 	public void dataStatusSynRedis() {
 		List<Product> list = productRepository.findByMerchantId(Long.toString(getJDID()));
 		List<String> listStatus = new ArrayList<>();
@@ -869,6 +962,9 @@ public class JDProductServiceImpl implements JDProductService{
 		redisRepository.setListJDStatus(listStatus);
 	}
 	
+	/**
+	 * 查询商品价格是否变动  地区是否限制购买
+	 */
 	@Override
 	public String isProduct(String productNo,String region,String price,String jdPrice) {
 		boolean jd = false;
@@ -883,6 +979,8 @@ public class JDProductServiceImpl implements JDProductService{
 				return jdr.getInfo().get(0).getIsAreaRestrict();
 			}else {
 				synUpPrice(pri.getJdPrice(),pri.getPrice(),productNo);
+				JDRegionF jdr = getRegionLimit(region,productNo);
+				return jdr.getInfo().get(0).getIsAreaRestrict();
 			}
 		}
 		return "true";
@@ -892,6 +990,7 @@ public class JDProductServiceImpl implements JDProductService{
 	/**
 	 * 价格对比 如有变化更新到reids 和 数据库
 	 */
+	@Transactional
 	public void priceContrast() {
 		List<String> list1 = getProductStatus();//拿到所有上架商品信息
 		Map<String, PriceVo> map = getPrice(list1);//拿到所有上架商品的价格
@@ -925,6 +1024,7 @@ public class JDProductServiceImpl implements JDProductService{
 	 * 上下架同步
 	 */
 	@Override
+	@Transactional
 	public void synchronization() {
 		// TODO Auto-generated method stub
 		
@@ -964,7 +1064,6 @@ public class JDProductServiceImpl implements JDProductService{
 	public void synUpPrice(String jdPrice,String price,String productNo) {
 		Product pro = productRepository.findByProductNo(productNo);
 		productRepository.upProductPrice(productNo, jdPrice, price);
-		System.out.println(Long.toString(pro.getId()));
 		onSaleRuleRepository.upProductPrice(Long.toString(pro.getId()), jdPrice, price);
 		onSaleAreaItemRepository.upProductPrice(Long.toString(pro.getId()), jdPrice, price);
 	}
@@ -1042,5 +1141,82 @@ public class JDProductServiceImpl implements JDProductService{
 		return price.getInfo().get(0);
 	}
 	
+	
+	/**
+	 * 地区映射获取
+	 * @param region
+	 * @return
+	 */
+	private String getAddress(String region) {
+		String[] address = region.split("_");
+		JDregionMapping jdre = jdregionMappingRepository.getByRegionId(address[0], address[1]);
+		JDregionMapping jdre1 = jdregionMappingRepository.getByRegionId(address[1], address[2]);
+		String regionAddress = jdre.getJdparentid()+"_"+jdre.getJdregionid()+"_"+jdre1.getJdregionid();
+		return regionAddress;
+	}
+
+	@Override
+	@Transactional
+	public void productNameSyn() {
+		// TODO Auto-generated method stub
+		
+		List<String> strlist = getProductStatus();
+		List<Product> list = productRepository.findByJDProductNoIsNull();
+		
+		for (int i = 0; i < strlist.size(); i++) {
+			JDSkuIDF jdskuf = getByidSku(strlist.get(i));
+			for (int j = 0; j < list.size(); j++) {
+				if(jdskuf.getInfo().getName().equals(list.get(j).getName())) {
+					Product pro = list.get(j);
+					JDSavePro(pro,jdskuf.getInfo().getSku());
+				}
+			}
+		}
+	}
+
+	private Product JDSavePro(Product pro,String productNo) {
+
+		Product product = new Product();
+		
+		product.setId(pro.getId());
+		product.setMerchantId(pro.getMerchantId());//供应商id
+		
+		
+		product.setProductNo(productNo);//京东商品编号
+		product.setMerchanProductNo(productNo);//京东商品编号
+		
+		
+		product.setProductType("京东");	//TODO
+		product.setName(pro.getName());
+		
+		String imagePath = pro.getPictures();
+		product.setPictures(imagePath);
+		product.setMainPicture(imagePath);
+		product.setSmallPicture(imagePath);
+		
+		product.setMiniPrice(pro.getMiniPrice());//结算价
+		product.setOriPrice(pro.getOriPrice());//市场价
+		product.setSinglePrice(pro.getSinglePrice());//单买价
+		
+		product.setServiceDesc(pro.getServiceDesc());
+		
+		product.setStatus(ModelConstant.PRODUCT_ONSALE);	//上架
+		product.setTotalCount(999);
+		product.setShortName(pro.getShortName());
+		product.setTitleName(pro.getTitleName());
+		product.setOrderTemplate("goodDetail");
+		String startDate = "2018-01-01 00:00:00";
+		String endDate = "2020-01-01 00:00:00";
+		product.setStartDate(startDate);
+		product.setEndDate(endDate);
+		product.setProvenance(2);
+		product.setFirstType("01");
+		product.setSecondType("01");
+		product.setPostageFee(0f);	//TODO
+		return productRepository.save(product);
+
+	}
+
+
 	
 }

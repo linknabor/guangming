@@ -1,11 +1,18 @@
 package com.yumu.hexie.service.jingdong;
 
-import java.util.List;
-
 import com.yumu.hexie.model.jingdong.getSecurity.JDLoad;
 import com.yumu.hexie.model.jingdong.getSecurity.JDSecurity;
 import com.yumu.hexie.model.jingdong.getaddress.JDAddress;
 import com.yumu.hexie.model.jingdong.getaddress.JDAddressF;
+import com.yumu.hexie.model.jingdong.getorder.ConfirmOrder;
+import com.yumu.hexie.model.jingdong.getorder.ConfirmOrderF;
+import com.yumu.hexie.model.jingdong.getorder.DownloadOrder;
+import com.yumu.hexie.model.jingdong.getorder.DownloadOrderF;
+import com.yumu.hexie.model.jingdong.getorder.WHOrder;
+import com.yumu.hexie.model.jingdong.getorder.WHOrderF;
+import com.yumu.hexie.model.jingdong.getorder.query.QueryOrder;
+import com.yumu.hexie.model.jingdong.getorder.query.QueryOrderF;
+import com.yumu.hexie.model.jingdong.getorder.query.QueryTrackF;
 import com.yumu.hexie.model.jingdong.getsku.JDSku;
 import com.yumu.hexie.model.jingdong.getsku.JDSkuF;
 import com.yumu.hexie.model.jingdong.getskuid.JDSkuID;
@@ -13,7 +20,6 @@ import com.yumu.hexie.model.jingdong.getskuid.detail.JDSkuIDF;
 import com.yumu.hexie.model.jingdong.getskuid.image.JDSkuIdImageF;
 import com.yumu.hexie.model.jingdong.getskuid.price.PriceF;
 import com.yumu.hexie.model.jingdong.getskuid.status.JDSkuIDStatusF;
-import com.yumu.hexie.model.jingdong.getstock.SkuNums;
 import com.yumu.hexie.model.jingdong.getstock.Stock;
 import com.yumu.hexie.model.jingdong.getstock.StockF;
 import com.yumu.hexie.model.jingdong.gettype.Classification;
@@ -45,4 +51,13 @@ public interface JDService {
 	
 	PriceF getPrice(JDSkuID sku);//批量查询协议价价格
 	
+	WHOrderF getOrder(WHOrder order);//获取订单
+	
+	DownloadOrderF sendOrder(DownloadOrder download);//发送订单
+	
+	ConfirmOrderF confirmSendOd(ConfirmOrder confirmorder);//确认订单
+	
+	QueryOrderF getOrderInfo(QueryOrder ordersn);//获取订单信息
+	
+	QueryTrackF getOrderTrackInfo(QueryOrder ordersn);//获取配送信息
 }

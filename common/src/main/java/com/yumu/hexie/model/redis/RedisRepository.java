@@ -35,6 +35,16 @@ public class RedisRepository {
     private StringRedisTemplate stringRedisTemplate;
     
     
+    
+    public void setJDtoken(String token) {
+    	stringRedisTemplate.opsForValue().set(JDconstant.TOKEN, token);
+    }
+    
+    public String getJDtoken() {
+    	return stringRedisTemplate.opsForValue().get(JDconstant.TOKEN);
+    }
+    
+    
     /**
      * 把所有上架商品的价格加到redis
      * @param map

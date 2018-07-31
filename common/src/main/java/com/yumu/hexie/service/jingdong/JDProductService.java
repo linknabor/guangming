@@ -6,6 +6,11 @@ import java.util.Map;
 import com.yumu.hexie.model.distribution.region.Region;
 import com.yumu.hexie.model.jingdong.JDregionMapping;
 import com.yumu.hexie.model.jingdong.getaddress.RegionJ;
+import com.yumu.hexie.model.jingdong.getorder.ConfirmOrderF;
+import com.yumu.hexie.model.jingdong.getorder.DownloadOrderF;
+import com.yumu.hexie.model.jingdong.getorder.WHOrderF;
+import com.yumu.hexie.model.jingdong.getorder.query.QueryOrderF;
+import com.yumu.hexie.model.jingdong.getorder.query.QueryTrackF;
 import com.yumu.hexie.model.jingdong.getskuid.detail.JDSkuIDF;
 import com.yumu.hexie.model.jingdong.getskuid.image.SKUImage;
 import com.yumu.hexie.model.jingdong.getskuid.price.PriceVo;
@@ -35,8 +40,25 @@ public interface JDProductService {
 	
 	List<JDregionMapping> getregionMapping();//地区映射 集合
 	
-	JDRegionF getRegionLimit(String region,String productNo);
+	JDRegionF getRegionLimit(String region,String productNo);//查询商品购买限制
 	
+	
+	
+	
+	WHOrderF getWHOrder(String orderId);//获取网壕订单号
+	
+	DownloadOrderF sendDlo();//发送订单
+	
+	ConfirmOrderF getConfirmOd(String ordersn);//确认订单
+	
+	QueryOrderF getOrderinfo(String ordersn);//查询订单信息
+	
+	QueryTrackF getOrderTrackInfo(String ordersn);//查询配送信息
+	
+	
+	
+	
+	boolean getProductStock(String region,String productNo,String proNums);//获取地区库存是否足够
 	
 	void addregionMapping();//地区映射到数据库
 	
@@ -51,6 +73,10 @@ public interface JDProductService {
 	void dataStatusSynRedis();//数据库上架的商品缓存到redis
 	
 	String isProduct(String productNo,String region,String price,String jdPrice);//单个查询 商品上下架 价格 地区购买限制
+	
+	void productNameSyn();//通过名字同步京东ID
+	
+	
 	
 	
 	void redisSku();//商品状态缓存到redis    无用

@@ -5,7 +5,6 @@ import java.util.List;
 
 import com.yumu.hexie.model.jingdong.getskuid.detail.JDSkuIDF;
 import com.yumu.hexie.model.jingdong.getskuid.image.SKUImage;
-import com.yumu.hexie.model.jingdong.getskuid.price.PriceF;
 import com.yumu.hexie.model.jingdong.getskuid.price.PriceVo;
 
 public class JDProductVO implements Serializable{
