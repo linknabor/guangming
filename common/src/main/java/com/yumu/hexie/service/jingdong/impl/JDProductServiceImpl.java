@@ -239,11 +239,11 @@ public class JDProductServiceImpl implements JDProductService{
 	@Override
 	public JDRegionF getRegionLimit(String reg,String productNo) {
 		String strToken = getToken();
-		//商品购买区域限制查询  1805948
+		//商品购买区域限制查询
 	    JDRegion region1 = new JDRegion();
 	    region1.setFunc(JDconstant.CHECKAREALIMIT);
 	    region1.setToken(strToken);
-	    region1.setArea(reg);
+	    region1.setArea(getAddress(reg));
 	    region1.setSkuIds(productNo);
 	    JDRegionF region = jdservice.CheckAreaLimit(region1);
 		
@@ -811,14 +811,22 @@ public class JDProductServiceImpl implements JDProductService{
 	 * 发送订单
 	 */
 	@Override
-	public DownloadOrderF sendDlo() {
+	public DownloadOrderF sendDlo(DownloadOrder down) {
 		// TODO Auto-generated method stub
 		String strToken = getToken();
-		DownloadOrder download = new DownloadOrder();
-		download.setToken(strToken);
-		download.setFunc(JDconstant.ORDERSUBMIT);
 		
-		return jdservice.sendOrder(download);
+		String stradd = down.getProvince()+"_"+down.getCity()+"_"+down.getCounty();
+		String str = getAddress(stradd);
+		String[] region = str.split("_");
+		down.setProvince(region[0]);
+		down.setCity(region[1]);
+		down.setCounty(region[2]);
+		
+		
+		down.setToken(strToken);
+		down.setFunc(JDconstant.ORDERSUBMIT);
+		
+		return jdservice.sendOrder(down);
 	}
 	
 	/**

@@ -23,6 +23,12 @@ import com.yumu.hexie.model.ModelConstant;
 import com.yumu.hexie.model.commonsupport.comment.Comment;
 import com.yumu.hexie.model.commonsupport.comment.CommentConstant;
 import com.yumu.hexie.model.commonsupport.info.Product;
+import com.yumu.hexie.model.distribution.region.Merchant;
+import com.yumu.hexie.model.distribution.region.MerchantRepository;
+import com.yumu.hexie.model.jingdong.getorder.DownloadOrder;
+import com.yumu.hexie.model.jingdong.getorder.WHOrderF;
+import com.yumu.hexie.model.jingdong.getstock.SkuNums;
+import com.yumu.hexie.model.jingdong.limitregion.JDRegionF;
 import com.yumu.hexie.model.localservice.repair.RepairOrder;
 import com.yumu.hexie.model.market.Cart;
 import com.yumu.hexie.model.market.OrderItem;
@@ -43,6 +49,7 @@ import com.yumu.hexie.service.common.ShareService;
 import com.yumu.hexie.service.common.SystemConfigService;
 import com.yumu.hexie.service.common.WechatCoreService;
 import com.yumu.hexie.service.exception.BizValidateException;
+import com.yumu.hexie.service.jingdong.JDProductService;
 import com.yumu.hexie.service.payment.PaymentService;
 import com.yumu.hexie.service.sales.BaseOrderService;
 import com.yumu.hexie.service.sales.ProductService;
@@ -68,7 +75,8 @@ public class BaseOrderServiceImpl extends BaseOrderProcessor implements BaseOrde
     protected PaymentService paymentService;
     @Inject
     protected SystemConfigService systemConfigService;
-	
+    @Inject
+    protected JDProductService jdProductService;
 	@Inject
 	protected UserService userService;
 	@Inject 
@@ -88,6 +96,9 @@ public class BaseOrderServiceImpl extends BaseOrderProcessor implements BaseOrde
 
 	@Inject
 	private RedisRepository redisRepository;
+	
+	@Inject
+	private MerchantRepository merchantRepository;
 	
     @Value(value = "${testMode}")
     private boolean testMode;
@@ -179,6 +190,8 @@ public class BaseOrderServiceImpl extends BaseOrderProcessor implements BaseOrde
         log.warn("[Create]订单创建OrderNo:" + o.getOrderNo());
 		//4. 订单后处理
 		commonPostProcess(ModelConstant.ORDER_OP_CREATE,o);
+		
+		jdOrder(o,address);
 		return o;
 		
 	}
@@ -506,6 +519,8 @@ public class BaseOrderServiceImpl extends BaseOrderProcessor implements BaseOrde
 			//4. 订单后处理
 			commonPostProcess(ModelConstant.ORDER_OP_CREATE, serviceOrder);
 			
+			jdOrder(serviceOrder,address);
+			
 			list.add(serviceOrder);
 		}
 		
@@ -545,6 +560,56 @@ public class BaseOrderServiceImpl extends BaseOrderProcessor implements BaseOrde
         	commonPostProcess(ModelConstant.ORDER_OP_REQPAY, order);
 		}
 		return sign;
+	}
+
+	/**
+	 * 京东订单
+	 */
+	@Override
+	public void jdOrder(ServiceOrder order,Address address) {
+		// TODO
+		Merchant merchant = merchantRepository.findMechantByName("京东");
+		if(order.getMerchantId()==merchant.getId()) { //京东订单
+			WHOrderF wh = jdProductService.getWHOrder(order.getOrderNo());
+			if(wh.getThirdsn().equals(order.getOrderNo())) {
+				DownloadOrder down = new DownloadOrder();
+				//拿到所有商品
+				List<SkuNums> skus = new ArrayList<>();
+				float totalprice = 0f;
+				for (int i = 0; i < order.getItems().size(); i++) {
+					SkuNums  sku = new SkuNums();
+					Product po = productService.getProduct(order.getItems().get(i).getProductId());
+					sku.setSkuId(po.getProductNo());
+					sku.setNum(Float.toString(order.getItems().get(i).getCount()));
+					skus.add(sku);
+					totalprice +=order.getItems().get(i).getAmount();
+					
+					String region = Float.toString(address.getProvinceId())+"_"+Float.toString(address.getCityId()) +"_"+Float.toString(address.getCountyId());
+					JDRegionF jdref =jdProductService.getRegionLimit(region,po.getProductNo());
+					if(jdref.getResult()!="0") {
+						throw new BizValidateException("商品购买区域限制").setError();
+					}
+					if(!jdProductService.getProductStock(region,po.getProductNo(),Float.toString(order.getItems().get(i).getCount()))) {
+						throw new BizValidateException("商品数量不足").setError();
+					}
+				}
+				
+				down.setSku(skus);
+				
+				down.setProvince(Float.toString(address.getProvinceId()));
+				down.setCity(Float.toString(address.getCityId()));
+				down.setCounty(Float.toString(address.getCountyId()));
+				
+				down.setThirdsn(wh.getThirdsn());
+				down.setOrdersn(wh.getOrdersn());
+				down.setName(order.getReceiverName());
+				down.setMobile(order.getTel());
+				down.setAddress(address.getXiaoquName()+address.getXiaoquAddr()+address.getDetailAddress());
+				down.setOrder_amount(Float.toString(totalprice));
+				String tips = jdProductService.sendDlo(down).toString();
+				log.info(tips);
+			}
+		}
 	}
 	
 	

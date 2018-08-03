@@ -7,6 +7,7 @@ import com.yumu.hexie.model.distribution.region.Region;
 import com.yumu.hexie.model.jingdong.JDregionMapping;
 import com.yumu.hexie.model.jingdong.getaddress.RegionJ;
 import com.yumu.hexie.model.jingdong.getorder.ConfirmOrderF;
+import com.yumu.hexie.model.jingdong.getorder.DownloadOrder;
 import com.yumu.hexie.model.jingdong.getorder.DownloadOrderF;
 import com.yumu.hexie.model.jingdong.getorder.WHOrderF;
 import com.yumu.hexie.model.jingdong.getorder.query.QueryOrderF;
@@ -47,7 +48,7 @@ public interface JDProductService {
 	
 	WHOrderF getWHOrder(String orderId);//获取网壕订单号
 	
-	DownloadOrderF sendDlo();//发送订单
+	DownloadOrderF sendDlo(DownloadOrder down);//发送订单
 	
 	ConfirmOrderF getConfirmOd(String ordersn);//确认订单
 	
