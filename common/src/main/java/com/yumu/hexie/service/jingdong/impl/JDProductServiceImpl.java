@@ -729,8 +729,8 @@ public class JDProductServiceImpl implements JDProductService{
 		for (int i = 0; i < regionj.size(); i++) {
 			for (int j = 0; j < region.size(); j++) {
 				
-				
-				if(regionj.get(i).getRegion_name()=="上海") {
+				logger.info(regionj.get(i).getRegion_name());
+				if(regionj.get(i).getRegion_name()=="上海"||regionj.get(i).getRegion_name().equals("上海")) {
 					for (int j2 = 0; j2 < regionj.get(i).getInfo().size(); j2++) {
 						
 						
@@ -738,7 +738,7 @@ public class JDProductServiceImpl implements JDProductService{
 							for (int l = 0; l < region.get(j).getInfo().get(k).getInfo().size(); l++) {
 								String regionname=regionj.get(i).getInfo().get(j2).getRegion_name();
 								logger.info(regionname+"-----------");
-								logger.info(regionj.get(i).getRegion_name());
+								
 								if(regionname==region.get(j).getInfo().get(k).getInfo().get(l).getName()||regionname.equals(region.get(j).getInfo().get(k).getInfo().get(l).getName())) {
 									JDregionMapping jdregionmapping = new JDregionMapping();
 									jdregionmapping.setJdparentid(Integer.parseInt(regionj.get(i).getInfo().get(j2).getParent_id()));
