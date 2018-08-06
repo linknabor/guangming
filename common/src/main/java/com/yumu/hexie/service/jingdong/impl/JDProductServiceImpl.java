@@ -1195,10 +1195,12 @@ public class JDProductServiceImpl implements JDProductService{
 	private String getAddress(String region) {
 		String[] address = region.split("_");
 		logger.info("1:"+address[0]+"    2:"+address[1]+"     3:"+address[2]);
-		JDregionMapping jdre = jdregionMappingRepository.getByRegionId(address[0].toString(), address[1].toString());
-		logger.info(" jdre :-- "+jdre.toString());
-		JDregionMapping jdre1 = jdregionMappingRepository.getByRegionId(address[1].toString(), address[2].toString());
-		logger.info("jdre1 :--" + jdre1.toString());
+		String address0 = address[0];
+		String address1 = address[1];
+		String address2 = address[2];
+		logger.info("a1:"+address0+"    a2:"+address1+"     a3:"+address2);
+		JDregionMapping jdre = jdregionMappingRepository.getByRegionId(address0, address1);
+		JDregionMapping jdre1 = jdregionMappingRepository.getByRegionId(address1, address2);
 		String regionAddress = jdre.getJdparentid()+"_"+jdre.getJdregionid()+"_"+jdre1.getJdregionid();
 		logger.info("region："+regionAddress);
 		return regionAddress;
