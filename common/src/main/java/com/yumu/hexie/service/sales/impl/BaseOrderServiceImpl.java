@@ -588,6 +588,7 @@ public class BaseOrderServiceImpl extends BaseOrderProcessor implements BaseOrde
 					totalprice +=order.getItems().get(i).getAmount();
 					
 					String region = Float.toString(address.getProvinceId())+"_"+Float.toString(address.getCityId()) +"_"+Float.toString(address.getCountyId());
+					log.info(region);
 					JDRegionF jdref =jdProductService.getRegionLimit(region,po.getProductNo());
 					if(jdref.getResult()!="0") {
 						throw new BizValidateException("商品购买区域限制").setError();

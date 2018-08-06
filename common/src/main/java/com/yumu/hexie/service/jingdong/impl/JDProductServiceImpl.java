@@ -1157,9 +1157,13 @@ public class JDProductServiceImpl implements JDProductService{
 	 */
 	private String getAddress(String region) {
 		String[] address = region.split("_");
+		logger.info("1:"+address[0]+"    2:"+address[1]+"     3"+address[2]);
 		JDregionMapping jdre = jdregionMappingRepository.getByRegionId(address[0], address[1]);
+		logger.info(" jdre :-- "+jdre.toString());
 		JDregionMapping jdre1 = jdregionMappingRepository.getByRegionId(address[1], address[2]);
+		logger.info("jdre1 :--" + jdre1.toString());
 		String regionAddress = jdre.getJdparentid()+"_"+jdre.getJdregionid()+"_"+jdre1.getJdregionid();
+		logger.info("region："+regionAddress);
 		return regionAddress;
 	}
 
@@ -1182,6 +1186,20 @@ public class JDProductServiceImpl implements JDProductService{
 		}
 	}
 
+	
+	
+	@Override
+	public void detaliedSyn() {
+		List<String> strlist = getProductStatus();
+		for (int i = 0; i < strlist.size(); i++) {
+			JDSkuIDF jd = getByidSku(strlist.get(i));
+			logger.info("商品加入集合："+i);
+		}
+	}
+	
+	
+	
+	
 	private Product JDSavePro(Product pro,String productNo) {
 
 		Product product = new Product();

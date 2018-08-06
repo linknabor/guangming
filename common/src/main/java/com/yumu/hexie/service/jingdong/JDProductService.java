@@ -44,8 +44,9 @@ public interface JDProductService {
 	JDRegionF getRegionLimit(String region,String productNo);//查询商品购买限制
 	
 	
-	
-	
+	/**
+	 * 订单
+	 */
 	WHOrderF getWHOrder(String orderId);//获取网壕订单号
 	
 	DownloadOrderF sendDlo(DownloadOrder down);//发送订单
@@ -76,6 +77,8 @@ public interface JDProductService {
 	String isProduct(String productNo,String region,String price,String jdPrice);//单个查询 商品上下架 价格 地区购买限制
 	
 	void productNameSyn();//通过名字同步京东ID
+	
+	void detaliedSyn();//同步详细信息
 	
 	
 	
