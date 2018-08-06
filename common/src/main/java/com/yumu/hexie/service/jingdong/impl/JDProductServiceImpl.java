@@ -728,32 +728,36 @@ public class JDProductServiceImpl implements JDProductService{
 		
 		for (int i = 0; i < regionj.size(); i++) {
 			for (int j = 0; j < region.size(); j++) {
-				//判断市是否一样
-				if(regionj.get(i).getRegion_name().equals(region.get(j).getName())||regionj.get(i).getRegion_name()==region.get(j).getName()) {
-					
-					if(regionj.get(i).getRegion_name()=="上海") {
-						for (int j2 = 0; j2 < regionj.get(i).getInfo().size(); j2++) {
-							
-							
-							for (int k = 0; k < region.get(j).getInfo().size(); k++) {
-								for (int l = 0; l < region.get(j).getInfo().get(k).getInfo().size(); l++) {
-									String regionname=regionj.get(i).getInfo().get(j2).getRegion_name();
-									logger.info(regionname+"-----------");
-									logger.info(regionj.get(i).getRegion_name());
-									if(regionname==region.get(j).getInfo().get(k).getInfo().get(l).getName()||regionname.equals(region.get(j).getInfo().get(k).getInfo().get(l).getName())) {
-										JDregionMapping jdregionmapping = new JDregionMapping();
-										jdregionmapping.setJdparentid(Integer.parseInt(regionj.get(i).getInfo().get(j2).getParent_id()));
-										jdregionmapping.setJdregionid(Integer.parseInt(regionj.get(i).getInfo().get(j2).getRegion_id()));
-										jdregionmapping.setParentid(region.get(j).getInfo().get(k).getInfo().get(l).getParentId());
-										jdregionmapping.setRegionid(region.get(j).getInfo().get(k).getInfo().get(l).getId());
-										jdregionmapping.setParentname(region.get(j).getInfo().get(k).getInfo().get(l).getParentName());
-										jdregionmapping.setName(region.get(j).getInfo().get(k).getInfo().get(l).getName());
-										list.add(jdregionmapping);
-									}
+				
+				
+				if(regionj.get(i).getRegion_name()=="上海") {
+					for (int j2 = 0; j2 < regionj.get(i).getInfo().size(); j2++) {
+						
+						
+						for (int k = 0; k < region.get(j).getInfo().size(); k++) {
+							for (int l = 0; l < region.get(j).getInfo().get(k).getInfo().size(); l++) {
+								String regionname=regionj.get(i).getInfo().get(j2).getRegion_name();
+								logger.info(regionname+"-----------");
+								logger.info(regionj.get(i).getRegion_name());
+								if(regionname==region.get(j).getInfo().get(k).getInfo().get(l).getName()||regionname.equals(region.get(j).getInfo().get(k).getInfo().get(l).getName())) {
+									JDregionMapping jdregionmapping = new JDregionMapping();
+									jdregionmapping.setJdparentid(Integer.parseInt(regionj.get(i).getInfo().get(j2).getParent_id()));
+									jdregionmapping.setJdregionid(Integer.parseInt(regionj.get(i).getInfo().get(j2).getRegion_id()));
+									jdregionmapping.setParentid(region.get(j).getInfo().get(k).getInfo().get(l).getParentId());
+									jdregionmapping.setRegionid(region.get(j).getInfo().get(k).getInfo().get(l).getId());
+									jdregionmapping.setParentname(region.get(j).getInfo().get(k).getInfo().get(l).getParentName());
+									jdregionmapping.setName(region.get(j).getInfo().get(k).getInfo().get(l).getName());
+									list.add(jdregionmapping);
 								}
 							}
 						}
 					}
+				}
+				
+				//判断市是否一样
+				if(regionj.get(i).getRegion_name().equals(region.get(j).getName())||regionj.get(i).getRegion_name()==region.get(j).getName()) {
+					
+					
 					//拿到市里面的区
 					for (int j2 = 0; j2 < regionj.get(i).getInfo().size(); j2++) {
 						for (int k = 0; k < region.get(j).getInfo().size(); k++) {
