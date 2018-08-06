@@ -586,8 +586,7 @@ public class BaseOrderServiceImpl extends BaseOrderProcessor implements BaseOrde
 					sku.setNum(Float.toString(order.getItems().get(i).getCount()));
 					skus.add(sku);
 					totalprice +=order.getItems().get(i).getAmount();
-					
-					String region = Float.toString(address.getProvinceId())+"_"+Float.toString(address.getCityId()) +"_"+Float.toString(address.getCountyId());
+					String region = Integer.toString((int)address.getProvinceId())+"_"+Integer.toString((int)address.getCityId()) +"_"+Integer.toString((int)address.getCountyId());
 					log.info(region);
 					JDRegionF jdref =jdProductService.getRegionLimit(region,po.getProductNo());
 					if(jdref.getResult()!="0") {
