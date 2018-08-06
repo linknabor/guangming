@@ -755,6 +755,19 @@ public class JDProductServiceImpl implements JDProductService{
 													list.add(jdregionmapping);
 												}
 												
+												if(regionj.get(i).getInfo().get(j2).getRegion_name()=="上海") {
+													String regionname=regionj.get(i).getInfo().get(j2).getRegion_name()+"市";
+													if(regionname==region.get(j).getInfo().get(k).getInfo().get(l).getName()||regionname.equals(region.get(j).getInfo().get(k).getInfo().get(l).getName())) {
+														JDregionMapping jdregionmapping = new JDregionMapping();
+														jdregionmapping.setJdparentid(Integer.parseInt(regionj.get(i).getInfo().get(j2).getParent_id()));
+														jdregionmapping.setJdregionid(Integer.parseInt(regionj.get(i).getInfo().get(j2).getRegion_id()));
+														jdregionmapping.setParentid(region.get(j).getInfo().get(k).getInfo().get(l).getParentId());
+														jdregionmapping.setRegionid(region.get(j).getInfo().get(k).getInfo().get(l).getId());
+														jdregionmapping.setParentname(region.get(j).getInfo().get(k).getInfo().get(l).getParentName());
+														jdregionmapping.setName(region.get(j).getInfo().get(k).getInfo().get(l).getName());
+														list.add(jdregionmapping);
+													}
+												}
 											}
 										}
 									}
