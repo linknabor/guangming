@@ -665,9 +665,7 @@ public class JDProductServiceImpl implements JDProductService{
 				
 				
 				
-				if(address.getInfo().get(i).getRegion_name()=="上海"||"上海".equals(address.getInfo().get(i).getRegion_name())) {
-					continue;
-				}
+
 				if(address.getInfo().get(i).getRegion_name()=="北京"||"北京".equals(address.getInfo().get(i).getRegion_name())) {
 					continue;
 				}
