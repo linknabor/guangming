@@ -30,24 +30,24 @@ public class JDtiming {
      */
 	@Scheduled(cron = " 0 30 0/2 * * ?")
 	public void timerproduct() {
-//		JDLoad load = new JDLoad();
-//		load.setFunc(JDconstant.GETTOKENSAFECODE);
-//		load.setUsername(JDconstant.USERNAME);
-//		load.setPassword(JDconstant.PASSWORD);
-//		load.setApi_name(JDconstant.API_NAME);
-//		load.setApi_secret(JDconstant.API_SECRET);
-//		JDSecurity jds = jdservice.getTokenSafeCode(load);//获取安全码
-//		
-//		JDToken token = new JDToken();
-//		token.setFunc(JDconstant.GETAPITOKEN);
-//		token.setUsername(JDconstant.USERNAME);
-//		token.setPassword(JDconstant.PASSWORD);
-//		token.setApi_name(JDconstant.API_NAME);
-//		token.setApi_secret(JDconstant.API_SECRET);
-//		token.setSafecode(jds.getSafecode());
-//		JDTokenF tokenf = jdservice.getApiToken(token);//用安全码获取token
-//		
-//		redisRepository.setJDtoken(tokenf.getToken());//token放入到redis
+		JDLoad load = new JDLoad();
+		load.setFunc(JDconstant.GETTOKENSAFECODE);
+		load.setUsername(JDconstant.USERNAME);
+		load.setPassword(JDconstant.PASSWORD);
+		load.setApi_name(JDconstant.API_NAME);
+		load.setApi_secret(JDconstant.API_SECRET);
+		JDSecurity jds = jdservice.getTokenSafeCode(load);//获取安全码
+		
+		JDToken token = new JDToken();
+		token.setFunc(JDconstant.GETAPITOKEN);
+		token.setUsername(JDconstant.USERNAME);
+		token.setPassword(JDconstant.PASSWORD);
+		token.setApi_name(JDconstant.API_NAME);
+		token.setApi_secret(JDconstant.API_SECRET);
+		token.setSafecode(jds.getSafecode());
+		JDTokenF tokenf = jdservice.getApiToken(token);//用安全码获取token
+		
+		redisRepository.setJDtoken(tokenf.getToken());//token放入到redis
 	}
 	
 	

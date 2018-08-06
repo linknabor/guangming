@@ -76,6 +76,20 @@ public class JDProductController extends BaseController{
 		jdproductService.dataStatusSynRedis();
 		return "数据库上架的商品缓存到redis";
 	}
+	@RequestMapping(value = "/dataSynRedis", method = RequestMethod.GET)
+	@ResponseBody
+	public String dataSynRedis() {
+		jdproductService.dataSynRedis();
+		return "价格缓存到redis";
+	}
+	
+	
+	@RequestMapping(value = "/priceContrast", method = RequestMethod.GET)
+	@ResponseBody
+	public String priceContrast() {
+		jdproductService.priceContrast();
+		return "价格同步";
+	}
 	
 	@RequestMapping(value = "/synchronization", method = RequestMethod.GET)
 	@ResponseBody
@@ -83,6 +97,14 @@ public class JDProductController extends BaseController{
 		jdproductService.synchronization();
 		return "商品上下架同步";
 	}
+	
+	@RequestMapping(value = "/productNameSyn", method = RequestMethod.GET)
+	@ResponseBody
+	public String productNameSyn() {
+		jdproductService.productNameSyn();
+		return "名字同步";
+	}
+	
 	
 	@RequestMapping(value = "/helloWord", method = RequestMethod.GET)
 	@ResponseBody
