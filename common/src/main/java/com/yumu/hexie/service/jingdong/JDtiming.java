@@ -1,5 +1,6 @@
 package com.yumu.hexie.service.jingdong;
 
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 
 import org.slf4j.Logger;
@@ -46,9 +47,30 @@ public class JDtiming {
 		token.setApi_secret(JDconstant.API_SECRET);
 		token.setSafecode(jds.getSafecode());
 		JDTokenF tokenf = jdservice.getApiToken(token);//用安全码获取token
-		
+		logger.info("TOKEN"+token.toString());
 		redisRepository.setJDtoken(tokenf.getToken());//token放入到redis
 	}
 	
+	@PostConstruct
+	public void initToken() {
+		JDLoad load = new JDLoad();
+		load.setFunc(JDconstant.GETTOKENSAFECODE);
+		load.setUsername(JDconstant.USERNAME);
+		load.setPassword(JDconstant.PASSWORD);
+		load.setApi_name(JDconstant.API_NAME);
+		load.setApi_secret(JDconstant.API_SECRET);
+		JDSecurity jds = jdservice.getTokenSafeCode(load);//获取安全码
+		
+		JDToken token = new JDToken();
+		token.setFunc(JDconstant.GETAPITOKEN);
+		token.setUsername(JDconstant.USERNAME);
+		token.setPassword(JDconstant.PASSWORD);
+		token.setApi_name(JDconstant.API_NAME);
+		token.setApi_secret(JDconstant.API_SECRET);
+		token.setSafecode(jds.getSafecode());
+		JDTokenF tokenf = jdservice.getApiToken(token);//用安全码获取token
+		
+		redisRepository.setJDtoken(tokenf.getToken());//token放入到redis
+	}
 	
 }
