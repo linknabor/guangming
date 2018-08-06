@@ -55,4 +55,6 @@ public interface BaseOrderService {
 	public void sendGoods(long orderId);
 	
 	public void jdOrder(ServiceOrder order,Address address);
+	
+	public void jdConfirmOrder(PaymentOrder payment);
 }

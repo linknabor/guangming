@@ -35,11 +35,34 @@ public class RedisRepository {
     private StringRedisTemplate stringRedisTemplate;
     
     
+    /**
+     * 订单号
+     * @param ordersn
+     * @param thirdsn
+     */
+    public void setOrderNum(String ordersn,String thirdsn) {
+    	stringRedisTemplate.opsForValue().set(thirdsn, ordersn);
+    }
+    /**
+     * 订单号获取
+     * @param thirdsn
+     * @return
+     */
+    public String getOrderNum(String thirdsn) {
+    	return stringRedisTemplate.opsForValue().get(thirdsn);
+    }
     
+    /**
+     * token缓存
+     * @param token
+     */
     public void setJDtoken(String token) {
     	stringRedisTemplate.opsForValue().set(JDconstant.TOKEN, token);
     }
-    
+    /**
+     * 获取token
+     * @return
+     */
     public String getJDtoken() {
     	return stringRedisTemplate.opsForValue().get(JDconstant.TOKEN);
     }
@@ -120,8 +143,7 @@ public class RedisRepository {
     	stringRedisTemplate.opsForList().remove(JDconstant.LISTJDPRODUCT, 0, productId);
     }
     
-    
-    
+
     
     
     

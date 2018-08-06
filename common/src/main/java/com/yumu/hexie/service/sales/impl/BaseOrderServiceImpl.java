@@ -25,7 +25,9 @@ import com.yumu.hexie.model.commonsupport.comment.CommentConstant;
 import com.yumu.hexie.model.commonsupport.info.Product;
 import com.yumu.hexie.model.distribution.region.Merchant;
 import com.yumu.hexie.model.distribution.region.MerchantRepository;
+import com.yumu.hexie.model.jingdong.getorder.ConfirmOrderF;
 import com.yumu.hexie.model.jingdong.getorder.DownloadOrder;
+import com.yumu.hexie.model.jingdong.getorder.DownloadOrderF;
 import com.yumu.hexie.model.jingdong.getorder.WHOrderF;
 import com.yumu.hexie.model.jingdong.getstock.SkuNums;
 import com.yumu.hexie.model.jingdong.limitregion.JDRegionF;
@@ -563,11 +565,12 @@ public class BaseOrderServiceImpl extends BaseOrderProcessor implements BaseOrde
 	}
 
 	/**
-	 * 京东订单
+	 * 京东订单创建
 	 */
 	@Override
 	public void jdOrder(ServiceOrder order,Address address) {
 		// TODO
+		log.warn("[jdOrder]NonceStr:" + order.toString());
 		Merchant merchant = merchantRepository.findMechantByName("京东");
 		if(order.getMerchantId()==merchant.getId()) { //京东订单
 			WHOrderF wh = jdProductService.getWHOrder(order.getOrderNo());
@@ -606,8 +609,35 @@ public class BaseOrderServiceImpl extends BaseOrderProcessor implements BaseOrde
 				down.setMobile(order.getTel());
 				down.setAddress(address.getXiaoquName()+address.getXiaoquAddr()+address.getDetailAddress());
 				down.setOrder_amount(Float.toString(totalprice));
-				String tips = jdProductService.sendDlo(down).toString();
-				log.info(tips);
+				DownloadOrderF tips = jdProductService.sendDlo(down);
+				redisRepository.setOrderNum(tips.getInfo().getOrdersn(), tips.getInfo().getThirdsn());//订单号存储到redis
+				log.info(tips.toString());
+			}
+		}
+	}
+
+	/**
+	 * 京东确认订单
+	 */
+	@Override
+	public void jdConfirmOrder(PaymentOrder payment) {
+		// TODO
+		log.warn("[jdConfirmOrder]NonceStr:" + payment.toString());
+		Merchant merchant = merchantRepository.findMechantByName("京东");
+		if(payment.getMerchantId()==merchant.getId()) { //京东订单
+			ServiceOrder order = serviceOrderRepository.findOneWithItem(payment.getOrderId());
+			if(payment.getStatus()==PaymentConstant.PAYMENT_STATUS_SUCCESS) {
+				if(order.getStatus()==ModelConstant.ORDER_STATUS_CONFIRM){
+					String ordersn = redisRepository.getOrderNum(order.getOrderNo());
+					ConfirmOrderF cfo = jdProductService.getConfirmOd(ordersn);
+					
+					if(cfo.getResult()!="0") {
+						log.error("[jdConfirmOrder]:"+cfo.getMsg()+"提示："+cfo.getJd_msg());
+						throw new BizValidateException("确认订单失败").setError();
+					}
+					
+	                log.warn("[jdConfirmOrder]Success");
+				}
 			}
 		}
 	}
