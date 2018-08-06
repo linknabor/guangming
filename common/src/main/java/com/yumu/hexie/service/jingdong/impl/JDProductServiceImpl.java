@@ -729,16 +729,25 @@ public class JDProductServiceImpl implements JDProductService{
 		for (int i = 0; i < regionj.size(); i++) {
 			for (int j = 0; j < region.size(); j++) {
 				
-				logger.info(regionj.get(i).getRegion_name());
+				/**
+				 * 京东 上海2级    光明  上海3级
+				 */
 				if(regionj.get(i).getRegion_name()=="上海"||regionj.get(i).getRegion_name().equals("上海")) {
 					for (int j2 = 0; j2 < regionj.get(i).getInfo().size(); j2++) {
-						
-						
 						for (int k = 0; k < region.get(j).getInfo().size(); k++) {
+							if(region.get(j).getInfo().get(k).getName().equals("上海市")&&regionj.get(i).getRegion_name().equals("上海")) {
+								JDregionMapping jdregionmapping = new JDregionMapping();
+								jdregionmapping.setJdparentid(Integer.parseInt(regionj.get(i).getParent_id()));
+								jdregionmapping.setJdregionid(Integer.parseInt(regionj.get(i).getRegion_id()));
+								jdregionmapping.setParentid(region.get(j).getInfo().get(k).getParentId());
+								jdregionmapping.setRegionid(region.get(j).getInfo().get(k).getId());
+								jdregionmapping.setParentname(region.get(j).getInfo().get(k).getParentName());
+								jdregionmapping.setName(region.get(j).getInfo().get(k).getName());
+								list.add(jdregionmapping);
+							}
+							
 							for (int l = 0; l < region.get(j).getInfo().get(k).getInfo().size(); l++) {
 								String regionname=regionj.get(i).getInfo().get(j2).getRegion_name();
-								logger.info(regionname+"-----------");
-								
 								if(regionname==region.get(j).getInfo().get(k).getInfo().get(l).getName()||regionname.equals(region.get(j).getInfo().get(k).getInfo().get(l).getName())) {
 									JDregionMapping jdregionmapping = new JDregionMapping();
 									jdregionmapping.setJdparentid(Integer.parseInt(regionj.get(i).getInfo().get(j2).getParent_id()));
@@ -1184,10 +1193,10 @@ public class JDProductServiceImpl implements JDProductService{
 	 */
 	private String getAddress(String region) {
 		String[] address = region.split("_");
-		logger.info("1:"+address[0]+"    2:"+address[1]+"     3"+address[2]);
-		JDregionMapping jdre = jdregionMappingRepository.getByRegionId(address[0], address[1]);
+		logger.info("1:"+address[0]+"    2:"+address[1]+"     3:"+address[2]);
+		JDregionMapping jdre = jdregionMappingRepository.getByRegionId(address[0].toString(), address[1].toString());
 		logger.info(" jdre :-- "+jdre.toString());
-		JDregionMapping jdre1 = jdregionMappingRepository.getByRegionId(address[1], address[2]);
+		JDregionMapping jdre1 = jdregionMappingRepository.getByRegionId(address[1].toString(), address[2].toString());
 		logger.info("jdre1 :--" + jdre1.toString());
 		String regionAddress = jdre.getJdparentid()+"_"+jdre.getJdregionid()+"_"+jdre1.getJdregionid();
 		logger.info("region："+regionAddress);
