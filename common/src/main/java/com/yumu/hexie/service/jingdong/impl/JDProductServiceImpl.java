@@ -756,7 +756,7 @@ public class JDProductServiceImpl implements JDProductService{
 												}
 												
 												if(regionj.get(i).getInfo().get(j2).getRegion_name()=="上海") {
-													String regionname=regionj.get(i).getInfo().get(j2).getRegion_name()+"市";
+													String regionname=regionj.get(i).getInfo().get(j2).getRegion_name();
 													if(regionname==region.get(j).getInfo().get(k).getInfo().get(l).getName()||regionname.equals(region.get(j).getInfo().get(k).getInfo().get(l).getName())) {
 														JDregionMapping jdregionmapping = new JDregionMapping();
 														jdregionmapping.setJdparentid(Integer.parseInt(regionj.get(i).getInfo().get(j2).getParent_id()));
