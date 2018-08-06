@@ -6,5 +6,5 @@ import org.springframework.data.jpa.repository.Query;
 public interface JDregionMappingRepository extends JpaRepository<JDregionMapping, Long>{
 	
 	@Query("from JDregionMapping where parentid = ?1 and regionid = ?2")
-	public JDregionMapping getByRegionId(String parentid,String regionid);
+	public JDregionMapping getByRegionId(long parentid,long regionid);
 }

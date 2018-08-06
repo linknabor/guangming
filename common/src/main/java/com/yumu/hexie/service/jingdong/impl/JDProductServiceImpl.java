@@ -1199,8 +1199,8 @@ public class JDProductServiceImpl implements JDProductService{
 		String address1 = address[1];
 		String address2 = address[2];
 		logger.info("a1:"+address0+"    a2:"+address1+"     a3:"+address2);
-		JDregionMapping jdre = jdregionMappingRepository.getByRegionId(address0, address1);
-		JDregionMapping jdre1 = jdregionMappingRepository.getByRegionId(address1, address2);
+		JDregionMapping jdre = jdregionMappingRepository.getByRegionId(Long.parseLong(address0), Long.parseLong(address1));
+		JDregionMapping jdre1 = jdregionMappingRepository.getByRegionId(Long.parseLong(address1), Long.parseLong(address2));
 		String regionAddress = jdre.getJdparentid()+"_"+jdre.getJdregionid()+"_"+jdre1.getJdregionid();
 		logger.info("region："+regionAddress);
 		return regionAddress;
