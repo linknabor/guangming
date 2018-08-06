@@ -733,18 +733,19 @@ public class JDProductServiceImpl implements JDProductService{
 				 * 京东 上海2级    光明  上海3级
 				 */
 				if(regionj.get(i).getRegion_name()=="上海"||regionj.get(i).getRegion_name().equals("上海")) {
-					for (int j2 = 0; j2 < regionj.get(i).getInfo().size(); j2++) {
-						for (int k = 0; k < region.get(j).getInfo().size(); k++) {
-							if(region.get(j).getInfo().get(k).getName().equals("上海市")&&regionj.get(i).getRegion_name().equals("上海")) {
-								JDregionMapping jdregionmapping = new JDregionMapping();
-								jdregionmapping.setJdparentid(Integer.parseInt(regionj.get(i).getParent_id()));
-								jdregionmapping.setJdregionid(Integer.parseInt(regionj.get(i).getRegion_id()));
-								jdregionmapping.setParentid(region.get(j).getInfo().get(k).getParentId());
-								jdregionmapping.setRegionid(region.get(j).getInfo().get(k).getId());
-								jdregionmapping.setParentname(region.get(j).getInfo().get(k).getParentName());
-								jdregionmapping.setName(region.get(j).getInfo().get(k).getName());
-								list.add(jdregionmapping);
-							}
+					for (int k = 0; k < region.get(j).getInfo().size(); k++) {
+						if(region.get(j).getInfo().get(k).getName().equals("上海市")&&regionj.get(i).getRegion_name().equals("上海")) {
+							JDregionMapping jdregionmapping = new JDregionMapping();
+							jdregionmapping.setJdparentid(Integer.parseInt(regionj.get(i).getParent_id()));
+							jdregionmapping.setJdregionid(Integer.parseInt(regionj.get(i).getRegion_id()));
+							jdregionmapping.setParentid(region.get(j).getInfo().get(k).getParentId());
+							jdregionmapping.setRegionid(region.get(j).getInfo().get(k).getId());
+							jdregionmapping.setParentname(region.get(j).getInfo().get(k).getParentName());
+							jdregionmapping.setName(region.get(j).getInfo().get(k).getName());
+							list.add(jdregionmapping);
+						}
+						
+						for (int j2 = 0; j2 < regionj.get(i).getInfo().size(); j2++) {
 							
 							for (int l = 0; l < region.get(j).getInfo().get(k).getInfo().size(); l++) {
 								String regionname=regionj.get(i).getInfo().get(j2).getRegion_name();
