@@ -865,7 +865,7 @@ public class JDProductServiceImpl implements JDProductService{
 		down.setToken(strToken);
 		down.setFunc(JDconstant.ORDERSUBMIT);
 		logger.info("订单：getSkuId:"+down.getSku().get(0).getSkuId()+"-getNum:"+down.getSku().get(0).getNum()+"-getOrdersn:"+down.getOrdersn()+"-getThirdsn:"+down.getThirdsn()+"-getMobile:"+down.getMobile());
-		logger.info(" 1级："+down.getProvince()+" 2级："+down.getCity()+" 3级:"+down.getCounty()+" getAddress:"+down.getAddress());
+		logger.info(" 1级："+down.getProvince()+" 2级："+down.getCity()+" 3级:"+down.getCounty()+" getAddress:"+down.getAddress()+" 价格"+down.getOrder_amount());
 		return jdservice.sendOrder(down);
 	}
 	
