@@ -256,6 +256,7 @@ public class JDProductServiceImpl implements JDProductService{
 	 */
 	@Override
 	public boolean getProductStock(String region,String productNo,String proNums) {
+		logger.info("商品数量："+proNums);
 		String strToken = getToken();
 		List<SkuNums> skuNums = new ArrayList<>();
 		SkuNums s = new SkuNums();
@@ -863,7 +864,7 @@ public class JDProductServiceImpl implements JDProductService{
 		
 		down.setToken(strToken);
 		down.setFunc(JDconstant.ORDERSUBMIT);
-		
+		logger.info("订单："+down.toString());
 		return jdservice.sendOrder(down);
 	}
 	
