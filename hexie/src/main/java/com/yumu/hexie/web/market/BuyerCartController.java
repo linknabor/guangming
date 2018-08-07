@@ -157,6 +157,7 @@ public class BuyerCartController extends BaseController {
 			
 		} catch(Exception e) {
 			logger.error("/shopping/toCart error : ", e);
+			logger.error("/shopping/toCart error : "+user.toString());
 			return new BaseResult<List<BuyerCart>>().failMsg(e.getMessage());
 		}
 		

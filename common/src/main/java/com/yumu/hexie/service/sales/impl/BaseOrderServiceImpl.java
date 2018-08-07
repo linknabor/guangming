@@ -582,8 +582,6 @@ public class BaseOrderServiceImpl extends BaseOrderProcessor implements BaseOrde
 				for (int i = 0; i < order.getItems().size(); i++) {
 					SkuNums  sku = new SkuNums();
 					Product po = productService.getProduct(order.getItems().get(i).getProductId());
-					log.error(po.toString());
-					
 					sku.setSkuId(po.getProductNo());
 					sku.setNum(Float.toString(order.getItems().get(i).getCount()));
 					skus.add(sku);
