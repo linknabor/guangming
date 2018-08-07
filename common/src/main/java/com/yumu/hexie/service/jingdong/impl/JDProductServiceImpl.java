@@ -1201,8 +1201,9 @@ public class JDProductServiceImpl implements JDProductService{
 		JDregionMapping jdre = jdregionMappingRepository.getByRegionId(Long.parseLong(address0), Long.parseLong(address1));
 		JDregionMapping jdre1 = jdregionMappingRepository.getByRegionId(Long.parseLong(address1), Long.parseLong(address2));
 		String regionAddress = jdre.getJdparentid()+"_"+jdre.getJdregionid()+"_"+jdre1.getJdregionid();
-		logger.info(regionAddress);
-		return regionAddress;
+		String regionAddress1 = jdre.getJdregionid()+"_"+jdre1.getJdregionid()+"_"+"0";
+		logger.info(regionAddress+"二级地址："+regionAddress1);
+		return regionAddress1;
 	}
 
 	@Override
