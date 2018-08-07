@@ -593,16 +593,16 @@ public class BaseOrderServiceImpl extends BaseOrderProcessor implements BaseOrde
 					}else {
 						throw new BizValidateException("商品购买区域限制").setError();
 					}
-					if(!jdProductService.getProductStock(region,po.getProductNo(),Float.toString(order.getItems().get(i).getCount()))) {
+					if(!jdProductService.getProductStock(region,po.getProductNo(),Integer.toString((int)order.getItems().get(i).getCount()))) {
 						throw new BizValidateException("商品数量不足").setError();
 					}
 				}
 				
 				down.setSku(skus);
 				
-				down.setProvince(Float.toString(address.getProvinceId()));
-				down.setCity(Float.toString(address.getCityId()));
-				down.setCounty(Float.toString(address.getCountyId()));
+				down.setProvince(Integer.toString((int)address.getProvinceId()));
+				down.setCity(Integer.toString((int)address.getCityId()));
+				down.setCounty(Integer.toString((int)address.getCountyId()));
 				
 				down.setThirdsn(wh.getThirdsn());
 				down.setOrdersn(wh.getOrdersn());
