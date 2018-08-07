@@ -407,15 +407,16 @@ public class BuyerCartController extends BaseController {
 				Merchant mer = merchantRepository.findMechantByName("京东");
 				if(product.getMerchantId()==mer.getId()) {//京东商品
 					jdPostage += product.getMiniPrice();
-					if(listSku.size()-1 == i) {
-						if(jdPostage<49) {
-							postageFee = postageFee + 8;
-						}
-						if(jdPostage<99&&jdPostage>48) {
-							postageFee = postageFee + 6;
-						}
+				}
+				if(listSku.size()-1 == i) {
+					if(jdPostage<49) {
+						postageFee = postageFee + 8;
+					}
+					if(jdPostage<99&&jdPostage>48) {
+						postageFee = postageFee + 6;
 					}
 				}
+				
 				
 				buyerItem.setPostageFee(postageFee);
 			}

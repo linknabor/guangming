@@ -2,6 +2,9 @@ package com.yumu.hexie.service.sales.impl;
 
 import javax.inject.Inject;
 
+import com.yumu.hexie.model.commonsupport.info.Product;
+import com.yumu.hexie.model.distribution.region.Merchant;
+import com.yumu.hexie.model.distribution.region.MerchantRepository;
 import com.yumu.hexie.model.market.Collocation;
 import com.yumu.hexie.model.market.OrderItem;
 import com.yumu.hexie.model.market.ServiceOrder;
@@ -10,6 +13,7 @@ import com.yumu.hexie.model.promotion.coupon.Coupon;
 import com.yumu.hexie.model.user.Address;
 import com.yumu.hexie.service.exception.BizValidateException;
 import com.yumu.hexie.service.sales.CollocationService;
+import com.yumu.hexie.service.sales.ProductService;
 import com.yumu.hexie.service.sales.SalePlanService;
 import com.yumu.hexie.service.user.AddressService;
 import com.yumu.hexie.service.user.CouponService;
@@ -23,7 +27,10 @@ public abstract class BaseOrderProcessor {
 	protected CouponService couponService;
 	@Inject 
     protected SalePlanService salePlanService;
-	
+	@Inject
+	protected MerchantRepository merchantRepository;
+	@Inject
+	protected ProductService productService;
 
     protected SalePlan findSalePlan(int type, long ruleId){
         return salePlanService.getService(type).findSalePlan(ruleId);
@@ -37,6 +44,10 @@ public abstract class BaseOrderProcessor {
 		Float price = 0f;
 		int count = 0;
 		long closeTime = System.currentTimeMillis() + 900000;// 默认15分
+		float jdPirce = 0f;
+		
+		Merchant mer = merchantRepository.findMechantByName("京东");
+		
 		// 设定价格运费等
 		if (order.getCollocationId() > 0) {
 			// 1.优惠组合
@@ -64,6 +75,7 @@ public abstract class BaseOrderProcessor {
 
 			closeTime = c.getTimeoutForPay() + System.currentTimeMillis();
 		} else if (order.getItems().size() >= 1) {
+			
 			for (int i = 0; i < order.getItems().size(); i++) {
 				OrderItem item = order.getItems().get(i);
 				
@@ -77,6 +89,22 @@ public abstract class BaseOrderProcessor {
 				if (item.getCount() >= freeNum) {
 					postageFee = 0;
 				}
+				
+				
+				Product product = productService.getProduct(plan.getProductId());
+				if(mer.getId()==product.getMerchantId()) {
+					jdPirce += item.getAmount();
+				}
+				if(order.getItems().size()-1==i) {
+					if(jdPirce<49) {
+						shipfee +=8;
+					}
+					if(jdPirce>48&&jdPirce<99) {
+						shipfee +=6;
+					}
+				}
+				
+				
 				shipfee += postageFee;
 				
 				count += item.getCount();
