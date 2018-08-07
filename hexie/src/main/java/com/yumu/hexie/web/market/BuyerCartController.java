@@ -338,7 +338,7 @@ public class BuyerCartController extends BaseController {
 		
 		Map<String, BuyerCart> map = new HashMap<String, BuyerCart>();
 		List<BuyerItem> items = new ArrayList<BuyerItem>();
-		
+		float jdPostage = 0f;
 		for (int i = 0; i < listSku.size(); i++) {
 			
 			BuyerCart buyerCart = new BuyerCart();
@@ -403,6 +403,20 @@ public class BuyerCartController extends BaseController {
 				if (Integer.parseInt(sku_num) >= freeNum) {
 					postageFee = 0;
 				}
+				
+				Merchant mer = merchantRepository.findMechantByName("京东");
+				if(product.getMerchantId()==mer.getId()) {//京东商品
+					jdPostage += product.getMiniPrice();
+					if(listSku.size()-1 == i) {
+						if(jdPostage<49) {
+							postageFee = postageFee + 8;
+						}
+						if(jdPostage<99&&jdPostage>48) {
+							postageFee = postageFee + 6;
+						}
+					}
+				}
+				
 				buyerItem.setPostageFee(postageFee);
 			}
 			
