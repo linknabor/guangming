@@ -238,7 +238,7 @@ public class JDProductServiceImpl implements JDProductService{
 
 	@Override
 	public JDRegionF getRegionLimit(String reg,String productNo) {
-		logger.info("区域限制productNo："+productNo);
+		logger.info("区域限制productNo："+productNo+" 地区id"+reg);
 		String strToken = getToken();
 		//商品购买区域限制查询
 	    JDRegion region1 = new JDRegion();
@@ -1201,6 +1201,7 @@ public class JDProductServiceImpl implements JDProductService{
 		JDregionMapping jdre = jdregionMappingRepository.getByRegionId(Long.parseLong(address0), Long.parseLong(address1));
 		JDregionMapping jdre1 = jdregionMappingRepository.getByRegionId(Long.parseLong(address1), Long.parseLong(address2));
 		String regionAddress = jdre.getJdparentid()+"_"+jdre.getJdregionid()+"_"+jdre1.getJdregionid();
+		logger.info(regionAddress);
 		return regionAddress;
 	}
 

@@ -152,12 +152,11 @@ public class BuyerCartController extends BaseController {
 			for (Entry<Object, Object> entry : entrySet) {
 				listSku.add(entry.getKey().toString());
 			}
-			logger.error("/shopping/toCart error : "+listSku);
+			
 			list = getCartItem(user, listSku, false);
 			
 		} catch(Exception e) {
 			logger.error("/shopping/toCart error : ", e);
-			logger.error("/shopping/toCart error : "+user.toString());
 			return new BaseResult<List<BuyerCart>>().failMsg(e.getMessage());
 		}
 		
@@ -347,7 +346,7 @@ public class BuyerCartController extends BaseController {
 			
 			String newKey = listSku.get(i);
 			String[] str = newKey.split("-");
-			logger.error("tishi:"+newKey);
+			
 			if(str.length!=2) {
 				return list;
 			}
@@ -362,7 +361,7 @@ public class BuyerCartController extends BaseController {
 			
 			//查询商品对应商户信息及商品详细信息
 			Product product = productservice.getProduct(Long.parseLong(sku_id));
-			logger.error("tishi:"+product.toString());
+			
 			Merchant merchant = merchantRepository.findOne(product.getMerchantId());
 			
 			//商户名称
