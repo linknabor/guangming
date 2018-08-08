@@ -39,7 +39,7 @@ public class JDPushController {
 			log.info("---订单验证成功---");
 			return "success";
 		}else {
-			log.error("订单验证失败-----第三方订单号："+jdr.getThridsn()+"  网壕订单号："+jdr.getOrdersn()+"  协议价价格："+jdr.getOrder_amount());
+			log.error("订单验证失败-----第三方订单号："+jdr.getThirdsn()+"  网壕订单号："+jdr.getOrdersn()+"  协议价价格："+jdr.getOrder_amount());
 			return "fail";
 		}
 	}

@@ -1305,13 +1305,13 @@ public class JDProductServiceImpl implements JDProductService{
 	public boolean verificationJD(JDReceiveVO jdReceive) {
 		// TODO
 		long merchantId = getJDID();
-		ServiceOrder serviceorder = serviceOrderRepository.findByOrderNoAndMerchantId(jdReceive.getThridsn(),merchantId); //京东订单
+		ServiceOrder serviceorder = serviceOrderRepository.findByOrderNoAndMerchantId(jdReceive.getThirdsn(),merchantId); //京东订单
 		float price = 0f;
 		if(serviceorder==null) {
 			logger.info("订单为空"+jdReceive);
 			return false;
 		}
-		String orderNo = redisRepository.getOrderNum(jdReceive.getThridsn());
+		String orderNo = redisRepository.getOrderNum(jdReceive.getThirdsn());
 		if(orderNo == null) {
 			if(orderNo.equals("")||orderNo=="") {
 				logger.info("redis获取网壕订单为空1");
