@@ -612,7 +612,6 @@ public class BaseOrderServiceImpl extends BaseOrderProcessor implements BaseOrde
 				down.setOrder_amount(Float.toString(totalprice));
 				DownloadOrderF tips = jdProductService.sendDlo(down);
 				redisRepository.setOrderNum(tips.getInfo().getOrdersn(), tips.getInfo().getThirdsn());//订单号存储到redis
-				log.info(tips.toString());
 			}
 		}
 	}

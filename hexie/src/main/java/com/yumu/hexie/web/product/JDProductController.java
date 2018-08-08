@@ -52,6 +52,9 @@ public class JDProductController extends BaseController{
 		return "地区映射成功";
 	}
 	
+	
+	
+	
 	@RequestMapping(value = "/addproduct", method = RequestMethod.GET)
 	@ResponseBody
 	public String addproduct() {

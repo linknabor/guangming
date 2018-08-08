@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
+import javax.print.attribute.standard.MediaSize.Other;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +22,7 @@ import com.yumu.hexie.model.distribution.region.Merchant;
 import com.yumu.hexie.model.distribution.region.MerchantRepository;
 import com.yumu.hexie.model.distribution.region.Region;
 import com.yumu.hexie.model.distribution.region.RegionRepository;
+import com.yumu.hexie.model.jingdong.JDReceiveVO;
 import com.yumu.hexie.model.jingdong.JDconstant;
 import com.yumu.hexie.model.jingdong.JDregionMapping;
 import com.yumu.hexie.model.jingdong.JDregionMappingRepository;
@@ -50,8 +52,12 @@ import com.yumu.hexie.model.jingdong.getstock.Stock;
 import com.yumu.hexie.model.jingdong.getstock.StockF;
 import com.yumu.hexie.model.jingdong.limitregion.JDRegion;
 import com.yumu.hexie.model.jingdong.limitregion.JDRegionF;
+import com.yumu.hexie.model.market.OrderItem;
+import com.yumu.hexie.model.market.OrderItemRepository;
 import com.yumu.hexie.model.market.ServiceAreaItem;
 import com.yumu.hexie.model.market.ServiceAreaItemRepository;
+import com.yumu.hexie.model.market.ServiceOrder;
+import com.yumu.hexie.model.market.ServiceOrderRepository;
 import com.yumu.hexie.model.market.saleplan.OnSaleRule;
 import com.yumu.hexie.model.market.saleplan.OnSaleRuleRepository;
 import com.yumu.hexie.model.redis.RedisRepository;
@@ -83,6 +89,10 @@ public class JDProductServiceImpl implements JDProductService{
 	private JDregionMappingRepository jdregionMappingRepository;
     @Inject
     private RedisRepository redisRepository;
+	@Inject
+	protected ServiceOrderRepository serviceOrderRepository;
+	@Inject
+	protected OrderItemRepository orderItemRepository;
 	/**
 	 * 获取token
 	 */
@@ -1236,6 +1246,7 @@ public class JDProductServiceImpl implements JDProductService{
 		List<String> strlist = getProductStatus();
 		for (int i = 0; i < strlist.size(); i++) {
 			JDSkuIDF jd = getByidSku(strlist.get(i));
+			
 			logger.info("商品加入集合："+i);
 		}
 	}
@@ -1284,6 +1295,43 @@ public class JDProductServiceImpl implements JDProductService{
 		product.setPostageFee(0f);	//TODO
 		return productRepository.save(product);
 
+	}
+
+	
+	/**
+	 * 京东订单验证
+	 */
+	@Override
+	public boolean verificationJD(JDReceiveVO jdReceive) {
+		// TODO
+		long merchantId = getJDID();
+		ServiceOrder serviceorder = serviceOrderRepository.findByOrderNoAndMerchantId(jdReceive.getThridsn(),merchantId); //京东订单
+		float price = 0f;
+		if(serviceorder==null) {
+			logger.info("订单为空"+jdReceive);
+			return false;
+		}
+		String orderNo = redisRepository.getOrderNum(jdReceive.getThridsn());
+		if(orderNo == null) {
+			if(orderNo.equals("")||orderNo=="") {
+				logger.info("redis获取网壕订单为空"+jdReceive);
+				return false;
+			}
+			logger.info("redis获取网壕订单为空"+jdReceive);
+			return false;
+		}
+		if(orderNo.equals(jdReceive.getOrdersn())||orderNo==jdReceive.getOrdersn()) {
+			List<OrderItem> listo = orderItemRepository.findByServiceOrder(serviceorder); // 京东商品
+			for (int i = 0; i < listo.size(); i++) {
+				price+=listo.get(i).getPrice();
+			}
+			if(price==jdReceive.getOrder_amount()) {
+				return true;
+			}
+		}	
+		
+		
+		return false;
 	}
 
 

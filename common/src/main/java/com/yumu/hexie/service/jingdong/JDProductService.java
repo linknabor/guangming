@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Map;
 
 import com.yumu.hexie.model.distribution.region.Region;
+import com.yumu.hexie.model.jingdong.JDReceiveVO;
 import com.yumu.hexie.model.jingdong.JDregionMapping;
 import com.yumu.hexie.model.jingdong.getaddress.RegionJ;
 import com.yumu.hexie.model.jingdong.getorder.ConfirmOrderF;
@@ -81,6 +82,8 @@ public interface JDProductService {
 	void detaliedSyn();//同步详细信息
 	
 	
+	
+	boolean verificationJD(JDReceiveVO jdReceive);
 	
 	
 	void redisSku();//商品状态缓存到redis    无用
