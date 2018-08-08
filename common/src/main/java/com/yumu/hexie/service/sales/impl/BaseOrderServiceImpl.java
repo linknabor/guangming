@@ -29,6 +29,7 @@ import com.yumu.hexie.model.jingdong.getorder.ConfirmOrderF;
 import com.yumu.hexie.model.jingdong.getorder.DownloadOrder;
 import com.yumu.hexie.model.jingdong.getorder.DownloadOrderF;
 import com.yumu.hexie.model.jingdong.getorder.WHOrderF;
+import com.yumu.hexie.model.jingdong.getskuid.price.PriceVo;
 import com.yumu.hexie.model.jingdong.getstock.SkuNums;
 import com.yumu.hexie.model.jingdong.limitregion.JDRegionF;
 import com.yumu.hexie.model.localservice.repair.RepairOrder;
@@ -596,6 +597,9 @@ public class BaseOrderServiceImpl extends BaseOrderProcessor implements BaseOrde
 					if(!jdProductService.getProductStock(region,po.getProductNo(),Integer.toString((int)order.getItems().get(i).getCount()))) {
 						throw new BizValidateException("商品数量不足").setError();
 					}
+					PriceVo pr = jdProductService.getPriceSingle(po.getProductNo());
+					log.error(" jiage:"+pr.getPrice());
+					totalprice = Float.parseFloat(pr.getPrice());
 				}
 				down.setSku(skus);
 				down.setProvince(Integer.toString((int)address.getProvinceId()));
@@ -607,6 +611,7 @@ public class BaseOrderServiceImpl extends BaseOrderProcessor implements BaseOrde
 				down.setMobile(order.getTel());
 				down.setAddress(address.getXiaoquName()+address.getXiaoquAddr()+address.getDetailAddress());
 				down.setOrder_amount(Float.toString(totalprice));
+				
 				redisRepository.setOrderNum(wh.getOrdersn()+"_"+Float.toString(totalprice), wh.getThirdsn());//订单号存储到redis
 				
 				DownloadOrderF tips = jdProductService.sendDlo(down);
