@@ -597,20 +597,18 @@ public class BaseOrderServiceImpl extends BaseOrderProcessor implements BaseOrde
 						throw new BizValidateException("商品数量不足").setError();
 					}
 				}
-				
 				down.setSku(skus);
-				
 				down.setProvince(Integer.toString((int)address.getProvinceId()));
 				down.setCity(Integer.toString((int)address.getCityId()));
 				down.setCounty(Integer.toString((int)address.getCountyId()));
-				
 				down.setThirdsn(wh.getThirdsn());
 				down.setOrdersn(wh.getOrdersn());
 				down.setName(order.getReceiverName());
 				down.setMobile(order.getTel());
 				down.setAddress(address.getXiaoquName()+address.getXiaoquAddr()+address.getDetailAddress());
 				down.setOrder_amount(Float.toString(totalprice));
-				redisRepository.setOrderNum(wh.getOrdersn(), wh.getThirdsn()+"_"+Float.toString(totalprice));//订单号存储到redis
+				redisRepository.setOrderNum(wh.getOrdersn()+"_"+Float.toString(totalprice), wh.getThirdsn());//订单号存储到redis
+				
 				DownloadOrderF tips = jdProductService.sendDlo(down);
 			}
 		}
