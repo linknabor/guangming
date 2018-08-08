@@ -1304,31 +1304,38 @@ public class JDProductServiceImpl implements JDProductService{
 	@Override
 	public boolean verificationJD(JDReceiveVO jdReceive) {
 		// TODO
-		long merchantId = getJDID();
-		ServiceOrder serviceorder = serviceOrderRepository.findByOrderNoAndMerchantId(jdReceive.getThirdsn(),merchantId); //京东订单
-		float price = 0f;
-		if(serviceorder==null) {
-			logger.info("订单为空"+jdReceive);
-			return false;
-		}
+//		long merchantId = getJDID();
+//		ServiceOrder serviceorder = serviceOrderRepository.findByOrderNoAndMerchantId(jdReceive.getThirdsn(),merchantId); //京东订单
+//		float price = 0f;
+//		if(serviceorder==null) {
+//			logger.info("订单为空"+jdReceive);
+//			return false;
+//		}
 		String orderNo = redisRepository.getOrderNum(jdReceive.getThirdsn());
-		if(orderNo == null) {
-			if(orderNo.equals("")||orderNo=="") {
+		String[] or = orderNo.split("_");
+		if(or[0] == null) {
+			if(or[0].equals("")||or[0]=="") {
 				logger.info("redis获取网壕订单为空1");
 				return false;
 			}
 			logger.info("redis获取网壕订单为空2");
 			return false;
 		}
-		if(orderNo.equals(jdReceive.getOrdersn())||orderNo==jdReceive.getOrdersn()) {
-			List<OrderItem> listo = orderItemRepository.findByServiceOrder(serviceorder); // 京东商品
-			for (int i = 0; i < listo.size(); i++) {
-				price+=listo.get(i).getPrice();
-			}
-			if(price==jdReceive.getOrder_amount()) {
+		if(jdReceive.getOrdersn().equals(or[0])||or[0]==jdReceive.getOrdersn()) {
+			if(Float.parseFloat(or[1])==jdReceive.getOrder_amount()) {
 				return true;
 			}
-		}	
+		}
+		
+//		if(orderNo.equals(jdReceive.getOrdersn())||orderNo==jdReceive.getOrdersn()) {
+//			List<OrderItem> listo = orderItemRepository.findByServiceOrder(serviceorder); // 京东商品
+//			for (int i = 0; i < listo.size(); i++) {
+//				price+=listo.get(i).getPrice();
+//			}
+//			if(price==jdReceive.getOrder_amount()) {
+//				return true;
+//			}
+//		}	
 		
 		
 		return false;
