@@ -574,6 +574,7 @@ public class BaseOrderServiceImpl extends BaseOrderProcessor implements BaseOrde
 		Merchant merchant = merchantRepository.findMechantByName("京东");
 		if(order.getMerchantId()==merchant.getId()) { //京东订单
 			WHOrderF wh = jdProductService.getWHOrder(order.getOrderNo());
+			redisRepository.setOrderNum(wh.getOrdersn(), wh.getThirdsn());//订单号存储到redis
 			if(wh.getThirdsn().equals(order.getOrderNo())) {
 				DownloadOrder down = new DownloadOrder();
 				//拿到所有商品
@@ -611,7 +612,6 @@ public class BaseOrderServiceImpl extends BaseOrderProcessor implements BaseOrde
 				down.setAddress(address.getXiaoquName()+address.getXiaoquAddr()+address.getDetailAddress());
 				down.setOrder_amount(Float.toString(totalprice));
 				DownloadOrderF tips = jdProductService.sendDlo(down);
-				redisRepository.setOrderNum(tips.getInfo().getOrdersn(), tips.getInfo().getThirdsn());//订单号存储到redis
 			}
 		}
 	}

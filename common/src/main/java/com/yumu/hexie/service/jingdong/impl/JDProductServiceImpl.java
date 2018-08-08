@@ -1314,10 +1314,10 @@ public class JDProductServiceImpl implements JDProductService{
 		String orderNo = redisRepository.getOrderNum(jdReceive.getThridsn());
 		if(orderNo == null) {
 			if(orderNo.equals("")||orderNo=="") {
-				logger.info("redis获取网壕订单为空"+jdReceive);
+				logger.info("redis获取网壕订单为空1");
 				return false;
 			}
-			logger.info("redis获取网壕订单为空"+jdReceive);
+			logger.info("redis获取网壕订单为空2");
 			return false;
 		}
 		if(orderNo.equals(jdReceive.getOrdersn())||orderNo==jdReceive.getOrdersn()) {

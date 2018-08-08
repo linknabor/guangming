@@ -25,7 +25,7 @@ public class JDPushController {
 	@RequestMapping(value = "/Verification", method = RequestMethod.POST)
 	@ResponseBody
 	public String Verification(String param) {
-		
+		log.info("网壕推送参数："+param);
 		JDReceiveVO jdr = null;
 		try {
 			jdr = (JDReceiveVO)JacksonJsonUtil.jsonToBean(param, JDReceiveVO.class);
@@ -33,6 +33,7 @@ public class JDPushController {
 			// TODO Auto-generated catch block
 			log.error(e.toString());
 			e.printStackTrace();
+			return "fail";
 		}
 		if(jdproductService.verificationJD(jdr)) {
 			log.info("---订单验证成功---");

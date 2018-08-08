@@ -83,7 +83,7 @@ public interface JDProductService {
 	
 	
 	
-	boolean verificationJD(JDReceiveVO jdReceive);
+	boolean verificationJD(JDReceiveVO jdReceive);//京东订单验证
 	
 	
 	void redisSku();//商品状态缓存到redis    无用
