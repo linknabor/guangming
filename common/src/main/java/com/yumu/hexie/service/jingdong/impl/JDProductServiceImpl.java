@@ -1210,25 +1210,29 @@ public class JDProductServiceImpl implements JDProductService{
 	 */
 	public void synUpPrice(String jdPrice,String price,String productNo) {
 		Product pro = productRepository.findByProductNo(productNo);
-		logger.info("价格更新      京东价："+jdPrice+"   协议价：" + price+"   SKUid：" + productNo);
 		if(pro!=null) {
-			logger.info("   商品id：" + pro.getId());
+			productRepository.upProductPrice(productNo, jdPrice, price);
+			onSaleRuleRepository.upProductPrice(Long.toString(pro.getId()), jdPrice, price);
+			onSaleAreaItemRepository.upProductPrice(Long.toString(pro.getId()), jdPrice, price);
 		}else {
-			logger.error("商品为空");
+			logger.error("商品为空  sku:"+productNo);
 		}
-		productRepository.upProductPrice(productNo, jdPrice, price);
-		onSaleRuleRepository.upProductPrice(Long.toString(pro.getId()), jdPrice, price);
-		onSaleAreaItemRepository.upProductPrice(Long.toString(pro.getId()), jdPrice, price);
+		
 	}
 	
 	
 	//下架商品 根据京东id
 	public void synUPEnd(String productNo) {
 		Product pro = productRepository.findByProductNo(productNo);
-		productRepository.invalidByProductNoEnd(productNo);
-		onSaleRuleRepository.upStatusEnd(Long.toString(pro.getId()));;
-		serviceAreaItemRepository.upStatusEnd(Long.toString(pro.getId()));
-		onSaleAreaItemRepository.upStatusEnd(Long.toString(pro.getId()));
+		if(pro!=null) {
+			productRepository.invalidByProductNoEnd(productNo);
+			onSaleRuleRepository.upStatusEnd(Long.toString(pro.getId()));;
+			serviceAreaItemRepository.upStatusEnd(Long.toString(pro.getId()));
+			onSaleAreaItemRepository.upStatusEnd(Long.toString(pro.getId()));
+		}else {
+			logger.error("商品为空 sku:"+productNo);
+		}
+
 	}
 	
 	//上架商品 根据京东id
