@@ -1222,53 +1222,72 @@ public class JDProductServiceImpl implements JDProductService{
 	 * @param productNo
 	 */
 	public void synUpPrice(String jdPrice,String price,String productNo) {
-		Product pro = productRepository.findByProductNo(productNo);
-		if(pro!=null) {
-			productRepository.upProductPrice(productNo, jdPrice, price);
-			onSaleRuleRepository.upProductPrice(Long.toString(pro.getId()), jdPrice, price);
-			onSaleAreaItemRepository.upProductPrice(Long.toString(pro.getId()), jdPrice, price);
+		List<Product> pro = productRepository.findByProductNo(productNo);
+		if(pro.size()>1) {
+			for (int i = 0; i < pro.size(); i++) {
+				logger.error("更新差异---名称："+pro.get(i).getName()+" skuID"+pro.get(i).getProductNo());
+			}
+			
 		}else {
-			logger.error("商品为空  sku:"+productNo);
+			if(pro.get(0)!=null) {
+				productRepository.upProductPrice(productNo, jdPrice, price);
+				onSaleRuleRepository.upProductPrice(Long.toString(pro.get(0).getId()), jdPrice, price);
+				onSaleAreaItemRepository.upProductPrice(Long.toString(pro.get(0).getId()), jdPrice, price);
+			}else {
+				logger.error("商品为空  sku:"+productNo);
+			}
 		}
-		
 	}
 	
 	
 	//下架商品 根据京东id
 	public void synUPEnd(String productNo) {
-		Product pro = productRepository.findByProductNo(productNo);
-		if(pro!=null) {
-			productRepository.invalidByProductNoEnd(productNo);
-			onSaleRuleRepository.upStatusEnd(Long.toString(pro.getId()));;
-			serviceAreaItemRepository.upStatusEnd(Long.toString(pro.getId()));
-			onSaleAreaItemRepository.upStatusEnd(Long.toString(pro.getId()));
+		List<Product> pro = productRepository.findByProductNo(productNo);
+		if(pro.size()>1) {
+			for (int i = 0; i < pro.size(); i++) {
+				logger.error("更新差异---名称："+pro.get(i).getName()+" skuID"+pro.get(i).getProductNo());
+			}
+			
 		}else {
-			logger.error("商品为空 sku:"+productNo);
+			if(pro.get(0)!=null) {
+				productRepository.invalidByProductNoEnd(productNo);
+				onSaleRuleRepository.upStatusEnd(Long.toString(pro.get(0).getId()));;
+				serviceAreaItemRepository.upStatusEnd(Long.toString(pro.get(0).getId()));
+				onSaleAreaItemRepository.upStatusEnd(Long.toString(pro.get(0).getId()));
+			}else {
+				logger.error("商品为空 sku:"+productNo);
+			}
 		}
-
 	}
 	
 	//上架商品 根据京东id
 	public void synUPStart(String productNo) {
 		
-		Product pro = productRepository.findByProductNo(productNo);
-		if(pro!=null) {
-			productRepository.invalidByProductNo(productNo);
-			onSaleRuleRepository.upStatusStart(Long.toString(pro.getId()));;
-			serviceAreaItemRepository.upStatusStart(Long.toString(pro.getId()));
-			onSaleAreaItemRepository.upStatusStart(Long.toString(pro.getId()));
+		List<Product> pro = productRepository.findByProductNo(productNo);
+		if(pro.size()>1) {
+			for (int i = 0; i < pro.size(); i++) {
+				logger.error("更新差异---名称："+pro.get(i).getName()+" skuID"+pro.get(i).getProductNo());
+			}
+			
 		}else {
-			JDSkuIDF skuf = getByidSku(productNo);
-			List<SKUImage> list = getImageSingle(productNo);
-			PriceVo pri =getPriceSingle(productNo);
-			JDProductVO sku = new JDProductVO();
-			sku.setJdskuidf(skuf);
-			sku.setJdskuidimagef(list);//根据商品id拿到image
-			sku.setPrivef(pri);//根据商品id拿到价格
-			Product product = saveProdcut(sku);
-			OnSaleRule onsalerule = saveOnSaleRule(product);
-		    ServiceAreaItem serviceareaitem = saveServiceAreaItem(product,onsalerule);
-		    saveOnSaleAreaItem(product,onsalerule,serviceareaitem);
+			if(pro.get(0)!=null) {
+				productRepository.invalidByProductNo(productNo);
+				onSaleRuleRepository.upStatusStart(Long.toString(pro.get(0).getId()));;
+				serviceAreaItemRepository.upStatusStart(Long.toString(pro.get(0).getId()));
+				onSaleAreaItemRepository.upStatusStart(Long.toString(pro.get(0).getId()));
+			}else {
+				JDSkuIDF skuf = getByidSku(productNo);
+				List<SKUImage> list = getImageSingle(productNo);
+				PriceVo pri =getPriceSingle(productNo);
+				JDProductVO sku = new JDProductVO();
+				sku.setJdskuidf(skuf);
+				sku.setJdskuidimagef(list);//根据商品id拿到image
+				sku.setPrivef(pri);//根据商品id拿到价格
+				Product product = saveProdcut(sku);
+				OnSaleRule onsalerule = saveOnSaleRule(product);
+			    ServiceAreaItem serviceareaitem = saveServiceAreaItem(product,onsalerule);
+			    saveOnSaleAreaItem(product,onsalerule,serviceareaitem);
+			}
 		}
 	}
 

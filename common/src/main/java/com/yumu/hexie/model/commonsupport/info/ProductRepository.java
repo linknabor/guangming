@@ -60,5 +60,5 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
 	
 
-	Product findByProductNo(String productNo);
+	List<Product> findByProductNo(String productNo);
 }

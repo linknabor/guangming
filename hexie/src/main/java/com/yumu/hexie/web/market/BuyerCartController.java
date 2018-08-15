@@ -29,6 +29,7 @@ import com.yumu.hexie.model.ModelConstant;
 import com.yumu.hexie.model.commonsupport.info.Product;
 import com.yumu.hexie.model.distribution.region.Merchant;
 import com.yumu.hexie.model.distribution.region.MerchantRepository;
+import com.yumu.hexie.model.jingdong.limitregion.JDRegionF;
 import com.yumu.hexie.model.market.ServiceOrder;
 import com.yumu.hexie.model.market.marketOrder.BuyerCart;
 import com.yumu.hexie.model.market.marketOrder.BuyerItem;
@@ -41,6 +42,7 @@ import com.yumu.hexie.model.redis.RedisRepository;
 import com.yumu.hexie.model.user.Address;
 import com.yumu.hexie.model.user.User;
 import com.yumu.hexie.service.exception.BizValidateException;
+import com.yumu.hexie.service.jingdong.JDProductService;
 import com.yumu.hexie.service.sales.BaseOrderService;
 import com.yumu.hexie.service.sales.ProductService;
 import com.yumu.hexie.service.user.AddressService;
@@ -65,7 +67,8 @@ public class BuyerCartController extends BaseController {
     private AddressService addressService;
 	@Inject
 	protected ProductService productService;
-	
+    @Inject
+    protected JDProductService jdProductService;
 	/**
 	 * 添加购物车
 	 * @param user
@@ -81,7 +84,7 @@ public class BuyerCartController extends BaseController {
 		try {
 			//1.加入购物车前判断是否有库存
 			Product product = productservice.getProduct(skuId);
-			
+			Merchant merchant = merchantRepository.findMechantByName("京东");
 			String newKey = String.valueOf(skuId) + "-" + String.valueOf(ruleId);
 					
 			Object o = redisRepository.getBuyerCartByKey(user.getId(), newKey);
@@ -97,6 +100,28 @@ public class BuyerCartController extends BaseController {
 				if(!saleRule.valid(Integer.parseInt(o.toString())+amount)){
 					throw new BizValidateException(ModelConstant.EXCEPTION_BIZ_TYPE_ONSALE, saleRule.getId(), "商品信息已过期，请重新下单！").setError();
 		        }
+				
+				if(merchant.getId() == product.getMerchantId()) {//检验是否是京东的商品 
+					if(product.getProductNo()==null||product.getProductNo().equals("")) {
+						
+					}else {
+						String region = Integer.toString((int)user.getProvinceId())+"_"+Integer.toString((int)user.getCityId()) +"_"+Integer.toString((int)user.getCountyId());
+						JDRegionF jdref =jdProductService.getRegionLimit(region,product.getProductNo());
+						if(jdref==null) {
+							throw new BizValidateException( "地区购买限制").setError();
+						}
+						if(jdref.getResult().equals("0")) {
+							
+						}else {
+							throw new BizValidateException( "地区购买限制").setError();
+						}
+						if(!jdProductService.getProductStock(region,product.getProductNo(),Integer.toString(amount))) {
+							logger.error("购物车添加   商品数量不足");
+							throw new BizValidateException( "商品数量不足").setError();
+						}
+					}
+					
+				}
 				
 				//校验商品（库存）
 				productService.checkSalable(product, Integer.parseInt(o.toString()));
