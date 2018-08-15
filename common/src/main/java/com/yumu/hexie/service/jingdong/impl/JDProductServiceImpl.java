@@ -6,12 +6,12 @@ import java.util.List;
 import java.util.Map;
 
 import javax.inject.Inject;
-import javax.print.attribute.standard.MediaSize.Other;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.mysql.fabric.xmlrpc.base.Array;
 import com.yumu.hexie.common.util.DateUtil;
 import com.yumu.hexie.model.ModelConstant;
 import com.yumu.hexie.model.commonsupport.info.Product;
@@ -52,11 +52,11 @@ import com.yumu.hexie.model.jingdong.getstock.Stock;
 import com.yumu.hexie.model.jingdong.getstock.StockF;
 import com.yumu.hexie.model.jingdong.limitregion.JDRegion;
 import com.yumu.hexie.model.jingdong.limitregion.JDRegionF;
-import com.yumu.hexie.model.market.OrderItem;
+import com.yumu.hexie.model.jingdong.regionsyn.RegionSynLimt;
+import com.yumu.hexie.model.jingdong.regionsyn.RegionSynLimtRepository;
 import com.yumu.hexie.model.market.OrderItemRepository;
 import com.yumu.hexie.model.market.ServiceAreaItem;
 import com.yumu.hexie.model.market.ServiceAreaItemRepository;
-import com.yumu.hexie.model.market.ServiceOrder;
 import com.yumu.hexie.model.market.ServiceOrderRepository;
 import com.yumu.hexie.model.market.saleplan.OnSaleRule;
 import com.yumu.hexie.model.market.saleplan.OnSaleRuleRepository;
@@ -93,6 +93,8 @@ public class JDProductServiceImpl implements JDProductService{
 	protected ServiceOrderRepository serviceOrderRepository;
 	@Inject
 	protected OrderItemRepository orderItemRepository;
+	@Inject
+	protected RegionSynLimtRepository regionSynLimtRepository;
 	/**
 	 * 获取token
 	 */
@@ -245,7 +247,10 @@ public class JDProductServiceImpl implements JDProductService{
 		}
 		return list;
 	}
-
+	
+	/**
+	 * 商品地区限制查询
+	 */
 	@Override
 	public JDRegionF getRegionLimit(String reg,String productNo) {
 		logger.info("区域限制productNo："+productNo+" 地区id"+reg);
@@ -255,6 +260,19 @@ public class JDProductServiceImpl implements JDProductService{
 	    region1.setFunc(JDconstant.CHECKAREALIMIT);
 	    region1.setToken(strToken);
 	    region1.setArea(getAddress(reg));
+	    region1.setSkuIds(productNo);
+	    JDRegionF region = jdservice.CheckAreaLimit(region1);
+		
+		return region;
+	}
+	
+	public JDRegionF getRegionLimits(String reg,String productNo) {
+		String strToken = getToken();
+		//商品购买区域限制查询
+	    JDRegion region1 = new JDRegion();
+	    region1.setFunc(JDconstant.CHECKAREALIMIT);
+	    region1.setToken(strToken);
+	    region1.setArea(reg);
 	    region1.setSkuIds(productNo);
 	    JDRegionF region = jdservice.CheckAreaLimit(region1);
 		
@@ -776,6 +794,77 @@ public class JDProductServiceImpl implements JDProductService{
 					}
 				}
 				
+				
+				/**
+				 * 京东 北京2级    光明  北京3级
+				 */
+				if(regionj.get(i).getRegion_name()=="北京"||regionj.get(i).getRegion_name().equals("北京")) {
+					for (int k = 0; k < region.get(j).getInfo().size(); k++) {
+						if(region.get(j).getInfo().get(k).getName().equals("北京市")&&regionj.get(i).getRegion_name().equals("北京")) {
+							JDregionMapping jdregionmapping = new JDregionMapping();
+							jdregionmapping.setJdparentid(Integer.parseInt(regionj.get(i).getParent_id()));
+							jdregionmapping.setJdregionid(Integer.parseInt(regionj.get(i).getRegion_id()));
+							jdregionmapping.setParentid(region.get(j).getInfo().get(k).getParentId());
+							jdregionmapping.setRegionid(region.get(j).getInfo().get(k).getId());
+							jdregionmapping.setParentname(region.get(j).getInfo().get(k).getParentName());
+							jdregionmapping.setName(region.get(j).getInfo().get(k).getName());
+							list.add(jdregionmapping);
+						}
+						
+						for (int j2 = 0; j2 < regionj.get(i).getInfo().size(); j2++) {
+							
+							for (int l = 0; l < region.get(j).getInfo().get(k).getInfo().size(); l++) {
+								String regionname=regionj.get(i).getInfo().get(j2).getRegion_name();
+								if(regionname==region.get(j).getInfo().get(k).getInfo().get(l).getName()||regionname.equals(region.get(j).getInfo().get(k).getInfo().get(l).getName())) {
+									JDregionMapping jdregionmapping = new JDregionMapping();
+									jdregionmapping.setJdparentid(Integer.parseInt(regionj.get(i).getInfo().get(j2).getParent_id()));
+									jdregionmapping.setJdregionid(Integer.parseInt(regionj.get(i).getInfo().get(j2).getRegion_id()));
+									jdregionmapping.setParentid(region.get(j).getInfo().get(k).getInfo().get(l).getParentId());
+									jdregionmapping.setRegionid(region.get(j).getInfo().get(k).getInfo().get(l).getId());
+									jdregionmapping.setParentname(region.get(j).getInfo().get(k).getInfo().get(l).getParentName());
+									jdregionmapping.setName(region.get(j).getInfo().get(k).getInfo().get(l).getName());
+									list.add(jdregionmapping);
+								}
+							}
+						}
+					}
+				}
+				
+				/**
+				 * 京东 重庆2级    光明  重庆3级
+				 */
+				if(regionj.get(i).getRegion_name()=="重庆"||regionj.get(i).getRegion_name().equals("重庆")) {
+					for (int k = 0; k < region.get(j).getInfo().size(); k++) {
+						if(region.get(j).getInfo().get(k).getName().equals("重庆市")&&regionj.get(i).getRegion_name().equals("重庆")) {
+							JDregionMapping jdregionmapping = new JDregionMapping();
+							jdregionmapping.setJdparentid(Integer.parseInt(regionj.get(i).getParent_id()));
+							jdregionmapping.setJdregionid(Integer.parseInt(regionj.get(i).getRegion_id()));
+							jdregionmapping.setParentid(region.get(j).getInfo().get(k).getParentId());
+							jdregionmapping.setRegionid(region.get(j).getInfo().get(k).getId());
+							jdregionmapping.setParentname(region.get(j).getInfo().get(k).getParentName());
+							jdregionmapping.setName(region.get(j).getInfo().get(k).getName());
+							list.add(jdregionmapping);
+						}
+						
+						for (int j2 = 0; j2 < regionj.get(i).getInfo().size(); j2++) {
+							
+							for (int l = 0; l < region.get(j).getInfo().get(k).getInfo().size(); l++) {
+								String regionname=regionj.get(i).getInfo().get(j2).getRegion_name();
+								if(regionname==region.get(j).getInfo().get(k).getInfo().get(l).getName()||regionname.equals(region.get(j).getInfo().get(k).getInfo().get(l).getName())) {
+									JDregionMapping jdregionmapping = new JDregionMapping();
+									jdregionmapping.setJdparentid(Integer.parseInt(regionj.get(i).getInfo().get(j2).getParent_id()));
+									jdregionmapping.setJdregionid(Integer.parseInt(regionj.get(i).getInfo().get(j2).getRegion_id()));
+									jdregionmapping.setParentid(region.get(j).getInfo().get(k).getInfo().get(l).getParentId());
+									jdregionmapping.setRegionid(region.get(j).getInfo().get(k).getInfo().get(l).getId());
+									jdregionmapping.setParentname(region.get(j).getInfo().get(k).getInfo().get(l).getParentName());
+									jdregionmapping.setName(region.get(j).getInfo().get(k).getInfo().get(l).getName());
+									list.add(jdregionmapping);
+								}
+							}
+						}
+					}
+				}
+				
 				//判断市是否一样
 				if(regionj.get(i).getRegion_name().equals(region.get(j).getName())||regionj.get(i).getRegion_name()==region.get(j).getName()) {
 					
@@ -1216,6 +1305,12 @@ public class JDProductServiceImpl implements JDProductService{
 		if(jdre.getParentname().equals("上海")) {
 			regionAddress = jdre.getJdregionid()+"_"+jdre1.getJdregionid()+"_"+"0";
 		}
+		if(jdre.getParentname().equals("北京")) {
+			regionAddress = jdre.getJdregionid()+"_"+jdre1.getJdregionid()+"_"+"0";
+		}
+		if(jdre.getParentname().equals("重庆")) {
+			regionAddress = jdre.getJdregionid()+"_"+jdre1.getJdregionid()+"_"+"0";
+		}
 		logger.info("地址"+regionAddress);
 		return regionAddress;
 	}
@@ -1240,22 +1335,355 @@ public class JDProductServiceImpl implements JDProductService{
 	}
 
 	
-	
+	/**
+	 * 同步商品信息  此出不比对 价格 上下架情况
+	 */
 	@Override
 	public void detaliedSyn() {
-		List<String> strlist = getProductStatus();
+		List<String> strlist = getProductStatus();//拿到所有上架商品
+		List<Product> listpro = productRepository.findByMerchantId(Long.toBinaryString(getJDID()));//拿到所有京东商品
 		for (int i = 0; i < strlist.size(); i++) {
-			JDSkuIDF jd = getByidSku(strlist.get(i));
+			JDSkuIDF jd = getByidSku(strlist.get(i));//拿到jd商品详细信息
+			for (int j = 0; j < listpro.size(); j++) {
+				if(jd.getInfo().getSku() == listpro.get(j).getProductNo()||jd.getInfo().getSku().equals(listpro.get(j).getProductNo())) {//统一商品 进行比对
+					boolean p = true;
+					if(jd.getInfo().getBrandName() == listpro.get(j).getName() ||jd.getInfo().getBrandName().equals(listpro.get(j).getName())) {//名字
+						
+					}else {
+						p = false;
+					}
+					String imagePath = "http://img13.360buyimg.com/n0/"+jd.getInfo().getImagePath();
+					if( imagePath == listpro.get(j).getMainPicture() ||imagePath.equals(listpro.get(j).getMainPicture())) {//图片
+						
+					}else {
+						p = false;
+					}
+					if(jd.getInfo().getIntroduction() == listpro.get(j).getServiceDesc() ||jd.getInfo().getIntroduction().equals(listpro.get(j).getServiceDesc())) {//详细描述
+						
+					}else {
+						p = false;
+					}
+					if(!p) {
+						delaliedUp(jd,listpro.get(j).getId());
+					}
+					
+				}
+			}
 			
-			logger.info("商品加入集合："+i);
+			logger.info("商品比对目前条数："+i+"   剩余条数："+(strlist.size()-i));
 		}
+	}
+	
+	/**
+	 * 同步地区购买限制
+	 */
+	@Override
+	public void regionLimtSyn() {
+		List<RegionSynLimt> reg = regionSynLimtRepository.findByAddressAll();//拿到所有地区  （举例：0_2_20）
+		for (int i = 0; i < reg.size(); i++) {
+			List<RegionSynLimt> listreg = regionSynLimtRepository.findByAddress(reg.get(i).getAddress());//拿到此编号下的所有商品
+			int b = (listreg.size()-(listreg.size()%100))/100;
+			for (int l = 0; l < b; l++) {
+				List<RegionSynLimt> list = new ArrayList<>();
+				StringBuilder str = new StringBuilder();
+				for (int k = l*100; k < 100*(l+1); k++) {//每100个循环
+					if(k < 100*(l+1)-1) {
+						str.append(listreg.get(k).getProductno()+",");
+					}else {
+						str.append(listreg.get(k).getProductno());
+					}
+					list.add(listreg.get(k));
+				}	
+				JDRegionF jd = getRegionLimits(reg.get(i).getAddress(),str.toString()); //查询这100个商品的状态
+				if(jd.getInfo()!=null) {
+					for (int k = 0; k < jd.getInfo().size(); k++) {
+						for (int j = 0; j < list.size(); j++) {
+							if(jd.getInfo().get(k).getSkuId().equals(list.get(j).getProductno())) {
+								if(jd.getInfo().get(k).getIsAreaRestrict().equals(list.get(j).getStatus())) {
+									
+								}else {
+									RegionSynLimt rsl = list.get(j);
+									rsl.setStatus(jd.getInfo().get(k).getIsAreaRestrict());
+									regionSynLimtRepository.save(rsl);  //修改状态
+								}
+							}
+						}
+					}
+				}else {
+					logger.info("提示信息："+jd.getMsg());
+				}
+			}
+			
+
+			StringBuilder str2 = new StringBuilder();
+			List<RegionSynLimt> list = new ArrayList<>();
+			for (int l = 100*b; l < 100*b+listreg.size()%100; l++) {//循环剩下不足100条的
+				if(l < 100*b+listreg.size()%100-1) {
+					str2.append(listreg.get(l).getProductno()+",");
+				}else {
+					str2.append(listreg.get(l).getProductno());
+				}
+			}
+			JDRegionF jd = getRegionLimits(reg.get(i).getAddress(),str2.toString());
+			if(jd.getInfo()!=null) {
+				for (int k = 0; k < jd.getInfo().size(); k++) {
+					for (int j = 0; j < list.size(); j++) {
+						if(jd.getInfo().get(k).getSkuId().equals(list.get(j).getProductno())) {
+							if(jd.getInfo().get(k).getIsAreaRestrict().equals(list.get(j).getStatus())) {
+								
+							}else {
+								RegionSynLimt rsl = list.get(j);
+								rsl.setStatus(jd.getInfo().get(k).getIsAreaRestrict());
+								regionSynLimtRepository.save(rsl);  //修改状态
+							}
+						}
+					}
+				}
+			}else {
+				logger.info("提示信息："+jd.getMsg());
+			}
+		}
+		
+		regionLimtSynadd();//增加新增商品 购买限制
+	}
+	
+	
+	/**
+	 * 增加新增商品 购买限制
+	 */
+	public void regionLimtSynadd() {
+		List<Product> pro = productRepository.findByJDProductNoIsNotNull();
+		List<RegionSynLimt> reg = regionSynLimtRepository.findByproductNoAll();
+		List<Product> pro1 = new ArrayList<>();
+		for (int i = 0; i < pro.size(); i++) {
+			for (int j = 0; j < reg.size(); j++) {
+				boolean a = true;
+				if(pro.get(i).getProductNo().equals(reg.get(j).getProductno())) {
+					a = false;
+				}
+				if(a) {
+					pro1.add(pro.get(i));
+				}
+			}
+		}
+		regionLimtSynMapping(pro1);
+		
+	}
+	
+	
+	/**
+	 * 地区购买限制 增加
+	 */
+	@Override
+	@Transactional
+	public void regionLimtSynMapping() {
+	 	List<Product> pro = productRepository.findByJDProductNoIsNotNull();
+	 	
+	 	String region = "上海_北京";
+	 	String[] regionli = region.split("_");
+	 	for (int i = 0; i < regionli.length; i++) {
+	 		JDregionMapping jdname = jdregionMappingRepository.getByName(regionli[i]);
+		 	List<JDregionMapping> jdlist = jdregionMappingRepository.getByParentName(regionli[i]);
+		 	
+		 	for (int j = 0; j < jdlist.size(); j++) {
+		 		
+		 		String reg = jdname.getJdparentid()+"_"+ jdlist.get(j).getJdparentid() +"_"+jdlist.get(j).getJdregionid();
+				if(regionli[i].equals("上海")||regionli[i].equals("北京")) {
+					reg = jdname.getJdregionid()+"_"+jdlist.get(j).getJdregionid()+"_"+"0";
+				}
+		 		
+				
+				int b = (pro.size()-(pro.size()%100))/100;
+				for (int l = 0; l < b; l++) {
+					StringBuilder str = new StringBuilder();
+					for (int k = l*100; k < 100*(l+1); k++) {//每100个循环
+						if(k < 100*(l+1)-1) {
+							str.append(pro.get(k).getProductNo()+",");
+						}else {
+							str.append(pro.get(k).getProductNo());
+						}
+					}	
+					JDRegionF jd = getRegionLimits(reg,str.toString());
+					if(jd.getInfo()!=null) {
+						for (int k = 0; k < jd.getInfo().size(); k++) {
+							RegionSynLimt rsl = new RegionSynLimt();
+							rsl.setJdregionid(jdlist.get(j).getJdregionid());
+							rsl.setJdregionparentid(jdlist.get(j).getJdparentid());
+							rsl.setRegionid(jdlist.get(j).getRegionid());
+							rsl.setRegionparentid(jdlist.get(j).getParentid());
+							rsl.setName(jdlist.get(j).getName());
+							rsl.setParentname(jdlist.get(j).getParentname());
+							rsl.setProductno(jd.getInfo().get(k).getSkuId());
+							rsl.setAddress(reg);
+							
+							if(jd.getInfo().get(k).getIsAreaRestrict().equals("true")) {
+								rsl.setStatus("0");
+							}else {
+								rsl.setStatus("1");
+							}
+							
+							regionSynLimtRepository.save(rsl);
+						}
+					}else {
+						logger.info("提示信息："+jd.getMsg());
+					}
+				}
+				
+
+				StringBuilder str2 = new StringBuilder();
+				for (int l = 100*b; l < 100*b+pro.size()%100; l++) {//循环剩下不足100条的
+					if(l < 100*b+pro.size()%100-1) {
+						str2.append(pro.get(l).getProductNo()+",");
+					}else {
+						str2.append(pro.get(l).getProductNo());
+					}
+				}
+				JDRegionF jd = getRegionLimits(reg,str2.toString());
+				if(jd.getInfo()!=null) {
+					for (int k = 0; k < jd.getInfo().size(); k++) {
+						RegionSynLimt rsl = new RegionSynLimt();
+						rsl.setJdregionid(jdlist.get(j).getJdregionid());
+						rsl.setJdregionparentid(jdlist.get(j).getJdparentid());
+						rsl.setRegionid(jdlist.get(j).getRegionid());
+						rsl.setRegionparentid(jdlist.get(j).getParentid());
+						rsl.setName(jdlist.get(j).getName());
+						rsl.setParentname(jdlist.get(j).getParentname());
+						rsl.setProductno(jd.getInfo().get(k).getSkuId());
+						rsl.setAddress(reg);
+						
+						if(jd.getInfo().get(k).getIsAreaRestrict().equals("true")) {
+							rsl.setStatus("0");
+						}else {
+							rsl.setStatus("1");
+						}
+						
+						regionSynLimtRepository.save(rsl);
+					}
+				}else {
+					logger.info("提示信息："+jd.getMsg());
+				}
+
+		 	}
+		}
+	}
+	
+	/**
+	 * 地区购买限制 增加
+	 */
+	@Transactional
+	public void regionLimtSynMapping(List<Product> pro) {
+	 	
+	 	String region = "上海_北京";
+	 	String[] regionli = region.split("_");
+	 	for (int i = 0; i < regionli.length; i++) {
+	 		JDregionMapping jdname = jdregionMappingRepository.getByName(regionli[i]);
+		 	List<JDregionMapping> jdlist = jdregionMappingRepository.getByParentName(regionli[i]);
+		 	
+		 	for (int j = 0; j < jdlist.size(); j++) {
+		 		
+		 		String reg = jdname.getJdparentid()+"_"+ jdlist.get(j).getJdparentid() +"_"+jdlist.get(j).getJdregionid();
+				if(regionli[i].equals("上海")||regionli[i].equals("北京")||regionli[i].equals("重庆")) {
+					reg = jdname.getJdregionid()+"_"+jdlist.get(j).getJdregionid()+"_"+"0";
+				}
+		 		
+				
+				int b = (pro.size()-(pro.size()%100))/100;
+				for (int l = 0; l < b; l++) {
+					StringBuilder str = new StringBuilder();
+					for (int k = l*100; k < 100*(l+1); k++) {//每100个循环
+						if(k < 100*(l+1)-1) {
+							str.append(pro.get(k).getProductNo()+",");
+						}else {
+							str.append(pro.get(k).getProductNo());
+						}
+					}	
+					JDRegionF jd = getRegionLimits(reg,str.toString());
+					if(jd.getInfo()!=null) {
+						for (int k = 0; k < jd.getInfo().size(); k++) {
+							RegionSynLimt rsl = new RegionSynLimt();
+							rsl.setJdregionid(jdlist.get(j).getJdregionid());
+							rsl.setJdregionparentid(jdlist.get(j).getJdparentid());
+							rsl.setRegionid(jdlist.get(j).getRegionid());
+							rsl.setRegionparentid(jdlist.get(j).getParentid());
+							rsl.setName(jdlist.get(j).getName());
+							rsl.setParentname(jdlist.get(j).getParentname());
+							rsl.setProductno(jd.getInfo().get(k).getSkuId());
+							rsl.setAddress(reg);
+							
+							if(jd.getInfo().get(k).getIsAreaRestrict().equals("true")) {
+								rsl.setStatus("0");
+							}else {
+								rsl.setStatus("1");
+							}
+							
+							regionSynLimtRepository.save(rsl);
+						}
+					}else {
+						logger.info("提示信息："+jd.getMsg());
+					}
+				}
+				
+
+				StringBuilder str2 = new StringBuilder();
+				for (int l = 100*b; l < 100*b+pro.size()%100; l++) {//循环剩下不足100条的
+					if(l < 100*b+pro.size()%100-1) {
+						str2.append(pro.get(l).getProductNo()+",");
+					}else {
+						str2.append(pro.get(l).getProductNo());
+					}
+				}
+				JDRegionF jd = getRegionLimits(reg,str2.toString());
+				if(jd.getInfo()!=null) {
+					for (int k = 0; k < jd.getInfo().size(); k++) {
+						RegionSynLimt rsl = new RegionSynLimt();
+						rsl.setJdregionid(jdlist.get(j).getJdregionid());
+						rsl.setJdregionparentid(jdlist.get(j).getJdparentid());
+						rsl.setRegionid(jdlist.get(j).getRegionid());
+						rsl.setRegionparentid(jdlist.get(j).getParentid());
+						rsl.setName(jdlist.get(j).getName());
+						rsl.setParentname(jdlist.get(j).getParentname());
+						rsl.setProductno(jd.getInfo().get(k).getSkuId());
+						rsl.setAddress(reg);
+						
+						if(jd.getInfo().get(k).getIsAreaRestrict().equals("true")) {
+							rsl.setStatus("0");
+						}else {
+							rsl.setStatus("1");
+						}
+						
+						regionSynLimtRepository.save(rsl);
+					}
+				}else {
+					logger.info("提示信息："+jd.getMsg());
+				}
+
+		 	}
+		}
+	}
+	
+	/**
+	 * 修改商品 详细信息
+	 * @param jd
+	 * @param id
+	 */
+	private void delaliedUp(JDSkuIDF jd,long id) {
+		Product pro = new Product();
+		pro.setId(id);
+		pro.setName(jd.getInfo().getName());
+		pro.setShortName(jd.getInfo().getName());
+		pro.setTitleName(jd.getInfo().getName());
+		String imagePath = "http://img13.360buyimg.com/n0/"+jd.getInfo().getImagePath();
+		pro.setPictures(imagePath);
+		pro.setMainPicture(imagePath);
+		pro.setSmallPicture(imagePath);
+		pro.setServiceDesc(jd.getInfo().getIntroduction());
+		productRepository.save(pro);
 	}
 	
 	
 	
-	
 	private Product JDSavePro(Product pro,String productNo) {
-
+ 
 		Product product = new Product();
 		
 		product.setId(pro.getId());

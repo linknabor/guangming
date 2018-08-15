@@ -1,8 +1,8 @@
 package com.yumu.hexie.model.jingdong;
 
 public class JDReceiveVO {
-	private String ordersn;
-	private String thirdsn;
+	private String ordersn;//京东订单号
+	private String thirdsn;//第三方订单号
 	private float order_amount;
 	public String getOrdersn() {
 		return ordersn;

@@ -81,6 +81,10 @@ public interface JDProductService {
 	
 	void detaliedSyn();//同步详细信息
 	
+	void regionLimtSynMapping();//同步地区限制增加
+	
+	void regionLimtSyn();//同步地区购买限制
+	
 	
 	
 	boolean verificationJD(JDReceiveVO jdReceive);//京东订单验证

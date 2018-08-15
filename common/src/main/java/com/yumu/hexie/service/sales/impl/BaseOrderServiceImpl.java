@@ -597,9 +597,9 @@ public class BaseOrderServiceImpl extends BaseOrderProcessor implements BaseOrde
 					if(!jdProductService.getProductStock(region,po.getProductNo(),Integer.toString((int)order.getItems().get(i).getCount()))) {
 						throw new BizValidateException("商品数量不足").setError();
 					}
-					PriceVo pr = jdProductService.getPriceSingle(po.getProductNo());
-					log.error(" jiage:"+pr.getPrice());
-					totalprice = Float.parseFloat(pr.getPrice());
+					PriceVo pr = jdProductService.getPriceSingle(po.getProductNo());//注意注意注意！！！！！！！此处不删是大坑
+					log.error(" jiage:"+pr.getPrice());//注意注意注意！！！！！！！此处不删是大坑
+					totalprice = Float.parseFloat(pr.getPrice());//注意注意注意！！！！！！！此处不删是大坑
 				}
 				down.setSku(skus);
 				down.setProvince(Integer.toString((int)address.getProvinceId()));
