@@ -756,13 +756,15 @@ public class JDProductServiceImpl implements JDProductService{
 		List<RegionJ> regionj = getAllRegion();//拿到京东所有地区
 		List<Region> region = getRegion();//拿到所有地区
 		
+		logger.info("拿到京东所有地区:"+regionj.toString());
+		logger.info("拿到所有地区: "+region.toString());
 		for (int i = 0; i < regionj.size(); i++) {
 			for (int j = 0; j < region.size(); j++) {
 				
 				/**
 				 * 京东 上海2级    光明  上海3级
 				 */
-				if(regionj.get(i).getRegion_name()=="上海"||regionj.get(i).getRegion_name().equals("上海")) {
+				if(regionj.get(i).getRegion_name().equals("上海")) {
 					for (int k = 0; k < region.get(j).getInfo().size(); k++) {
 						if(region.get(j).getInfo().get(k).getName().equals("上海市")&&regionj.get(i).getRegion_name().equals("上海")) {
 							JDregionMapping jdregionmapping = new JDregionMapping();
@@ -798,7 +800,7 @@ public class JDProductServiceImpl implements JDProductService{
 				/**
 				 * 京东 北京2级    光明  北京3级
 				 */
-				if(regionj.get(i).getRegion_name()=="北京"||regionj.get(i).getRegion_name().equals("北京")) {
+				if(regionj.get(i).getRegion_name().equals("北京")) {
 					for (int k = 0; k < region.get(j).getInfo().size(); k++) {
 						if(region.get(j).getInfo().get(k).getName().equals("北京市")&&regionj.get(i).getRegion_name().equals("北京")) {
 							JDregionMapping jdregionmapping = new JDregionMapping();
@@ -833,7 +835,7 @@ public class JDProductServiceImpl implements JDProductService{
 				/**
 				 * 京东 重庆2级    光明  重庆3级
 				 */
-				if(regionj.get(i).getRegion_name()=="重庆"||regionj.get(i).getRegion_name().equals("重庆")) {
+				if(regionj.get(i).getRegion_name().equals("重庆")) {
 					for (int k = 0; k < region.get(j).getInfo().size(); k++) {
 						if(region.get(j).getInfo().get(k).getName().equals("重庆市")&&regionj.get(i).getRegion_name().equals("重庆")) {
 							JDregionMapping jdregionmapping = new JDregionMapping();
@@ -868,7 +870,7 @@ public class JDProductServiceImpl implements JDProductService{
 				//判断市是否一样
 				if(regionj.get(i).getRegion_name().equals(region.get(j).getName())||regionj.get(i).getRegion_name()==region.get(j).getName()) {
 					
-					
+					logger.info("其他地区");
 					//拿到市里面的区
 					for (int j2 = 0; j2 < regionj.get(i).getInfo().size(); j2++) {
 						for (int k = 0; k < region.get(j).getInfo().size(); k++) {
