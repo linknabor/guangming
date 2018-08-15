@@ -1210,6 +1210,12 @@ public class JDProductServiceImpl implements JDProductService{
 	 */
 	public void synUpPrice(String jdPrice,String price,String productNo) {
 		Product pro = productRepository.findByProductNo(productNo);
+		logger.info("价格更新      京东价："+jdPrice+"   协议价：" + price+"   SKUid：" + productNo);
+		if(pro!=null) {
+			logger.info("   商品id：" + pro.getId());
+		}else {
+			logger.error("商品为空");
+		}
 		productRepository.upProductPrice(productNo, jdPrice, price);
 		onSaleRuleRepository.upProductPrice(Long.toString(pro.getId()), jdPrice, price);
 		onSaleAreaItemRepository.upProductPrice(Long.toString(pro.getId()), jdPrice, price);
