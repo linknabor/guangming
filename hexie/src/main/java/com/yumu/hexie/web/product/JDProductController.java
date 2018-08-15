@@ -97,6 +97,19 @@ public class JDProductController extends BaseController{
 		return "名字同步";
 	}
 	
+	@RequestMapping(value = "/regionLimtSynMapping", method = RequestMethod.GET)
+	@ResponseBody
+	public String regionLimtSynMapping() {
+		jdproductService.regionLimtSynMapping();
+		return "同步地区限制增加";
+	}
+	
+	@RequestMapping(value = "/regionLimtSyn", method = RequestMethod.GET)
+	@ResponseBody
+	public String regionLimtSyn() {
+		jdproductService.regionLimtSyn();
+		return "同步地区购买限制";
+	}
 	
 	@RequestMapping(value = "/helloWord", method = RequestMethod.GET)
 	@ResponseBody
