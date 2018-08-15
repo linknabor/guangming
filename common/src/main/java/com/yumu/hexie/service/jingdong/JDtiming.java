@@ -5,6 +5,7 @@ import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -29,6 +30,7 @@ public class JDtiming {
     /**
      * 每一个半小时获取一次token 
      */
+    @Async
 	@Scheduled(cron = " 0 30 0/2 * * ?")
 	public void timerproduct() {
 		JDLoad load = new JDLoad();

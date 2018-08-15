@@ -575,6 +575,11 @@ public class BaseOrderServiceImpl extends BaseOrderProcessor implements BaseOrde
 		Merchant merchant = merchantRepository.findMechantByName("京东");
 		if(order.getMerchantId()==merchant.getId()) { //京东订单
 			WHOrderF wh = jdProductService.getWHOrder(order.getOrderNo());
+			if(wh==null) {
+				log.error("网壕订单号创建失败");
+				return;
+			}
+			
 			if(wh.getThirdsn().equals(order.getOrderNo())) {
 				DownloadOrder down = new DownloadOrder();
 				//拿到所有商品
@@ -583,23 +588,31 @@ public class BaseOrderServiceImpl extends BaseOrderProcessor implements BaseOrde
 				for (int i = 0; i < order.getItems().size(); i++) {
 					SkuNums  sku = new SkuNums();
 					Product po = productService.getProduct(order.getItems().get(i).getProductId());
+					if(po==null) {
+						log.error("商品为空");
+						return;
+					}
 					sku.setSkuId(po.getProductNo());
 					sku.setNum(Float.toString(order.getItems().get(i).getCount()));
 					skus.add(sku);
 					totalprice +=order.getItems().get(i).getAmount();
 					String region = Integer.toString((int)address.getProvinceId())+"_"+Integer.toString((int)address.getCityId()) +"_"+Integer.toString((int)address.getCountyId());
 					JDRegionF jdref =jdProductService.getRegionLimit(region,po.getProductNo());
+					if(jdref==null) {
+						log.error("地区购买限制ERROR");
+						return;
+					}
 					if(jdref.getResult().equals("0")) {
 						
 					}else {
-						throw new BizValidateException("商品购买区域限制").setError();
+						log.error("商品购买区域限制");
+						return;
 					}
 					if(!jdProductService.getProductStock(region,po.getProductNo(),Integer.toString((int)order.getItems().get(i).getCount()))) {
-						throw new BizValidateException("商品数量不足").setError();
+						log.error("商品数量不足");
+						return;
 					}
-					PriceVo pr = jdProductService.getPriceSingle(po.getProductNo());//注意注意注意！！！！！！！此处不删是大坑
-					log.error(" jiage:"+pr.getPrice());//注意注意注意！！！！！！！此处不删是大坑
-					totalprice = Float.parseFloat(pr.getPrice());//注意注意注意！！！！！！！此处不删是大坑
+				
 				}
 				down.setSku(skus);
 				down.setProvince(Integer.toString((int)address.getProvinceId()));
@@ -614,7 +627,7 @@ public class BaseOrderServiceImpl extends BaseOrderProcessor implements BaseOrde
 				
 				redisRepository.setOrderNum(wh.getOrdersn()+"_"+Float.toString(totalprice), wh.getThirdsn());//订单号存储到redis
 				
-				DownloadOrderF tips = jdProductService.sendDlo(down);
+				jdProductService.sendDlo(down);//发送订单
 			}
 		}
 	}
@@ -625,18 +638,32 @@ public class BaseOrderServiceImpl extends BaseOrderProcessor implements BaseOrde
 	@Override
 	public void jdConfirmOrder(PaymentOrder payment) {
 		// TODO
+		if(payment==null) {
+			log.error("订单确认失败，payment为空");
+			return;
+		}
 		log.warn("[jdConfirmOrder]NonceStr:" + payment.toString());
 		Merchant merchant = merchantRepository.findMechantByName("京东");
 		if(payment.getMerchantId()==merchant.getId()) { //京东订单
 			ServiceOrder order = serviceOrderRepository.findOneWithItem(payment.getOrderId());
+			if(order==null) {
+				log.error("订单确认失败，order为空");
+				return;
+			}
 			if(payment.getStatus()==PaymentConstant.PAYMENT_STATUS_SUCCESS) {
 				if(order.getStatus()==ModelConstant.ORDER_STATUS_CONFIRM){
 					String ordersn = redisRepository.getOrderNum(order.getOrderNo());
+					if(ordersn==null||ordersn.equals("")) {
+						log.error("订单确认失败，ordersn为空");
+						return;
+					}
 					ConfirmOrderF cfo = jdProductService.getConfirmOd(ordersn);
 					
-					if(cfo.getResult()!="0") {
+					if(cfo.getResult().equals("0")) {
+
+					}else {
 						log.error("[jdConfirmOrder]:"+cfo.getMsg()+"提示："+cfo.getJd_msg());
-						throw new BizValidateException("确认订单失败").setError();
+						return;
 					}
 					
 	                log.warn("[jdConfirmOrder]Success");

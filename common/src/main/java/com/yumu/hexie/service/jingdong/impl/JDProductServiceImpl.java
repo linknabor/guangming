@@ -254,6 +254,9 @@ public class JDProductServiceImpl implements JDProductService{
 	@Override
 	public JDRegionF getRegionLimit(String reg,String productNo) {
 		logger.info("区域限制productNo："+productNo+" 地区id"+reg);
+		if(reg==null||reg.equals("")||productNo.equals("")||productNo==null) {
+			return null;
+		}
 		String strToken = getToken();
 		//商品购买区域限制查询
 	    JDRegion region1 = new JDRegion();
@@ -285,6 +288,11 @@ public class JDProductServiceImpl implements JDProductService{
 	@Override
 	public boolean getProductStock(String region,String productNo,String proNums) {
 		logger.info("商品数量："+proNums);
+		
+		if(region==null||region.equals("")||productNo.equals("")||productNo==null||proNums.equals("")||proNums==null) {
+			return false;
+		}
+		
 		String strToken = getToken();
 		List<SkuNums> skuNums = new ArrayList<>();
 		SkuNums s = new SkuNums();
@@ -951,6 +959,11 @@ public class JDProductServiceImpl implements JDProductService{
 	@Override
 	public DownloadOrderF sendDlo(DownloadOrder down) {
 		// TODO Auto-generated method stub
+		
+		if(down==null) {
+			return null;
+		}
+		
 		String strToken = getToken();
 		
 		String stradd = down.getProvince()+"_"+down.getCity()+"_"+down.getCounty();
