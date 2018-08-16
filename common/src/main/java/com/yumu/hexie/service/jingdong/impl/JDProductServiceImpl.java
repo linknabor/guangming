@@ -1278,6 +1278,8 @@ public class JDProductServiceImpl implements JDProductService{
 			
 		}else {
 			if(pro!=null) {
+				logger.info("长度"+pro.size());
+				logger.info("值："+pro.get(0).getProductNo()+ " ---"+ pro.get(0).getId());
 				productRepository.invalidByProductNo(productNo);
 				onSaleRuleRepository.upStatusStart(Long.toString(pro.get(0).getId()));;
 				serviceAreaItemRepository.upStatusStart(Long.toString(pro.get(0).getId()));
