@@ -307,9 +307,13 @@ public class JDProductServiceImpl implements JDProductService{
 	    StockF sto = jdservice.GetNewStockById(sto1);//根据商品id 三级地址 获取库存
 	    
 	    boolean pan = true;
+		if(sto.getInfo().get(0).getStockStateId()==null||sto.getInfo().get(0).getStockStateId().equals("")) {
+			return false;
+		}
 		if(sto.getInfo().get(0).getStockStateId().equals("36")||sto.getInfo().get(0).getStockStateId().equals("34")) {
 			pan = false;
 		}
+
 	    
 	    return pan;
 	}
@@ -1221,15 +1225,17 @@ public class JDProductServiceImpl implements JDProductService{
 	 * @param price
 	 * @param productNo
 	 */
+	@SuppressWarnings("unused")
 	public void synUpPrice(String jdPrice,String price,String productNo) {
 		List<Product> pro = productRepository.findByProductNo(productNo);
+
 		if(pro.size()>1) {
 			for (int i = 0; i < pro.size(); i++) {
 				logger.error("更新差异---名称："+pro.get(i).getName()+" skuID"+pro.get(i).getProductNo());
 			}
 			
 		}else {
-			if(pro.get(0)!=null) {
+			if(pro!=null) {
 				productRepository.upProductPrice(productNo, jdPrice, price);
 				onSaleRuleRepository.upProductPrice(Long.toString(pro.get(0).getId()), jdPrice, price);
 				onSaleAreaItemRepository.upProductPrice(Long.toString(pro.get(0).getId()), jdPrice, price);
@@ -1241,6 +1247,7 @@ public class JDProductServiceImpl implements JDProductService{
 	
 	
 	//下架商品 根据京东id
+	@SuppressWarnings("unused")
 	public void synUPEnd(String productNo) {
 		List<Product> pro = productRepository.findByProductNo(productNo);
 		if(pro.size()>1) {
@@ -1249,7 +1256,7 @@ public class JDProductServiceImpl implements JDProductService{
 			}
 			
 		}else {
-			if(pro.get(0)!=null) {
+			if(pro!=null) {
 				productRepository.invalidByProductNoEnd(productNo);
 				onSaleRuleRepository.upStatusEnd(Long.toString(pro.get(0).getId()));;
 				serviceAreaItemRepository.upStatusEnd(Long.toString(pro.get(0).getId()));
@@ -1261,6 +1268,7 @@ public class JDProductServiceImpl implements JDProductService{
 	}
 	
 	//上架商品 根据京东id
+	@SuppressWarnings("unused")
 	public void synUPStart(String productNo) {
 		
 		List<Product> pro = productRepository.findByProductNo(productNo);
@@ -1270,7 +1278,7 @@ public class JDProductServiceImpl implements JDProductService{
 			}
 			
 		}else {
-			if(pro.get(0)!=null) {
+			if(pro!=null) {
 				productRepository.invalidByProductNo(productNo);
 				onSaleRuleRepository.upStatusStart(Long.toString(pro.get(0).getId()));;
 				serviceAreaItemRepository.upStatusStart(Long.toString(pro.get(0).getId()));

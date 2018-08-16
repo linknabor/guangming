@@ -49,8 +49,12 @@ public class JDtiming {
 		token.setApi_secret(JDconstant.API_SECRET);
 		token.setSafecode(jds.getSafecode());
 		JDTokenF tokenf = jdservice.getApiToken(token);//用安全码获取token
-		logger.info("TOKEN"+token.toString());
-		redisRepository.setJDtoken(tokenf.getToken());//token放入到redis
+		logger.info("TOKEN："+token.toString());
+		if(tokenf.getToken()==null||tokenf.getToken().equals("")) {
+			
+		}else {
+			redisRepository.setJDtoken(tokenf.getToken());//token放入到redis
+		}
 	}
 	
 	@PostConstruct
@@ -71,8 +75,11 @@ public class JDtiming {
 		token.setApi_secret(JDconstant.API_SECRET);
 		token.setSafecode(jds.getSafecode());
 		JDTokenF tokenf = jdservice.getApiToken(token);//用安全码获取token
-		
-		redisRepository.setJDtoken(tokenf.getToken());//token放入到redis
+		if(tokenf.getToken()==null||tokenf.getToken().equals("")) {
+			
+		}else {
+			redisRepository.setJDtoken(tokenf.getToken());//token放入到redis
+		}
 	}
 	
 }

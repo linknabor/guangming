@@ -111,14 +111,14 @@ public class BuyerCartController extends BaseController {
 							throw new BizValidateException( "地区购买限制").setError();
 						}
 						if(jdref.getResult().equals("0")) {
-							
+							if(!jdProductService.getProductStock(region,product.getProductNo(),Integer.toString(amount))) {
+								logger.error("购物车添加   商品数量不足");
+								throw new BizValidateException( "商品数量不足").setError();
+							}
 						}else {
 							throw new BizValidateException( "地区购买限制").setError();
 						}
-						if(!jdProductService.getProductStock(region,product.getProductNo(),Integer.toString(amount))) {
-							logger.error("购物车添加   商品数量不足");
-							throw new BizValidateException( "商品数量不足").setError();
-						}
+						
 					}
 					
 				}

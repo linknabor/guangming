@@ -575,7 +575,7 @@ public class BaseOrderServiceImpl extends BaseOrderProcessor implements BaseOrde
 		Merchant merchant = merchantRepository.findMechantByName("京东");
 		if(order.getMerchantId()==merchant.getId()) { //京东订单
 			WHOrderF wh = jdProductService.getWHOrder(order.getOrderNo());
-			if(wh==null) {
+			if(wh==null||wh.getThirdsn().equals("")||wh.getThirdsn()==null) {
 				log.error("网壕订单号创建失败");
 				return;
 			}
