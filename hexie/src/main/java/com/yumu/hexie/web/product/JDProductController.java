@@ -11,10 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.yumu.hexie.model.commonsupport.info.Product;
-import com.yumu.hexie.model.commonsupport.info.ProductRepository;
 import com.yumu.hexie.service.jingdong.JDProductService;
-import com.yumu.hexie.service.jingdong.JDService;
 import com.yumu.hexie.web.BaseController;
 
 @Controller
@@ -24,11 +21,7 @@ public class JDProductController extends BaseController{
 	private static final Logger log = LoggerFactory.getLogger(JDProductController.class);
 	
 	@Inject
-	private JDService jdservice;
-	@Inject
 	private JDProductService jdproductService;
-	@Inject
-	private ProductRepository productRepository;
 	
 	@RequestMapping(value = "/ceshi", method = RequestMethod.GET)
 	@ResponseBody
@@ -117,15 +110,9 @@ public class JDProductController extends BaseController{
 	
 	@RequestMapping(value = "/helloWord", method = RequestMethod.GET)
 	@ResponseBody
-	public List<Product> helloWord() {
-		List<Product> list = productRepository.findByProductNo("12312313");
-		if(list.size()>1) {
-			System.out.println("1");
-		}
-		if(list!=null) {
-			System.out.println("2");
-		}
-		return list;
+	public String helloWord() {
+
+		return "helloWord";
 	}
 	
 }

@@ -11,7 +11,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
-import com.mysql.fabric.xmlrpc.base.Array;
 import com.yumu.hexie.common.util.DateUtil;
 import com.yumu.hexie.model.ModelConstant;
 import com.yumu.hexie.model.commonsupport.info.Product;

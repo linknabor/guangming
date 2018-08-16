@@ -10,7 +10,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
-import com.yumu.hexie.model.jingdong.JDcarrier;
 import com.yumu.hexie.model.jingdong.JDconstant;
 import com.yumu.hexie.model.localservice.HomeCart;
 import com.yumu.hexie.model.market.Cart;
