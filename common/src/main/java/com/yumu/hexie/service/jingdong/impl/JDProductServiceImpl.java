@@ -1224,7 +1224,6 @@ public class JDProductServiceImpl implements JDProductService{
 	 * @param price
 	 * @param productNo
 	 */
-	@SuppressWarnings("unused")
 	public void synUpPrice(String jdPrice,String price,String productNo) {
 		List<Product> pro = productRepository.findByProductNo(productNo);
 
@@ -1234,7 +1233,7 @@ public class JDProductServiceImpl implements JDProductService{
 			}
 			
 		}else {
-			if(pro!=null) {
+			if(pro!=null&&pro.size()>0) {
 				productRepository.upProductPrice(productNo, jdPrice, price);
 				onSaleRuleRepository.upProductPrice(Long.toString(pro.get(0).getId()), jdPrice, price);
 				onSaleAreaItemRepository.upProductPrice(Long.toString(pro.get(0).getId()), jdPrice, price);
@@ -1246,7 +1245,6 @@ public class JDProductServiceImpl implements JDProductService{
 	
 	
 	//下架商品 根据京东id
-	@SuppressWarnings("unused")
 	public void synUPEnd(String productNo) {
 		List<Product> pro = productRepository.findByProductNo(productNo);
 		if(pro.size()>1) {
@@ -1255,7 +1253,7 @@ public class JDProductServiceImpl implements JDProductService{
 			}
 			
 		}else {
-			if(pro!=null) {
+			if(pro!=null&&pro.size()>0) {
 				productRepository.invalidByProductNoEnd(productNo);
 				onSaleRuleRepository.upStatusEnd(Long.toString(pro.get(0).getId()));;
 				serviceAreaItemRepository.upStatusEnd(Long.toString(pro.get(0).getId()));
@@ -1267,7 +1265,6 @@ public class JDProductServiceImpl implements JDProductService{
 	}
 	
 	//上架商品 根据京东id
-	@SuppressWarnings("unused")
 	public void synUPStart(String productNo) {
 		
 		List<Product> pro = productRepository.findByProductNo(productNo);
@@ -1277,9 +1274,7 @@ public class JDProductServiceImpl implements JDProductService{
 			}
 			
 		}else {
-			if(pro!=null) {
-				logger.info("长度"+pro.size());
-				logger.info("值："+pro.get(0).getProductNo()+ " ---"+ pro.get(0).getId());
+			if(pro!=null&&pro.size()>0) {
 				productRepository.invalidByProductNo(productNo);
 				onSaleRuleRepository.upStatusStart(Long.toString(pro.get(0).getId()));;
 				serviceAreaItemRepository.upStatusStart(Long.toString(pro.get(0).getId()));
