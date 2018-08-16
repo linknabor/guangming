@@ -1238,7 +1238,18 @@ public class JDProductServiceImpl implements JDProductService{
 				onSaleRuleRepository.upProductPrice(Long.toString(pro.get(0).getId()), jdPrice, price);
 				onSaleAreaItemRepository.upProductPrice(Long.toString(pro.get(0).getId()), jdPrice, price);
 			}else {
-				logger.error("商品为空  sku:"+productNo);
+				//没有 就增加
+				JDSkuIDF skuf = getByidSku(productNo);
+				List<SKUImage> list = getImageSingle(productNo);
+				PriceVo pri =getPriceSingle(productNo);
+				JDProductVO sku = new JDProductVO();
+				sku.setJdskuidf(skuf);
+				sku.setJdskuidimagef(list);//根据商品id拿到image
+				sku.setPrivef(pri);//根据商品id拿到价格
+				Product product = saveProdcut(sku);
+				OnSaleRule onsalerule = saveOnSaleRule(product);
+			    ServiceAreaItem serviceareaitem = saveServiceAreaItem(product,onsalerule);
+			    saveOnSaleAreaItem(product,onsalerule,serviceareaitem);
 			}
 		}
 	}
@@ -1361,6 +1372,9 @@ public class JDProductServiceImpl implements JDProductService{
 		return regionAddress;
 	}
 
+	/**
+	 * 通过名字同步京东ID
+	 */
 	@Override
 	@Transactional
 	public void productNameSyn() {

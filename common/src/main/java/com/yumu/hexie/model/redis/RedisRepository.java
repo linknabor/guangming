@@ -93,7 +93,7 @@ public class RedisRepository {
     }
     
     /**
-     * 根据商品Id删除价格
+     * 确认hashKey是否存在
      * @param productNo
      */
     public boolean judgePrice(String productNo) {
