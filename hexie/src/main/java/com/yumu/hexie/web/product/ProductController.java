@@ -44,6 +44,7 @@ public class ProductController extends BaseController{
         System.out.println("创建了一个sessionUser");
     }
 	
+	
 	/**
 	 * 模糊查询商品
 	 * @param name
