@@ -41,6 +41,7 @@ public class RedisRepository {
      */
     public void setOrderNum(String ordersn,String thirdsn) {
     	stringRedisTemplate.opsForValue().set(thirdsn, ordersn);
+    	stringRedisTemplate.expire(thirdsn, 7, TimeUnit.DAYS);
     }
     /**
      * 订单号获取

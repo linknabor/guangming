@@ -948,6 +948,9 @@ public class JDProductServiceImpl implements JDProductService{
 	public WHOrderF getWHOrder(String orderId) {
 		// TODO Auto-generated method stub
 		String strToken = getToken();
+		if(strToken.equals("")||strToken==null) {
+			return null;
+		}
 		WHOrder whorder = new WHOrder();
 		whorder.setFunc(JDconstant.GETORDERSN);
 		whorder.setThirdsn(orderId);

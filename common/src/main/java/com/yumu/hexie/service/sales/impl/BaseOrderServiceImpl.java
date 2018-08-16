@@ -590,6 +590,10 @@ public class BaseOrderServiceImpl extends BaseOrderProcessor implements BaseOrde
 						log.error("商品为空");
 						return;
 					}
+					if(po.getProductNo().equals("")||po.getProductNo()==null) {
+						log.error("京东ID为空");
+						return;
+					}
 					sku.setSkuId(po.getProductNo());
 					sku.setNum(Float.toString(order.getItems().get(i).getCount()));
 					skus.add(sku);
@@ -623,7 +627,7 @@ public class BaseOrderServiceImpl extends BaseOrderProcessor implements BaseOrde
 				down.setAddress(address.getXiaoquName()+address.getXiaoquAddr()+address.getDetailAddress());
 				down.setOrder_amount(Float.toString(totalprice));
 				
-				redisRepository.setOrderNum(wh.getOrdersn()+"_"+Float.toString(totalprice), wh.getThirdsn());//订单号存储到redis
+				redisRepository.setOrderNum(wh.getOrdersn()+"_"+Float.toString(totalprice), wh.getThirdsn());//订单号存储到redis 7天过期
 				
 				jdProductService.sendDlo(down);//发送订单
 			}
