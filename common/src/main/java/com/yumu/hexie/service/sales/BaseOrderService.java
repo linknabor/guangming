@@ -13,6 +13,7 @@ import com.yumu.hexie.model.market.OrderItem;
 import com.yumu.hexie.model.market.ServiceOrder;
 import com.yumu.hexie.model.market.marketOrder.req.BuyerOrderReq;
 import com.yumu.hexie.model.payment.PaymentOrder;
+import com.yumu.hexie.model.user.Address;
 import com.yumu.hexie.vo.CreateOrderReq;
 import com.yumu.hexie.vo.SingleItemOrder;
 
@@ -52,4 +53,8 @@ public interface BaseOrderService {
 	public List<OrderItem> findOrderItemsByOrderId(long orderId);
 	
 	public void sendGoods(long orderId);
+	
+	public void jdOrder(ServiceOrder order,Address address);
+	
+	public void jdConfirmOrder(PaymentOrder payment);
 }

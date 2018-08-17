@@ -7,22 +7,11 @@ import javax.inject.Inject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import com.yumu.hexie.model.jingdong.JDconstant;
-import com.yumu.hexie.model.jingdong.getSecurity.JDLoad;
-import com.yumu.hexie.model.jingdong.getSecurity.JDSecurity;
-import com.yumu.hexie.model.jingdong.getsku.JDSku;
-import com.yumu.hexie.model.jingdong.getsku.JDSkuF;
-import com.yumu.hexie.model.jingdong.getskuid.JDSkuID;
-import com.yumu.hexie.model.jingdong.getskuid.detail.JDSkuIDF;
-import com.yumu.hexie.model.jingdong.token.JDToken;
-import com.yumu.hexie.model.jingdong.token.JDTokenF;
 import com.yumu.hexie.service.jingdong.JDProductService;
-import com.yumu.hexie.service.jingdong.JDService;
 import com.yumu.hexie.web.BaseController;
 
 @Controller
@@ -31,8 +20,6 @@ public class JDProductController extends BaseController{
 	
 	private static final Logger log = LoggerFactory.getLogger(JDProductController.class);
 	
-	@Inject
-	private JDService jdservice;
 	@Inject
 	private JDProductService jdproductService;
 	
@@ -62,6 +49,9 @@ public class JDProductController extends BaseController{
 		return "地区映射成功";
 	}
 	
+	
+	
+	
 	@RequestMapping(value = "/addproduct", method = RequestMethod.GET)
 	@ResponseBody
 	public String addproduct() {
@@ -75,6 +65,20 @@ public class JDProductController extends BaseController{
 		jdproductService.dataStatusSynRedis();
 		return "数据库上架的商品缓存到redis";
 	}
+	@RequestMapping(value = "/dataSynRedis", method = RequestMethod.GET)
+	@ResponseBody
+	public String dataSynRedis() {
+		jdproductService.dataSynRedis();
+		return "价格缓存到redis";
+	}
+	
+	
+	@RequestMapping(value = "/priceContrast", method = RequestMethod.GET)
+	@ResponseBody
+	public String priceContrast() {
+		jdproductService.priceContrast();
+		return "价格同步";
+	}
 	
 	@RequestMapping(value = "/synchronization", method = RequestMethod.GET)
 	@ResponseBody
@@ -83,10 +87,32 @@ public class JDProductController extends BaseController{
 		return "商品上下架同步";
 	}
 	
+	@RequestMapping(value = "/productNameSyn", method = RequestMethod.GET)
+	@ResponseBody
+	public String productNameSyn() {
+		jdproductService.productNameSyn();
+		return "名字同步";
+	}
+	
+	@RequestMapping(value = "/regionLimtSynMapping", method = RequestMethod.GET)
+	@ResponseBody
+	public String regionLimtSynMapping() {
+		jdproductService.regionLimtSynMapping();
+		return "同步地区限制增加";
+	}
+	
+	@RequestMapping(value = "/regionLimtSyn", method = RequestMethod.GET)
+	@ResponseBody
+	public String regionLimtSyn() {
+		jdproductService.regionLimtSyn();
+		return "同步地区购买限制";
+	}
+	
 	@RequestMapping(value = "/helloWord", method = RequestMethod.GET)
 	@ResponseBody
 	public String helloWord() {
-		
+
 		return "helloWord";
 	}
+	
 }

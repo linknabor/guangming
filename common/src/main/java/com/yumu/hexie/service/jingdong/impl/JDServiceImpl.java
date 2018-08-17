@@ -14,6 +14,15 @@ import com.yumu.hexie.model.jingdong.getSecurity.JDLoad;
 import com.yumu.hexie.model.jingdong.getSecurity.JDSecurity;
 import com.yumu.hexie.model.jingdong.getaddress.JDAddress;
 import com.yumu.hexie.model.jingdong.getaddress.JDAddressF;
+import com.yumu.hexie.model.jingdong.getorder.ConfirmOrder;
+import com.yumu.hexie.model.jingdong.getorder.ConfirmOrderF;
+import com.yumu.hexie.model.jingdong.getorder.DownloadOrder;
+import com.yumu.hexie.model.jingdong.getorder.DownloadOrderF;
+import com.yumu.hexie.model.jingdong.getorder.WHOrder;
+import com.yumu.hexie.model.jingdong.getorder.WHOrderF;
+import com.yumu.hexie.model.jingdong.getorder.query.QueryOrder;
+import com.yumu.hexie.model.jingdong.getorder.query.QueryOrderF;
+import com.yumu.hexie.model.jingdong.getorder.query.QueryTrackF;
 import com.yumu.hexie.model.jingdong.getsku.JDSku;
 import com.yumu.hexie.model.jingdong.getsku.JDSkuF;
 import com.yumu.hexie.model.jingdong.getskuid.JDSkuID;
@@ -40,11 +49,12 @@ public class JDServiceImpl implements JDService{
 	 */
 	@Override
 	public JDSecurity getTokenSafeCode(JDLoad load) {
-		// TODO Auto-generated method stub
+		// TODO  
 		try {
 			return getAll(load,JDSecurity.class);
 		} catch (JSONException e) {
 			e.printStackTrace();
+			logger.error(e.toString());
 		}
 		return null;
 	}
@@ -54,11 +64,12 @@ public class JDServiceImpl implements JDService{
 	 */
 	@Override
 	public JDTokenF getApiToken(JDToken token) {
-		// TODO Auto-generated method stub
+		// TODO  
 		try {
 			return getAll(token,JDTokenF.class);
 		} catch (JSONException e) {
 			e.printStackTrace();
+			logger.error(e.toString());
 		}
 		return null;
 	}
@@ -68,11 +79,12 @@ public class JDServiceImpl implements JDService{
 	 */
 	@Override
 	public JDSkuF getSku(JDSku sku) {
-		// TODO Auto-generated method stub
+		// TODO  
 		try {
 			return getAll(sku,JDSkuF.class);
 		} catch (JSONException e) {
 			e.printStackTrace();
+			logger.error(e.toString());
 		}
 		return null;
 	}
@@ -82,11 +94,12 @@ public class JDServiceImpl implements JDService{
 	 */
 	@Override
 	public JDSkuIDF skuDetail(JDSkuID skuid) {
-		// TODO Auto-generated method stub
+		// TODO  
 		try {
 			return getAll(skuid,JDSkuIDF.class);
 		} catch (JSONException e) {
 			e.printStackTrace();
+			logger.error(e.toString());
 		}
 		return null;
 	}
@@ -96,11 +109,12 @@ public class JDServiceImpl implements JDService{
 	 */
 	@Override
 	public JDSkuIDStatusF skuState(JDSkuID skuid) {
-		// TODO Auto-generated method stub
+		// TODO  
 		try {
 			return getAll(skuid,JDSkuIDStatusF.class);
 		} catch (JSONException e) {
 			e.printStackTrace();
+			logger.error(e.toString());
 		}
 		return null;
 	}
@@ -110,11 +124,12 @@ public class JDServiceImpl implements JDService{
 	 */
 	@Override
 	public JDSkuIdImageF skuImage(JDSkuID skuid) {
-		// TODO Auto-generated method stub
+		// TODO  
 		try {
 			return getAll(skuid,JDSkuIdImageF.class);
 		} catch (JSONException e) {
 			e.printStackTrace();
+			logger.error(e.toString());
 		}
 		return null;
 	}
@@ -124,7 +139,7 @@ public class JDServiceImpl implements JDService{
 	 */
 	@Override
 	public String ClassificationC(Classification cic) {
-		// TODO Auto-generated method stub
+		// TODO  
 		
 		String json = "";
 		try {
@@ -139,6 +154,7 @@ public class JDServiceImpl implements JDService{
 			response = HttpUtil.doPostMap(JDOrderService.JD_URL, map, JDOrderService.DEFAULT_CHARACTER);
 		} catch (Exception e) {
 			e.printStackTrace();
+			logger.error(e.toString());
 		}
 		logger.info("response is : " + response);
 		return response;
@@ -149,11 +165,12 @@ public class JDServiceImpl implements JDService{
 	 */
 	@Override
 	public JDAddressF GetAdress(JDAddress addre) {
-		// TODO Auto-generated method stub
+		// TODO  
 		try {
 			return getAll(addre,JDAddressF.class);
 		} catch (JSONException e) {
 			e.printStackTrace();
+			logger.error(e.toString());
 		}
 		return null;
 	}
@@ -163,11 +180,12 @@ public class JDServiceImpl implements JDService{
 	 */
 	@Override
 	public StockF GetNewStockById(Stock sto) {
-		// TODO Auto-generated method stub
+		// TODO  
 		try {
 			return getAll(sto,StockF.class);
 		} catch (JSONException e) {
 			e.printStackTrace();
+			logger.error(e.toString());
 		}
 		return null;
 	}
@@ -177,11 +195,12 @@ public class JDServiceImpl implements JDService{
 	 */
 	@Override
 	public JDRegionF CheckAreaLimit(JDRegion region) {
-		// TODO Auto-generated method stub
+		// TODO  
 		try {
 			return getAll(region,JDRegionF.class);
 		} catch (JSONException e) {
 			e.printStackTrace();
+			logger.error(e.toString());
 		}
 		return null;
 	}
@@ -191,17 +210,93 @@ public class JDServiceImpl implements JDService{
 	 */
 	@Override
 	public PriceF getPrice(JDSkuID sku) {
-		// TODO Auto-generated method stub
+		// TODO  
 		try {
 			return getAll(sku,PriceF.class);
 		} catch (JSONException e) {
 			e.printStackTrace();
+			logger.error(e.toString());
 		}
 		return null;
 	}
 
+	/**
+	 * 获取网壕订单号
+	 */
+	@Override
+	public WHOrderF getOrder(WHOrder order) {
+		// TODO  
+		try {
+			return getAll(order,WHOrderF.class);
+		} catch (JSONException e) {
+			e.printStackTrace();
+			logger.error(e.toString());
+		}
+		return null;
+	}
+	
+	/**
+	 * 订单发送
+	 */
+	@Override
+	public DownloadOrderF sendOrder(DownloadOrder download) {
+		// TODO
+		try {
+			return getAll(download,DownloadOrderF.class);
+		} catch (JSONException e) {
+			e.printStackTrace();
+			logger.error(e.toString());
+		}
+		return null;
+	}
+	/**
+	 * 确认订单
+	 */
+	@Override
+	public ConfirmOrderF confirmSendOd(ConfirmOrder confirmorder) {
+		// TODO
+		try {
+			return getAll(confirmorder,ConfirmOrderF.class);
+		} catch (JSONException e) {
+			e.printStackTrace();
+			logger.error(e.toString());
+		}
+		return null;
+	}
+
+	/**
+	 * 查询订单信息
+	 */
+	@Override
+	public QueryOrderF getOrderInfo(QueryOrder ordersn) {
+		// TODO
+		try {
+			return getAll(ordersn,QueryOrderF.class);
+		} catch (JSONException e) {
+			e.printStackTrace();
+			logger.error(e.toString());
+		}
+		return null;
+	}
+
+	/**
+	 * 查询配送信息
+	 */
+	@Override
+	public QueryTrackF getOrderTrackInfo(QueryOrder ordersn) {
+		// TODO
+		try {
+			return getAll(ordersn,QueryTrackF.class);
+		} catch (JSONException e) {
+			e.printStackTrace();
+			logger.error(e.toString());
+		}
+		return null;
+	}
+
+	
 	private <T> String currency(T t) {
-		// TODO Auto-generated method stub
+		// TODO  
 		String json = "";
 		try {
 			json = JacksonJsonUtil.beanToJson(t);
@@ -218,6 +313,7 @@ public class JDServiceImpl implements JDService{
 				response = HttpUtil.doPostMap(JDOrderService.JD_URL, map, JDOrderService.DEFAULT_CHARACTER);
 			}else {
 				e.printStackTrace();
+				logger.error(e.toString());
 			}
 		
 		}
@@ -230,4 +326,5 @@ public class JDServiceImpl implements JDService{
 		T skudetailed = (T)JacksonJsonUtil.jsonToBean(currency(y),t);
 		return skudetailed;
 	}
+	
 }
