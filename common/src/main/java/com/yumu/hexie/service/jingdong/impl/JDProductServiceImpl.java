@@ -100,7 +100,11 @@ public class JDProductServiceImpl implements JDProductService{
 	@Override
 	public String getToken() {
 		// TODO Auto-generated method stub
-		return redisRepository.getJDtoken();//拿到token
+		if(redisRepository.getJDtoken()==null) {
+			return null;
+		}else {
+			return redisRepository.getJDtoken();//拿到token
+		}
 	}
 
 	/**
@@ -948,7 +952,10 @@ public class JDProductServiceImpl implements JDProductService{
 	public WHOrderF getWHOrder(String orderId) {
 		// TODO Auto-generated method stub
 		String strToken = getToken();
-		if(strToken.equals("")||strToken==null) {
+		if(strToken==null) {
+			return null;
+		}
+		if(strToken.equals("")) {
 			return null;
 		}
 		WHOrder whorder = new WHOrder();
