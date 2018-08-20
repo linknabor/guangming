@@ -9,6 +9,7 @@ import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.yumu.hexie.common.util.DateUtil;
@@ -65,7 +66,7 @@ import com.yumu.hexie.service.jingdong.JDProductService;
 import com.yumu.hexie.service.jingdong.JDService;
 import com.yumu.hexie.vo.JDProductVO;
 
-
+@Service("jDProductService")
 public class JDProductServiceImpl implements JDProductService{
 	
 	private static final Logger logger = LoggerFactory.getLogger(JDProductServiceImpl.class);
