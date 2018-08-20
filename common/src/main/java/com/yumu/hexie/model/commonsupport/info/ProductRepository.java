@@ -59,6 +59,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 	
 
 	
-
+	@Query(value = "SELECT p.* FROM Product p JOIN merchant m ON p.merchantId = m.id WHERE m.name = '京东' AND p.productNo = ?1",nativeQuery = true)
 	List<Product> findByProductNo(String productNo);
 }
