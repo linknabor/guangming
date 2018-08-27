@@ -32,10 +32,10 @@ public class JDtiming {
     @Inject
 	private JDProductService jdproductService;
     /**
-     * 每一个半小时获取1次token 
+     * 每半小时获取1次token 
      */
     @Async
-	@Scheduled(cron = " 0 30 0/2 * * ?")
+	@Scheduled(cron = " 0 0/30 * * * ?")
 	public void timerproduct() {
 		JDLoad load = new JDLoad();
 		load.setFunc(JDconstant.GETTOKENSAFECODE);
