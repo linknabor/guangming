@@ -58,6 +58,7 @@ public class RedisRepository {
      */
     public void setJDtoken(String token) {
     	stringRedisTemplate.opsForValue().set(JDconstant.TOKEN, token);
+    	stringRedisTemplate.expire(JDconstant.TOKEN, 1, TimeUnit.HOURS);
     }
     /**
      * 获取token

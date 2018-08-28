@@ -9,12 +9,15 @@ import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
+import com.yumu.hexie.common.util.HttpUtil;
+import com.yumu.hexie.integration.jingdong.JDOrderService;
 import com.yumu.hexie.model.jingdong.JDconstant;
 import com.yumu.hexie.model.jingdong.getSecurity.JDLoad;
 import com.yumu.hexie.model.jingdong.getSecurity.JDSecurity;
 import com.yumu.hexie.model.jingdong.token.JDToken;
 import com.yumu.hexie.model.jingdong.token.JDTokenF;
 import com.yumu.hexie.model.redis.RedisRepository;
+import com.yumu.hexie.service.exception.OvertimeException;
 import com.yumu.hexie.service.jingdong.JDProductService;
 import com.yumu.hexie.service.jingdong.JDService;
 
@@ -31,35 +34,7 @@ public class JDtiming {
 	
     @Inject
 	private JDProductService jdproductService;
-    /**
-     * 每半小时获取1次token 
-     */
-    @Async
-	@Scheduled(cron = " 0 0/30 * * * ?")
-	public void timerproduct() {
-		JDLoad load = new JDLoad();
-		load.setFunc(JDconstant.GETTOKENSAFECODE);
-		load.setUsername(JDconstant.USERNAME);
-		load.setPassword(JDconstant.PASSWORD);
-		load.setApi_name(JDconstant.API_NAME);
-		load.setApi_secret(JDconstant.API_SECRET);
-		JDSecurity jds = jdservice.getTokenSafeCode(load);//获取安全码
-		
-		JDToken token = new JDToken();
-		token.setFunc(JDconstant.GETAPITOKEN);
-		token.setUsername(JDconstant.USERNAME);
-		token.setPassword(JDconstant.PASSWORD);
-		token.setApi_name(JDconstant.API_NAME);
-		token.setApi_secret(JDconstant.API_SECRET);
-		token.setSafecode(jds.getSafecode());
-		JDTokenF tokenf = jdservice.getApiToken(token);//用安全码获取token
-		logger.info("TOKEN:"+token.toString());
-		if(tokenf.getToken()==null||tokenf.getToken().equals("")) {
-			
-		}else {
-			redisRepository.setJDtoken(tokenf.getToken());//token放入到redis
-		}
-	}
+   
 	
 	@PostConstruct
 	public void initToken() {
@@ -86,7 +61,7 @@ public class JDtiming {
 		}
 	}
 
-	
+	@Async
 	@Scheduled(cron = "0 0/30 * * * ?")
    	public void synchronizationJD() {
    		try {
