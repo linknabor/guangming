@@ -434,7 +434,7 @@ public class BuyerCartController extends BaseController {
 					jdPostage += product.getMiniPrice();
 				}
 				if(listSku.size()-1 == i) {
-					if(jdPostage<49) {
+					if(jdPostage<49&&jdPostage>0) {
 						postageFee = postageFee + 8;
 					}
 					if(jdPostage<99&&jdPostage>48) {
