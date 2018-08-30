@@ -5,19 +5,15 @@ import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
-import com.yumu.hexie.common.util.HttpUtil;
-import com.yumu.hexie.integration.jingdong.JDOrderService;
 import com.yumu.hexie.model.jingdong.JDconstant;
 import com.yumu.hexie.model.jingdong.getSecurity.JDLoad;
 import com.yumu.hexie.model.jingdong.getSecurity.JDSecurity;
 import com.yumu.hexie.model.jingdong.token.JDToken;
 import com.yumu.hexie.model.jingdong.token.JDTokenF;
 import com.yumu.hexie.model.redis.RedisRepository;
-import com.yumu.hexie.service.exception.OvertimeException;
 import com.yumu.hexie.service.jingdong.JDProductService;
 import com.yumu.hexie.service.jingdong.JDService;
 
@@ -61,7 +57,6 @@ public class JDtiming {
 		}
 	}
 
-	@Async
 	@Scheduled(cron = "0 0/30 * * * ?")
    	public void synchronizationJD() {
    		try {
