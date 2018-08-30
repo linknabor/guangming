@@ -123,6 +123,10 @@ public class JDProductServiceImpl implements JDProductService{
 			token.setSafecode(jds.getSafecode());
 			JDTokenF tokenf = jdservice.getApiToken(token);//用安全码获取token
 
+			if(tokenf.getToken()==null||tokenf.getToken().equals("")) {
+				return null;
+			}
+			
 			redisRepository.setJDtoken(tokenf.getToken());//token放入到redis
 			return redisRepository.getJDtoken();//拿到token
 			
