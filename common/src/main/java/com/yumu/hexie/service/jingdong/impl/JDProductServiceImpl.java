@@ -9,6 +9,7 @@ import javax.inject.Inject;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.yumu.hexie.common.util.DateUtil;
@@ -25,6 +26,8 @@ import com.yumu.hexie.model.jingdong.JDReceiveVO;
 import com.yumu.hexie.model.jingdong.JDconstant;
 import com.yumu.hexie.model.jingdong.JDregionMapping;
 import com.yumu.hexie.model.jingdong.JDregionMappingRepository;
+import com.yumu.hexie.model.jingdong.getSecurity.JDLoad;
+import com.yumu.hexie.model.jingdong.getSecurity.JDSecurity;
 import com.yumu.hexie.model.jingdong.getaddress.JDAddress;
 import com.yumu.hexie.model.jingdong.getaddress.JDAddressF;
 import com.yumu.hexie.model.jingdong.getaddress.RegionJ;
@@ -53,6 +56,8 @@ import com.yumu.hexie.model.jingdong.limitregion.JDRegion;
 import com.yumu.hexie.model.jingdong.limitregion.JDRegionF;
 import com.yumu.hexie.model.jingdong.regionsyn.RegionSynLimt;
 import com.yumu.hexie.model.jingdong.regionsyn.RegionSynLimtRepository;
+import com.yumu.hexie.model.jingdong.token.JDToken;
+import com.yumu.hexie.model.jingdong.token.JDTokenF;
 import com.yumu.hexie.model.market.OrderItemRepository;
 import com.yumu.hexie.model.market.ServiceAreaItem;
 import com.yumu.hexie.model.market.ServiceAreaItemRepository;
@@ -65,7 +70,7 @@ import com.yumu.hexie.service.jingdong.JDProductService;
 import com.yumu.hexie.service.jingdong.JDService;
 import com.yumu.hexie.vo.JDProductVO;
 
-
+@Service("jDProductService")
 public class JDProductServiceImpl implements JDProductService{
 	
 	private static final Logger logger = LoggerFactory.getLogger(JDProductServiceImpl.class);
@@ -101,7 +106,26 @@ public class JDProductServiceImpl implements JDProductService{
 	public String getToken() {
 		// TODO Auto-generated method stub
 		if(redisRepository.getJDtoken()==null) {
-			return null;
+			JDLoad load = new JDLoad();
+			load.setFunc(JDconstant.GETTOKENSAFECODE);
+			load.setUsername(JDconstant.USERNAME);
+			load.setPassword(JDconstant.PASSWORD);
+			load.setApi_name(JDconstant.API_NAME);
+			load.setApi_secret(JDconstant.API_SECRET);
+			JDSecurity jds = jdservice.getTokenSafeCode(load);//获取安全码
+			
+			JDToken token = new JDToken();
+			token.setFunc(JDconstant.GETAPITOKEN);
+			token.setUsername(JDconstant.USERNAME);
+			token.setPassword(JDconstant.PASSWORD);
+			token.setApi_name(JDconstant.API_NAME);
+			token.setApi_secret(JDconstant.API_SECRET);
+			token.setSafecode(jds.getSafecode());
+			JDTokenF tokenf = jdservice.getApiToken(token);//用安全码获取token
+
+			redisRepository.setJDtoken(tokenf.getToken());//token放入到redis
+			return redisRepository.getJDtoken();//拿到token
+			
 		}else {
 			return redisRepository.getJDtoken();//拿到token
 		}
@@ -1165,29 +1189,37 @@ public class JDProductServiceImpl implements JDProductService{
 	 */
 	@Transactional
 	public void priceContrast() {
-		List<String> list1 = getProductStatus();//拿到所有上架商品信息
-		Map<String, PriceVo> map = getPrice(list1);//拿到所有上架商品的价格
-		for (Map.Entry<String, PriceVo> entry : map.entrySet()) {
-			
-			if(redisRepository.judgePrice(entry.getKey())) {
-				String price = (String)redisRepository.getJDProductPrive(entry.getKey());
-				String[] pril = price.split(",");
+		
+		try {
+			List<String> list1 = getProductStatus();//拿到所有上架商品信息
+			Map<String, PriceVo> map = getPrice(list1);//拿到所有上架商品的价格
+			for (Map.Entry<String, PriceVo> entry : map.entrySet()) {
 				
-				if(entry.getValue().getJdPrice().equals(pril[0])&&entry.getValue().getPrice().equals(pril[1])) {
-						
+				if(redisRepository.judgePrice(entry.getKey())) {
+					String price = (String)redisRepository.getJDProductPrive(entry.getKey());
+					String[] pril = price.split(",");
+					
+					if(entry.getValue().getJdPrice().equals(pril[0])&&entry.getValue().getPrice().equals(pril[1])) {
+							
+					}else {
+						redisRepository.delJDProductPrice(entry.getKey());
+						redisRepository.addJDProductPrice(entry.getKey(),entry.getValue().getJdPrice()+","+entry.getValue().getPrice());
+						synUpPrice(entry.getValue().getJdPrice(),entry.getValue().getPrice(),entry.getKey());
+					}
 				}else {
-					redisRepository.delJDProductPrice(entry.getKey());
 					redisRepository.addJDProductPrice(entry.getKey(),entry.getValue().getJdPrice()+","+entry.getValue().getPrice());
 					synUpPrice(entry.getValue().getJdPrice(),entry.getValue().getPrice(),entry.getKey());
 				}
-			}else {
-				redisRepository.addJDProductPrice(entry.getKey(),entry.getValue().getJdPrice()+","+entry.getValue().getPrice());
-				synUpPrice(entry.getValue().getJdPrice(),entry.getValue().getPrice(),entry.getKey());
+				
+				
+				
 			}
-			
-			
+		} catch (IndexOutOfBoundsException in) {
+			// TODO: handle exception
+		} catch (NullPointerException e) {
 			
 		}
+		
 	}
 	
 	
@@ -1213,7 +1245,13 @@ public class JDProductServiceImpl implements JDProductService{
 		if(list1.size()>0) {
 			List<String> redis =new ArrayList<>();
 			for (int i = 0; i < list1.size(); i++) {
-				synUPStart(list1.get(i));
+				try {
+					synUPStart(list1.get(i));
+				} catch (IndexOutOfBoundsException in) {
+					// TODO: handle exception
+				} catch (NullPointerException e) {
+					
+				}
 				redis.add(list1.get(i));
 			}
 			redisRepository.setListJDStatus(redis);
@@ -1221,7 +1259,14 @@ public class JDProductServiceImpl implements JDProductService{
 		
 		if(listrd.size()>0) {
 			for (int i = 0; i < listrd.size(); i++) {
-				synUPEnd(listrd.get(i));
+				try {
+					synUPEnd(listrd.get(i));
+				} catch (IndexOutOfBoundsException in) {
+					// TODO: handle exception
+				} catch (NullPointerException e) {
+					
+				}
+				
 				redisRepository.delJDStatus(listrd.get(i));
 			}
 		}

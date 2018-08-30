@@ -96,7 +96,7 @@ public abstract class BaseOrderProcessor {
 					jdPirce += item.getAmount();
 				}
 				if(order.getItems().size()-1==i) {
-					if(jdPirce<49) {
+					if(jdPirce<49&&jdPirce>0) {
 						shipfee +=8;
 					}
 					if(jdPirce>48&&jdPirce<99) {
