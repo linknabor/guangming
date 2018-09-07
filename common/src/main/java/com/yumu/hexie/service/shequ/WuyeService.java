@@ -2,6 +2,7 @@ package com.yumu.hexie.service.shequ;
 
 import javax.xml.bind.ValidationException;
 
+import com.yumu.hexie.integration.wuye.resp.BaseResult;
 import com.yumu.hexie.integration.wuye.resp.BillListVO;
 import com.yumu.hexie.integration.wuye.resp.HouseListVO;
 import com.yumu.hexie.integration.wuye.resp.PayWaterListVO;
@@ -22,7 +23,7 @@ public interface WuyeService {
 	// 2.绑定房产
 	public HexieUser bindHouse(String userId,String stmtId, HexieHouse house);
 	// 3.删除房产
-	public boolean deleteHouse(String userId,String houseId);
+	public BaseResult<String> deleteHouse(String userId,String houseId);
 	// 4.根据订单查询房产信息
 	public HexieHouse getHouse(String userId,String stmtId, String house_id);
 	// 5.用户登录
@@ -56,5 +57,6 @@ public interface WuyeService {
 	
 	//16.根据名称模糊查询合协社区小区列表
 	public CellListVO getVagueSectByName(String sect_name);
+	
 
 }
