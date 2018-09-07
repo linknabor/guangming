@@ -17,6 +17,9 @@ public interface PaymentOrderRepository extends JpaRepository<PaymentOrder, Long
 	@Query("from PaymentOrder p where p.status = "+PaymentConstant.PAYMENT_STATUS_INIT + " and p.createDate<?1")
 	public List<PaymentOrder> findTimeoutPaymentOrder(long timeLast);
 	
+
+	
+	
 	@Query("select p.orderId from PaymentOrder p where p.status = "+PaymentConstant.PAYMENT_STATUS_INIT +" and p.orderType="+PaymentConstant.TYPE_MARKET_ORDER+" order by p.createDate desc")
 	public List<Long> queryAllUnpayMarketOrderIds();
 }

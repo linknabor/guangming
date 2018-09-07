@@ -6,6 +6,7 @@ import java.util.Map;
 import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import com.yumu.hexie.common.util.HttpUtil;
 import com.yumu.hexie.common.util.JacksonJsonUtil;
@@ -30,7 +31,7 @@ import com.yumu.hexie.model.jingdong.token.JDToken;
 import com.yumu.hexie.model.jingdong.token.JDTokenF;
 import com.yumu.hexie.service.exception.OvertimeException;
 import com.yumu.hexie.service.jingdong.JDService;
-
+@Service(value = "jDService")
 public class JDServiceImpl implements JDService{
 
 	private static final Logger logger = LoggerFactory.getLogger(JDServiceImpl.class);

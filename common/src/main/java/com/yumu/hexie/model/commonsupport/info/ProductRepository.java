@@ -26,6 +26,14 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 	@Query(value = "select * from Product where productType =?1 and status = 1",nativeQuery = true)
 	List<Product> findByProductType(String ProductType);
 	
+	@Query(value = "select * from Product where merchantId =?1 and status = 1",nativeQuery = true)
+	List<Product> findByMerchantId(String MerchantId);
+	
+	@Query(value = "SELECT p.* FROM Product p JOIN merchant m ON p.merchantId = m.id WHERE m.name = '京东' AND (productNo IS NULL OR productNo = '')",nativeQuery = true)
+	List<Product> findByJDProductNoIsNull();
+	
+	@Query(value = "SELECT p.* FROM Product p JOIN merchant m ON p.merchantId = m.id WHERE p.productNo IS NOT NULL AND m.name = '京东'",nativeQuery = true)
+	List<Product> findByJDProductNoIsNotNull();
 	
 //	@Query("select ifnull(max(substring(productNo,5)),0) as max_no from Product "
 //			+ "where productNo >= ?1 and productNo <= ?2 ")
@@ -51,6 +59,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 	
 
 	
-
-	Product findByProductNo(String productNo);
+	@Query(value = "SELECT p.* FROM Product p JOIN merchant m ON p.merchantId = m.id WHERE m.name = '京东' AND p.productNo = ?1",nativeQuery = true)
+	List<Product> findByProductNo(String productNo);
 }

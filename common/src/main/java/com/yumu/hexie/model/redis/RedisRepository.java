@@ -10,7 +10,6 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.core.StringRedisTemplate;
 import org.springframework.stereotype.Component;
 
-import com.yumu.hexie.model.jingdong.JDcarrier;
 import com.yumu.hexie.model.jingdong.JDconstant;
 import com.yumu.hexie.model.localservice.HomeCart;
 import com.yumu.hexie.model.market.Cart;
@@ -33,6 +32,41 @@ public class RedisRepository {
     private RedisTemplate<String, OrderCarInfo> orderCarInfoRedisTemplate;//鍒涘缓璁㈠崟涔嬪墠鐢ㄦ埛濉啓鐨勮溅杈嗕俊鎭�
     @Inject
     private StringRedisTemplate stringRedisTemplate;
+    
+    
+    /**
+     * 订单号
+     * @param ordersn
+     * @param thirdsn
+     */
+    public void setOrderNum(String ordersn,String thirdsn) {
+    	stringRedisTemplate.opsForValue().set(thirdsn, ordersn);
+    	stringRedisTemplate.expire(thirdsn, 7, TimeUnit.DAYS);
+    }
+    /**
+     * 订单号获取
+     * @param thirdsn
+     * @return
+     */
+    public String getOrderNum(String thirdsn) {
+    	return stringRedisTemplate.opsForValue().get(thirdsn);
+    }
+    
+    /**
+     * token缓存
+     * @param token
+     */
+    public void setJDtoken(String token) {
+    	stringRedisTemplate.opsForValue().set(JDconstant.TOKEN, token);
+    	stringRedisTemplate.expire(JDconstant.TOKEN, 1, TimeUnit.HOURS);
+    }
+    /**
+     * 获取token
+     * @return
+     */
+    public String getJDtoken() {
+    	return stringRedisTemplate.opsForValue().get(JDconstant.TOKEN);
+    }
     
     
     /**
@@ -61,7 +95,7 @@ public class RedisRepository {
     }
     
     /**
-     * 根据商品Id删除价格
+     * 确认hashKey是否存在
      * @param productNo
      */
     public boolean judgePrice(String productNo) {
@@ -110,8 +144,7 @@ public class RedisRepository {
     	stringRedisTemplate.opsForList().remove(JDconstant.LISTJDPRODUCT, 0, productId);
     }
     
-    
-    
+
     
     
     

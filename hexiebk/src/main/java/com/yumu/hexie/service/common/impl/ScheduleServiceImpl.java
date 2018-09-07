@@ -6,6 +6,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+
+import javax.annotation.PostConstruct;
 import javax.inject.Inject;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -19,6 +21,11 @@ import com.yumu.hexie.integration.wuye.resp.BaseResult;
 import com.yumu.hexie.model.ModelConstant;
 import com.yumu.hexie.model.distribution.region.Merchant;
 import com.yumu.hexie.model.distribution.region.MerchantRepository;
+import com.yumu.hexie.model.jingdong.JDconstant;
+import com.yumu.hexie.model.jingdong.getSecurity.JDLoad;
+import com.yumu.hexie.model.jingdong.getSecurity.JDSecurity;
+import com.yumu.hexie.model.jingdong.token.JDToken;
+import com.yumu.hexie.model.jingdong.token.JDTokenF;
 import com.yumu.hexie.model.localservice.bill.BaojieBill;
 import com.yumu.hexie.model.localservice.bill.BaojieBillRepository;
 import com.yumu.hexie.model.localservice.bill.YunXiyiBill;
@@ -37,6 +44,7 @@ import com.yumu.hexie.model.payment.RefundOrder;
 import com.yumu.hexie.model.payment.RefundOrderRepository;
 import com.yumu.hexie.model.promotion.coupon.Coupon;
 import com.yumu.hexie.model.provider.ProviderConstant;
+import com.yumu.hexie.model.redis.RedisRepository;
 import com.yumu.hexie.model.system.BizError;
 import com.yumu.hexie.model.system.BizErrorRepository;
 import com.yumu.hexie.model.user.User;
@@ -45,6 +53,8 @@ import com.yumu.hexie.service.common.ScheduleService;
 import com.yumu.hexie.service.common.SmsService;
 import com.yumu.hexie.service.common.WechatCoreService;
 import com.yumu.hexie.service.exception.BizValidateException;
+import com.yumu.hexie.service.jingdong.JDProductService;
+import com.yumu.hexie.service.jingdong.JDService;
 import com.yumu.hexie.service.o2o.BaojieService;
 import com.yumu.hexie.service.o2o.BillAssignService;
 import com.yumu.hexie.service.o2o.XiyiService;
@@ -95,12 +105,18 @@ public class ScheduleServiceImpl implements ScheduleService{
     private BillAssignService billAssignService;
     @Inject
     private MerchantRepository merchantRepository;
-    
     @SuppressWarnings("rawtypes")
 	@Inject
     private ProviderService providerService;
+	@Inject
+	private JDService jdservice;
+    @Inject
+    private RedisRepository redisRepository;
+    @Inject
+	private JDProductService jdproductService;
     
-	
+    
+    
 	//1. 订单超时
     @Scheduled(cron = "50 1/3 * * * ?")
     public void executeOrderTimeoutJob() {
@@ -498,5 +514,76 @@ public class ScheduleServiceImpl implements ScheduleService{
 	
 	
 	
+	
+	
+    /************************************定时任务，京东 **************************/
+    //TODO
+    @Async
+   	@Scheduled(cron = " 0 30 0/2 * * ?")
+   	public void timerproduct() {
+   		JDLoad load = new JDLoad();
+   		load.setFunc(JDconstant.GETTOKENSAFECODE);
+   		load.setUsername(JDconstant.USERNAME);
+   		load.setPassword(JDconstant.PASSWORD);
+   		load.setApi_name(JDconstant.API_NAME);
+   		load.setApi_secret(JDconstant.API_SECRET);
+   		JDSecurity jds = jdservice.getTokenSafeCode(load);//获取安全码
+   		
+   		JDToken token = new JDToken();
+   		token.setFunc(JDconstant.GETAPITOKEN);
+   		token.setUsername(JDconstant.USERNAME);
+   		token.setPassword(JDconstant.PASSWORD);
+   		token.setApi_name(JDconstant.API_NAME);
+   		token.setApi_secret(JDconstant.API_SECRET);
+   		token.setSafecode(jds.getSafecode());
+   		JDTokenF tokenf = jdservice.getApiToken(token);//用安全码获取token
+   		if(tokenf.getToken()==null||tokenf.getToken().equals("")) {
+   			
+   		}else {
+   			redisRepository.setJDtoken(tokenf.getToken());//token放入到redis
+   		}
+   	}
+    
+    
+   	@Scheduled(cron = "0 0/30 * * * ?")
+   	public void synchronizationJD() {
+   		try {
+   	   		jdproductService.dataStatusSynRedis();//商品缓存到redis
+   	   		jdproductService.dataSynRedis();//商品价格缓存到redis
+   	   		jdproductService.synchronization();//更新商品状态
+   	   		jdproductService.priceContrast();//更新价格
+		} catch (Exception e) {
+			SCHEDULE_LOG.error("京东定时更新失败:"+e);
+		}
+   		
+   	}
+    
+    @PostConstruct
+	public void initToken() {
+		JDLoad load = new JDLoad();
+		load.setFunc(JDconstant.GETTOKENSAFECODE);
+		load.setUsername(JDconstant.USERNAME);
+		load.setPassword(JDconstant.PASSWORD);
+		load.setApi_name(JDconstant.API_NAME);
+		load.setApi_secret(JDconstant.API_SECRET);
+		JDSecurity jds = jdservice.getTokenSafeCode(load);//获取安全码
+		
+		JDToken token = new JDToken();
+		token.setFunc(JDconstant.GETAPITOKEN);
+		token.setUsername(JDconstant.USERNAME);
+		token.setPassword(JDconstant.PASSWORD);
+		token.setApi_name(JDconstant.API_NAME);
+		token.setApi_secret(JDconstant.API_SECRET);
+		token.setSafecode(jds.getSafecode());
+		JDTokenF tokenf = jdservice.getApiToken(token);//用安全码获取token
+		if(tokenf.getToken()==null||tokenf.getToken().equals("")) {
+			
+		}else {
+			redisRepository.setJDtoken(tokenf.getToken());//token放入到redis
+		}
+	}
+    
+    
+
 	
 }
