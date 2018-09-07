@@ -317,7 +317,9 @@ public class PaymentServiceImpl implements PaymentService {
 			amount += p.getPrice();
 			pay = p;
 		}
-		
+		//因为存在多个订单，所有这个把订单的金额累计
+        pay.setPrice(amount);
+        
 		//因为是多订单一起支付，所有在paymentorder里面paymentNo是相同的
         
         //支付然后没继续的情景=----校验所需时间较长，是否需要如此操作
@@ -335,8 +337,6 @@ public class PaymentServiceImpl implements PaymentService {
 		}
         //获取预支付ID
         pay.setPrepayId(sign.getPkgStr());
-        //因为存在多个订单，所有这个把订单的金额累计
-        pay.setPrice(amount);
         
         for (int i = 0; i < payments.size(); i++) {
 			PaymentOrder p = payments.get(i);

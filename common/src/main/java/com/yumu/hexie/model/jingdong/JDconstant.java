@@ -7,6 +7,8 @@ public class JDconstant {
 	public static final String API_NAME = "wangdu";//接口帐号
 	public static final String API_SECRET = "wangdu123";//接口密码
 	
+	public static final String TOKEN = "JDtoken";
+	
 	public static final String JDPRODUCTPRICE = "JDProductPrice";//京东价格redis
 	
 	public static final String LISTJDPRODUCT = "listJDProduct";//京东状态redis
@@ -58,4 +60,27 @@ public class JDconstant {
 	 *  批量查询协议价价格
 	 */
 	public static final String GETPRICE = "getPrice";
+	
+	/**
+	 *   获取 网壕平台订单号（一次有效，5分钟内有效）
+	 */
+	public static final String GETORDERSN = "GetOrderSn";
+	
+	/**
+	 *   获取 网壕平台订单号（一次有效，5分钟内有效）
+	 */
+	public static final String ORDERSUBMIT = "OrderSubmit";
+	
+	/**
+	 *  确认订单接口
+	 */
+	public static final String CONFIRMORDER = "confirmOrder";
+	/**
+	 *  确认订单接口
+	 */
+	public static final String SELECTORDER = "selectOrder";
+	/**
+	 *  确认订单接口
+	 */
+	public static final String ORDERTRACK = "orderTrack";
 }

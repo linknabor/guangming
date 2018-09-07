@@ -128,22 +128,22 @@ public class CollocationController extends BaseController{
 	
 	@RequestMapping(value = "/collocation/notifyPayed/{orderId}", method = RequestMethod.GET)
 	@ResponseBody
-	public BaseResult<String> notifyPayed(@PathVariable long orderId, @ModelAttribute(Constants.USER)User user) throws Exception{
+	public BaseResult<String> notifyPayed(@PathVariable String orderId, @ModelAttribute(Constants.USER)User user) throws Exception{
 
-		ServiceOrder order = baseOrderService.findOne(orderId);
-		PaymentOrder pay = paymentService.findByOrderId(orderId);
-		if(pay!=null) {
-			List<PaymentOrder> paymentSum = baseOrderService.notifyPayed(Long.parseLong(pay.getPaymentNo()), "", "");
-			
-			for(int i=0;i<paymentSum.size();i++) {
-				PaymentOrder pay1 = paymentSum.get(i);
-				long newOrderId = pay1.getOrderId();
-				
-				if (PaymentConstant.PAYMENT_STATUS_SUCCESS == order.getStatus()) {
-					providerService.notifyPay(newOrderId);
-				}
-			}
-		}
+//		ServiceOrder order = baseOrderService.findOne(orderId);
+//		PaymentOrder pay = paymentService.findByOrderId(orderId);
+//		if(pay!=null) {
+//			List<PaymentOrder> paymentSum = baseOrderService.notifyPayed(Long.parseLong(pay.getPaymentNo()), "", "");
+//			
+//			for(int i=0;i<paymentSum.size();i++) {
+//				PaymentOrder pay1 = paymentSum.get(i);
+//				long newOrderId = pay1.getOrderId();
+//				
+//				if (PaymentConstant.PAYMENT_STATUS_SUCCESS == order.getStatus()) {
+//					providerService.notifyPay(newOrderId);
+//				}
+//			}
+//		}
 		
 		return new BaseResult<String>().success("success");
 	}

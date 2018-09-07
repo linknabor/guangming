@@ -81,6 +81,8 @@ public class OrderController extends BaseController{
 	@Inject
     private CustomOrderService customOnSaleService;
 	
+	
+	
 	@RequestMapping(value = "/getProduct/{productId}", method = RequestMethod.GET)
 	@ResponseBody
 	public BaseResult<Product> getProduct(@PathVariable long productId) throws Exception {
@@ -233,8 +235,10 @@ public class OrderController extends BaseController{
 	
 	@RequestMapping(value = "/getOrder/{orderId}", method = RequestMethod.GET)
 	@ResponseBody
-	public BaseResult<ServiceOrder> getOrder(@ModelAttribute(Constants.USER)User user,@PathVariable long orderId) throws Exception {
-		ServiceOrder order = baseOrderService.findOne(orderId);
+	public BaseResult<ServiceOrder> getOrder(@ModelAttribute(Constants.USER)User user,@PathVariable String orderId) throws Exception {
+		String[] orderIds = orderId.split(",");
+		long id = Long.parseLong(orderIds[0]);
+		ServiceOrder order = baseOrderService.findOne(id);
 		if(order.getUserId() != user.getId()){
 			return new BaseResult<ServiceOrder>().failMsg("你没有权限查看该订单！");
 		}
@@ -265,8 +269,8 @@ public class OrderController extends BaseController{
 
 	@RequestMapping(value = "/notifyPayed/{orderId}", method = RequestMethod.GET)
 	@ResponseBody
-	public BaseResult<String> notifyPayed(@PathVariable long orderId,@ModelAttribute(Constants.USER)User user) throws Exception {
-		baseOrderService.notifyPayed(orderId, "", "");
+	public BaseResult<String> notifyPayed(@PathVariable String orderId,@ModelAttribute(Constants.USER)User user) throws Exception {
+//		baseOrderService.notifyPayed(orderId, "", "");
 		return new BaseResult<String>().success("通知成功");
 	}
 

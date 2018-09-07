@@ -30,21 +30,6 @@ public class ProductController extends BaseController{
 	@Inject
 	private ProductService product;
 	
-//	模拟用户信息
-	@ModelAttribute
-    public void init01(Model model)
-    {
-		User user = new User();
-		user.setProvinceId(1);
-		user.setCityId(0);
-		user.setCountyId(0);
-		user.setXiaoquId(0);
-//		provinceId, long cityId, long countyId, long xiaoquId
-		model.addAttribute("sessionUser", user);
-        System.out.println("创建了一个sessionUser");
-    }
-	
-	
 	/**
 	 * 模糊查询商品
 	 * @param name

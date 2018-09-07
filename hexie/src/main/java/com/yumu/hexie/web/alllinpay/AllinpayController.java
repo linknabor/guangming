@@ -58,6 +58,7 @@ public class AllinpayController  extends BaseController{
 					PaymentOrder pay = payment.get(i);
 					pay = paymentService.refreshStatus(pay, map.get("trxstatus"), map.get("trxid"));
 					baseOrderService.update4Payment(pay);
+					baseOrderService.jdConfirmOrder(pay);//京东订单确认
 				}
 				
 			}else {
