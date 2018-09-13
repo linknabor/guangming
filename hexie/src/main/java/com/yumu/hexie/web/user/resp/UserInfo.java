@@ -58,8 +58,15 @@ public class UserInfo implements Serializable {
     
     private String xiaoquName;
     private long id;
+    private String officeTel;
 
-    public UserInfo(){}
+    public String getOfficeTel() {
+		return officeTel;
+	}
+	public void setOfficeTel(String officeTel) {
+		this.officeTel = officeTel;
+	}
+	public UserInfo(){}
     public UserInfo(User user){
         BeanUtils.copyProperties(user, this);
     }

@@ -42,9 +42,10 @@ public class WuyeServiceImpl implements WuyeService {
 	}
 
 	@Override
-	public boolean deleteHouse(String userId, String houseId) {
+	public BaseResult<String> deleteHouse(String userId, String houseId) {
 		BaseResult<String> r = WuyeUtil.deleteHouse(userId, houseId);
-		return r.isSuccess();
+
+		return r;
 	}
 
 	@Override
@@ -137,7 +138,5 @@ public class WuyeServiceImpl implements WuyeService {
 			String unit_id, String data_type) {
 		return WuyeUtil.getMngList(sect_id, build_id, unit_id, data_type).getData();
 	}
-	
-	
 
 }

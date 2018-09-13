@@ -128,7 +128,7 @@ public class WuyeUtil {
 	public static BaseResult<BillListVO> queryBillList(String userId,String payStatus,String startDate,String endDate, String currentPage, String totalCount, String house_id){
 		//total_count 和curr_page没有填
 		String url = REQUEST_ADDRESS + String.format(BILL_LIST_URL, userId,payStatus,startDate,endDate,currentPage,totalCount, house_id);
-		return (BaseResult<BillListVO>)httpGet(url,BillListVO.class);
+		return (BaseResult<BillListVO>)httpGet(url,BillListVO.class); 
 	}
 	// 9.账单详情 anotherbillIds(逗号分隔) 汇总了去支付,来自BillInfo的bill_id
 	public static BaseResult<PaymentInfo> getBillDetail(String userId,String stmtId,String anotherbillIds){
