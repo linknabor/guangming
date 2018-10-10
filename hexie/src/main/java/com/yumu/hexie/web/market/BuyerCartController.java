@@ -445,7 +445,7 @@ public class BuyerCartController extends BaseController {
 				
 				buyerItem.setPostageFee(postageFee);
 			}
-			
+			product.initRule(saleRule);
 			buyerItem.setSku(product);
 			buyerItem.setRuleId(Long.parseLong(ruleId));
 			buyerItem.setAmount(Integer.parseInt(sku_num));
