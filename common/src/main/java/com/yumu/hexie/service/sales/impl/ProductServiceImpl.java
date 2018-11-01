@@ -39,7 +39,15 @@ public class ProductServiceImpl implements ProductService {
 
 	@Override
 	public List<ProductItem> getByNameProduct(String name,User user,int pageNow) {
-		return productItemRepository.getByNameProduct(user.getProvinceId(), user.getCityId(), user.getCountyId(), user.getXiaoquId(),name,pageNow);
+		List<ProductItem> list = productItemRepository.getByNameProduct(user.getProvinceId(), user.getCityId(), user.getCountyId(), user.getXiaoquId(),name,pageNow);
+		for (int i = 0; i < list.size(); i++) {
+			int a = 0;
+			for (int j = 0; j < list.get(i).getProducts().size(); j++) {
+				 a = a+list.get(i).getProducts().get(j).getSaledNum();
+			}
+			list.get(i).setTotalSale(a);
+		}
+		return list;
 	}
 	
 	@Override
