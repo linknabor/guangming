@@ -50,7 +50,7 @@ public class ProductItem extends BaseModel{
 	private String specValList;	//产品规格值 列表，逗号分隔
 	
 	@JsonIgnore
-    @OneToMany(targetEntity = Product.class, fetch = FetchType.LAZY, cascade = {CascadeType.REFRESH}, mappedBy = "productItem")
+    @OneToMany(targetEntity = Product.class, fetch = FetchType.EAGER, cascade = {CascadeType.REFRESH}, mappedBy = "productItem")
     @Fetch(FetchMode.SUBSELECT)
 	private List<Product> products;
 
