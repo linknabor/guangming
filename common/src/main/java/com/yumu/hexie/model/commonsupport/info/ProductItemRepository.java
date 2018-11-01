@@ -81,7 +81,7 @@ public interface ProductItemRepository extends JpaRepository<ProductItem, Long> 
 	List<ProductItem> getByNameProductItem(String name,String regionId,int pageNow);
 	
 	
-	@Query(value="SELECT pitem.*,p.saledNum as totalSale FROM productitem pitem  "
+	@Query(value="SELECT pitem.*,p.* FROM productitem pitem  "
 			+"INNER JOIN product p ON p.`productItemId` = pitem.`id` "
 			+"INNER JOIN onsaleareaitem areaitem ON p.`id` = areaitem.`productId`  "
 			+"WHERE ((areaitem.regionType=0)  "
