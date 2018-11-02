@@ -113,6 +113,14 @@ public class ProductServiceImpl implements ProductService {
 	@Override
 	public List<ProductItem> getByProductCfiId(int productcfiid,User user,int pageNow) {
 		// TODO Auto-generated method stub
-		return productItemRepository.getByProductCfiId( user.getProvinceId(), user.getCityId(), user.getCountyId(), user.getXiaoquId(),productcfiid, pageNow);
+		List<ProductItem> list = productItemRepository.getByProductCfiId( user.getProvinceId(), user.getCityId(), user.getCountyId(), user.getXiaoquId(),productcfiid, pageNow);
+		for (int i = 0; i < list.size(); i++) {
+			int a = 0;
+			for (int j = 0; j < list.get(i).getProducts().size(); j++) {
+				 a = a+list.get(i).getProducts().get(j).getSaledNum();
+			}
+			list.get(i).setTotalSale(a);
+		}
+		return list;
 	}
 }
