@@ -493,7 +493,7 @@ public class BaseOrderServiceImpl extends BaseOrderProcessor implements BaseOrde
 				items.add(orderItem);
 				
 				//5.修改库存
-				productService.saledCount(sukId, orderItem.getCount());
+//				productService.saledCount(sukId, orderItem.getCount());   库存修改放在 支付接口中  避免唤起支付就直接修改商品  此处作废
 				
 			}
 			serviceOrder.setUserId(userId);
@@ -558,6 +558,7 @@ public class BaseOrderServiceImpl extends BaseOrderProcessor implements BaseOrde
 		//操作记录
         for (int i = 0; i < orders.size(); i++) {
         	ServiceOrder order = orders.get(i);
+        	productService.saledCount(order.getProductId(), order.getCount());
         	commonPostProcess(ModelConstant.ORDER_OP_REQPAY, order);
 		}
 		return sign;
