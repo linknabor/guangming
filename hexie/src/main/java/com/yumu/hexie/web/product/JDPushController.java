@@ -43,4 +43,12 @@ public class JDPushController {
 			return "fail";
 		}
 	}
+	
+	@RequestMapping(value = "/fufeitong", method = RequestMethod.POST)
+	@ResponseBody
+	public String fufeitong(String version,String merId,String tid,String orderId,String sign) {
+		log.error("付费通：version:"+ version +"  merId:"+merId + "   tid:"+tid + "   order:"+ orderId+ "  sign:"+sign);
+		return "success";
+	}
+	
 }
