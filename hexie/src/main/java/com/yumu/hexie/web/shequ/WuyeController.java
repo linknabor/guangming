@@ -161,7 +161,8 @@ public class WuyeController extends BaseController {
 		if(StringUtil.isEmpty(user.getWuyeId())){
 			return BaseResult.fail("删除房子失败！请重新访问页面并操作！");
 		}
-		com.yumu.hexie.integration.wuye.resp.BaseResult<String> r = wuyeService.deleteHouse(user.getWuyeId(), houseId);
+		//com.yumu.hexie.integration.wuye.resp.BaseResult<String> r = wuyeService.deleteHouse(user.getWuyeId(), houseId);
+		com.yumu.hexie.integration.wuye.resp.BaseResult<String> r = wuyeService.deleteHouse(user,user.getWuyeId(), houseId);
 		if ((boolean)r.isSuccess()) {
 			//添加电话到user表
 			log.error("这里是删除房子后保存的电话");
@@ -191,7 +192,8 @@ public class WuyeController extends BaseController {
 	@ResponseBody
 	public BaseResult<HexieHouse> addhouses(@ModelAttribute(Constants.USER)User user,
 			@RequestParam(required=false) String stmtId, @RequestParam(required=false) String houseId, @RequestBody HexieHouse house) throws Exception {
-		HexieUser u = wuyeService.bindHouse(user.getWuyeId(), stmtId, house);
+	//	HexieUser u = wuyeService.bindHouse(user.getWuyeId(), stmtId, house);
+		HexieUser u = wuyeService.bindHouse(user, stmtId, house);
 		log.error("HexieUser u = "+u);
 		if(u != null) {
 			pointService.addZhima(user, 1000, "zhima-house-"+user.getId()+"-"+houseId);

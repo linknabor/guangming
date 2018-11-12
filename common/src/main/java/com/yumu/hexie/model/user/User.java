@@ -72,6 +72,12 @@ public class User extends BaseModel{
     private String bindAppId;
     private String bindOpenId;
     private String officeTel;
+    
+    private long totalBind = 0;	//总共绑定房屋，初始为0
+	private String sectId;//绑定小区ID 对应region_info表
+	private String sectName;	//绑定房屋所在小区
+	private String cellId;//绑定房屋的ID
+	private String cellAddr; 
 	
 	
 	public String getOfficeTel() {
@@ -395,6 +401,53 @@ public class User extends BaseModel{
     public void setBindAppId(String bindAppId) {
         this.bindAppId = bindAppId;
     }
+  
+    
+	
+
+	public long getTotalBind() {
+		return totalBind;
+	}
+
+	public void setTotalBind(long totalBind) {
+		this.totalBind = totalBind;
+	}
+
+	public String getSectId() {
+		return sectId;
+	}
+
+	public void setSectId(String sectId) {
+		this.sectId = sectId;
+	}
+
+	public String getSectName() {
+		return sectName;
+	}
+
+	public void setSectName(String sectName) {
+		this.sectName = sectName;
+	}
+
+	public String getCellId() {
+		return cellId;
+	}
+
+	public void setCellId(String cellId) {
+		this.cellId = cellId;
+	}
+
+	public String getCellAddr() {
+		return cellAddr;
+	}
+
+	public void setCellAddr(String cellAddr) {
+		this.cellAddr = cellAddr;
+	}
+
+	public void setCouponCount(Integer couponCount) {
+		this.couponCount = couponCount;
+	}
 
 	@Override
 	public String toString() {

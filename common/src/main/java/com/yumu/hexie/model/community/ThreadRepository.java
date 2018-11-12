@@ -35,5 +35,11 @@ public interface ThreadRepository extends JpaRepository<Thread, Long> {
 	
 	public List<Thread> findByThreadStatusAndUserId(String threadStatus, long userId, Sort sort);
 	
+	//根据userId和threadStatus获取发布列表
+	@Query(value="from Thread t where t.threadStatus = ?1 and t.userId = ?2 and (t.threadCategory=2 or t.threadCategory=3)")
+	public List<Thread> getThreadListByUserId(String threadStatus, long userId, Pageable page);
+	//根据userId,threadStatus,threadCategory获取发布列表
+	@Query(value="from Thread t where t.threadStatus = ?1 and t.userId = ?2 and t.threadCategory=?3")
+	public List<Thread> getThreadListByUserIdAndCategory(String threadStatus, long userId, String threadCategory,Pageable page);
 	
 }
