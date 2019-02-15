@@ -72,7 +72,7 @@ public class User extends BaseModel{
     private String bindAppId;
     private String bindOpenId;
     private String officeTel;
-	
+	private String sect_id;//绑定小区ID 对应region_info表
 	
 	public String getOfficeTel() {
 		return officeTel;
@@ -395,6 +395,18 @@ public class User extends BaseModel{
     public void setBindAppId(String bindAppId) {
         this.bindAppId = bindAppId;
     }
+    
+	public String getSect_id() {
+		if(StringUtil.isEmpty(sect_id))
+		{
+			sect_id = "0";
+		}
+		return sect_id;
+	}
+
+	public void setSect_id(String sect_id) {
+		this.sect_id = sect_id;
+	}
 
 	@Override
 	public String toString() {
