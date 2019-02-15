@@ -185,11 +185,11 @@ public class GotongServiceImpl implements GotongService {
     @Async
 	@Override
 	public void sendThreadPubNotify(User user, com.yumu.hexie.model.community.Thread thread) {
-    	String sect_id = user.getSect_id();
+    	String sect_id = user.getSectId();
     	List<Staffing> list = staffingRepository.getStaffing(sect_id);
     	for (int i = 0; i < list.size(); i++) {
     		User useropenId = userService.getById(Long.parseLong(list.get(i).getStaffing_userid()));
-    		pushweixin(useropenId.getOpenid(),TEMPLATE_NOTICE_URL+Long.toString(thread.getThreadId()),TEMPLATE_NOTICE_ID, "您好，您有新的消息", Long.toString(thread.getThreadId()), user.getName(), user.getTel(), user.getXiaoquName(), "请点击查看具体信息");
+    		pushweixin(useropenId.getOpenid(),TEMPLATE_NOTICE_URL+Long.toString(thread.getThreadId()),TEMPLATE_NOTICE_ID, "您好，您有新的消息", Long.toString(thread.getThreadId()), user.getName(), user.getTel(), user.getCellAddr(), "请点击查看具体信息");
 		}
     }
     
