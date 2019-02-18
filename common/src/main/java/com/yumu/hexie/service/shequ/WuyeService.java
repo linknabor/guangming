@@ -21,11 +21,9 @@ public interface WuyeService {
 	// 1.房产列表
 	public HouseListVO queryHouse(String userId);
 	// 2.绑定房产
-//	public HexieUser bindHouse(String userId,String stmtId, HexieHouse house);
-	public HexieUser bindHouse(User user,String stmtId, HexieHouse house);
+	public HexieUser bindHouse(String userId,String stmtId, HexieHouse house);
 	// 3.删除房产
-	//public BaseResult<String> deleteHouse(String userId,String houseId);
-	public BaseResult<String> deleteHouse(User user,String userId,String houseId);
+	public BaseResult<String> deleteHouse(String userId,String houseId);
 	// 4.根据订单查询房产信息
 	public HexieHouse getHouse(String userId,String stmtId, String house_id);
 	// 5.用户登录

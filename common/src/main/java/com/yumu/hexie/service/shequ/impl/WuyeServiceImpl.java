@@ -2,7 +2,6 @@ package com.yumu.hexie.service.shequ.impl;
 
 import java.io.UnsupportedEncodingException;
 
-import javax.inject.Inject;
 import javax.xml.bind.ValidationException;
 
 import org.slf4j.Logger;
@@ -21,7 +20,6 @@ import com.yumu.hexie.integration.wuye.vo.PayResult;
 import com.yumu.hexie.integration.wuye.vo.PaymentInfo;
 import com.yumu.hexie.integration.wuye.vo.WechatPayInfo;
 import com.yumu.hexie.model.user.User;
-import com.yumu.hexie.model.user.UserRepository;
 import com.yumu.hexie.service.exception.BizValidateException;
 import com.yumu.hexie.service.shequ.WuyeService;
 
@@ -29,9 +27,6 @@ import com.yumu.hexie.service.shequ.WuyeService;
 public class WuyeServiceImpl implements WuyeService {
 	
 	private static final Logger logger = LoggerFactory.getLogger(WuyeServiceImpl.class);
-	
-	@Inject
-	private UserRepository userRepository;
 
 	@Override
 	public HouseListVO queryHouse(String userId) {
@@ -39,75 +34,20 @@ public class WuyeServiceImpl implements WuyeService {
 	}
 
 	@Override
-	public HexieUser bindHouse(User user, String stmtId, HexieHouse house) {
-		logger.error("userId : " + user.getId());
-		logger.error("hosue is :" + house.toString());
-		
-		User currUser = userRepository.findOne(user.getId());
-		
-		logger.error("total_bind :" + currUser.getTotalBind());
-		
-		if (currUser.getTotalBind() <= 0) {//从未绑定过的做新增
-			currUser.setTotalBind(1);
-			currUser.setSectId(house.getSect_id());
-			currUser.setSectName(house.getSect_name());
-			currUser.setCellId(house.getMng_cell_id());
-			currUser.setCellAddr(house.getCell_addr());
-			
-			user.setTotalBind(1);
-			user.setSectId(house.getSect_id());
-			user.setSectName(house.getSect_name());
-			user.setCellId(house.getMng_cell_id());
-			user.setCellAddr(house.getCell_addr());
-			
-			userRepository.save(currUser);
-		}else {
-			currUser.setTotalBind((currUser.getTotalBind()+1));
-			userRepository.save(currUser);
-		}
-		BaseResult<HexieUser> r= WuyeUtil.bindHouse(currUser.getWuyeId(), stmtId, house.getMng_cell_id());
+	public HexieUser bindHouse(String userId, String stmtId, HexieHouse house) {
+		BaseResult<HexieUser> r= WuyeUtil.bindHouse(userId, stmtId, house.getMng_cell_id());
 		if("04".equals(r.getResult())){
 			throw new BizValidateException("当前用户已经认领该房屋!");
 		}
 		if ("05".equals(r.getResult())) {
 			throw new BizValidateException("用户当前绑定房屋与已绑定房屋不属于同个小区，暂不支持此功能。");
 		}
-		if ("01".equals(r.getResult())) {
-			throw new BizValidateException("账户不存在");
-		}
 		return r.getData();
 	}
 
 	@Override
-	public BaseResult<String> deleteHouse(User user,String userId, String houseId) {
-
-		User currUser = userRepository.findOne(user.getId());
-		long curr_bind = currUser.getTotalBind() - 1;
-		if (curr_bind <= 0) {
-			currUser.setSectId("0");
-			currUser.setSectName("");
-			currUser.setCellId("");
-			currUser.setCellAddr("");
-			currUser.setTotalBind(curr_bind);
-			
-			user.setSectId("0");
-			user.setSectName("");
-			user.setCellId("");
-			user.setCellAddr("");
-			user.setTotalBind(curr_bind);
-			
-			userRepository.save(currUser);
-		}else {
-			currUser.setTotalBind(curr_bind);
-			userRepository.save(currUser);
-		}
-		
+	public BaseResult<String> deleteHouse(String userId, String houseId) {
 		BaseResult<String> r = WuyeUtil.deleteHouse(userId, houseId);
-        boolean isSuccess = r.isSuccess();
-		
-		if (!isSuccess) {
-			throw new BizValidateException("删除房屋失败。");
-		}
 		return r;
 	}
 
@@ -167,8 +107,7 @@ public class WuyeServiceImpl implements WuyeService {
 					HexieHouse house = getHouse(user.getWuyeId(), stmtId, idsSuff[i]);
 					if(house!=null)
 					{
-						//bindHouse(user.getWuyeId(), stmtId, house);
-						bindHouse(user, stmtId, house);
+						bindHouse(user.getWuyeId(), stmtId, house);
 					}
 				} catch(Exception e)
 				{
